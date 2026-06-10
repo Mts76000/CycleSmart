@@ -22,6 +22,8 @@ export type AuthFormState =
     }
   | undefined;
 
+type AuthFormValues = NonNullable<AuthFormState>["values"];
+
 const signupSchema = z.object({
   name: z.string().min(2, "Le nom doit faire au moins 2 caracteres.").trim(),
   email: z.email("Adresse e-mail invalide.").trim().toLowerCase(),
@@ -34,6 +36,13 @@ const signupSchema = z.object({
 });
 
 const loginSchema = signupSchema.pick({ email: true, password: true });
+
+function authUnavailable(values: AuthFormValues): NonNullable<AuthFormState> {
+  return {
+    message: "Connexion au compte indisponible pour le moment. Reessaie dans quelques instants.",
+    values,
+  };
+}
 
 export async function signup(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const values = {
@@ -51,23 +60,36 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
   }
 
   const { name, email, password } = validated.data;
-  await ensureDatabaseSchema();
+  let userId = "";
 
-  const existing = await query<{ id: string }>("select id from users where email = $1 limit 1", [email]);
-  if (existing.rowCount) {
-    return { message: "Un compte existe deja avec cette adresse e-mail.", values: { name, email } };
+  try {
+    await ensureDatabaseSchema();
+
+    const existing = await query<{ id: string }>("select id from users where email = $1 limit 1", [email]);
+    if (existing.rowCount) {
+      return { message: "Un compte existe deja avec cette adresse e-mail.", values: { name, email } };
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    userId = randomUUID();
+    await query(
+      `
+        insert into users (id, email, name, password_hash)
+        values ($1, $2, $3, $4)
+      `,
+      [userId, email, name, passwordHash],
+    );
+  } catch (error) {
+    console.error("Signup failed", error);
+    return authUnavailable({ name, email });
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  const userId = randomUUID();
-  await query(
-    `
-      insert into users (id, email, name, password_hash)
-      values ($1, $2, $3, $4)
-    `,
-    [userId, email, name, passwordHash],
-  );
-  await createSession(userId);
+  try {
+    await createSession(userId);
+  } catch (error) {
+    console.error("Session creation failed", error);
+    return authUnavailable({ name, email });
+  }
 
   redirect("/profil");
 }
@@ -86,24 +108,39 @@ export async function login(_state: AuthFormState, formData: FormData): Promise<
   }
 
   const { email, password } = validated.data;
-  await ensureDatabaseSchema();
+  let userId = "";
 
-  const result = await query<{ id: string; password_hash: string }>(
-    "select id, password_hash from users where email = $1 limit 1",
-    [email],
-  );
-  const user = result.rows[0];
+  try {
+    await ensureDatabaseSchema();
 
-  if (!user || !user.password_hash) {
-    return { message: "Identifiants invalides.", values: { email } };
+    const result = await query<{ id: string; password_hash: string }>(
+      "select id, password_hash from users where email = $1 limit 1",
+      [email],
+    );
+    const user = result.rows[0];
+
+    if (!user || !user.password_hash) {
+      return { message: "Identifiants invalides.", values: { email } };
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatches) {
+      return { message: "Identifiants invalides.", values: { email } };
+    }
+
+    userId = user.id;
+  } catch (error) {
+    console.error("Login failed", error);
+    return authUnavailable({ email });
   }
 
-  const passwordMatches = await bcrypt.compare(password, user.password_hash);
-  if (!passwordMatches) {
-    return { message: "Identifiants invalides.", values: { email } };
+  try {
+    await createSession(userId);
+  } catch (error) {
+    console.error("Session creation failed", error);
+    return authUnavailable({ email });
   }
 
-  await createSession(user.id);
   redirect("/profil");
 }
 

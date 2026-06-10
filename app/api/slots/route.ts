@@ -1,3 +1,4 @@
+import type { PoolClient } from "pg";
 import { ensureDatabaseSchema, getPool, query } from "../../../lib/db";
 import { getCurrentUser, requireCurrentUser } from "../../../lib/current-user";
 
@@ -61,7 +62,8 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  const client = await getPool().connect();
+  let client: PoolClient | undefined;
+  let transactionStarted = false;
 
   try {
     const user = await requireCurrentUser();
@@ -69,7 +71,9 @@ export async function PUT(request: Request) {
     const slots = Array.isArray(body.slots) ? body.slots.filter(isSlot) : [];
 
     await ensureDatabaseSchema();
+    client = await getPool().connect();
     await client.query("begin");
+    transactionStarted = true;
     await client.query("delete from off_peak_slots where user_id = $1", [user.id]);
 
     for (const slot of slots) {
@@ -86,7 +90,9 @@ export async function PUT(request: Request) {
 
     return Response.json({ ok: true, saved: slots.length });
   } catch (error) {
-    await client.query("rollback");
+    if (client && transactionStarted) {
+      await client.query("rollback");
+    }
 
     if (error instanceof Error && error.message === "UNAUTHENTICATED") {
       return Response.json({ ok: false, error: "Non connecte." }, { status: 401 });
@@ -97,6 +103,6 @@ export async function PUT(request: Request) {
       { status: 500 },
     );
   } finally {
-    client.release();
+    client?.release();
   }
 }

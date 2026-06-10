@@ -16,13 +16,18 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     return null;
   }
 
-  await ensureDatabaseSchema();
-  const result = await query<CurrentUser>(
-    "select id, name, email from users where id = $1 limit 1",
-    [session.userId],
-  );
+  try {
+    await ensureDatabaseSchema();
+    const result = await query<CurrentUser>(
+      "select id, name, email from users where id = $1 limit 1",
+      [session.userId],
+    );
 
-  return result.rows[0] || null;
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error("Current user lookup failed", error);
+    return null;
+  }
 }
 
 export async function requireCurrentUser() {

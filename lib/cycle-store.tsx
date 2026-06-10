@@ -143,6 +143,24 @@ function getSuggestions(slots: Slot[], currentTime: string, duration: number, fi
   });
 }
 
+function getDefaultSlotName(startTime: string) {
+  const start = timeToMinutes(startTime);
+
+  if (start < 6 * 60) {
+    return "Nuit";
+  }
+
+  if (start < 12 * 60) {
+    return "Matin";
+  }
+
+  if (start < 18 * 60) {
+    return "Apres-midi";
+  }
+
+  return "Soir";
+}
+
 export function CycleProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState("12:00");
   const [todayLabel, setTodayLabel] = useState("");
@@ -250,7 +268,7 @@ export function CycleProvider({ children }: { children: ReactNode }) {
       ...current,
       {
         id: crypto.randomUUID(),
-        name: newSlot.name.trim() || "Nouveau creneau",
+        name: newSlot.name.trim() || getDefaultSlotName(newSlot.start),
         start: newSlot.start,
         end: newSlot.end,
       },

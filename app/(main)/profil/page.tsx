@@ -7,7 +7,7 @@ export default async function ProfilPage() {
 
   if (!user) {
     return (
-      <div className="space-y-5 pt-6">
+      <div className="mx-auto max-w-2xl space-y-5 pt-6 md:pt-0">
         <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70">
           <div className="mx-auto grid size-20 place-items-center rounded-full bg-cyan-100 text-3xl font-black text-teal-700">
             CS
@@ -37,8 +37,8 @@ export default async function ProfilPage() {
   }
 
   return (
-    <div className="space-y-5 pt-6">
-      <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70">
+    <div className="grid gap-5 pt-6 md:grid-cols-[minmax(0,1fr)_360px] md:items-start md:pt-0">
+      <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70 md:p-8">
         <div className="mx-auto grid size-20 place-items-center rounded-full bg-cyan-400 text-2xl font-black text-teal-950">
           {user.name.slice(0, 2).toUpperCase()}
         </div>
@@ -46,14 +46,16 @@ export default async function ProfilPage() {
         <p className="mt-1 text-slate-500">{user.email}</p>
       </section>
 
-      <section className="rounded-[24px] bg-white p-5 shadow-sm">
+      <section className="rounded-[24px] bg-white p-5 shadow-sm md:row-start-1 md:col-start-2">
         <p className="text-lg font-bold">Synchronisation</p>
         <p className="mt-2 leading-6 text-slate-500">
-          Tes creneaux sont associes a ton compte et sauvegardes dans PostgreSQL.
+          Tes creneaux sont associes a ton compte et sauvegardes automatiquement.
         </p>
       </section>
 
-      <LogoutButton />
+      <div className="md:col-start-2">
+        <LogoutButton />
+      </div>
     </div>
   );
 }

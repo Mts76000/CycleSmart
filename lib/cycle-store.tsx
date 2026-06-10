@@ -9,7 +9,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { readLocalUser } from "./auth-store";
 
 export type Slot = {
   id: string;
@@ -164,11 +163,12 @@ export function CycleProvider({ children }: { children: ReactNode }) {
     }
 
     const timer = window.setTimeout(() => {
-      const user = readLocalUser();
+      let storedSlots: Slot[] = [];
       const stored = window.localStorage.getItem(storageKey);
       if (stored) {
         try {
-          setSlots(JSON.parse(stored) as Slot[]);
+          storedSlots = JSON.parse(stored) as Slot[];
+          setSlots(storedSlots);
         } catch {
           window.localStorage.removeItem(storageKey);
         }
@@ -177,19 +177,17 @@ export function CycleProvider({ children }: { children: ReactNode }) {
       syncTime();
       setHydrated(true);
 
-      if (!user) {
-        setRemoteHydrated(true);
-        setSyncStatus("local");
-        return;
-      }
-
       setSyncStatus("loading");
-      fetch(`/api/slots?email=${encodeURIComponent(user.email)}`)
+      fetch("/api/slots")
         .then((response) => response.json())
         .then((data: { ok?: boolean; slots?: Slot[] }) => {
           if (data.ok && Array.isArray(data.slots)) {
-            setSlots(data.slots);
+            if (data.slots.length > 0 || storedSlots.length === 0) {
+              setSlots(data.slots);
+            }
             setSyncStatus("saved");
+          } else if ("error" in data) {
+            setSyncStatus("local");
           } else {
             setSyncStatus("error");
           }
@@ -211,22 +209,25 @@ export function CycleProvider({ children }: { children: ReactNode }) {
     }
 
     window.localStorage.setItem(storageKey, JSON.stringify(slots));
-    const user = readLocalUser();
-
-    if (!user) {
-      return;
-    }
 
     const controller = new AbortController();
     const statusTimer = window.setTimeout(() => setSyncStatus("saving"), 0);
     fetch("/api/slots", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: user.email, name: user.name, slots }),
+      body: JSON.stringify({ slots }),
       signal: controller.signal,
     })
-      .then((response) => response.json())
-      .then((data: { ok?: boolean }) => setSyncStatus(data.ok ? "saved" : "error"))
+      .then((response) => {
+        if (response.status === 401) {
+          return { ok: false, local: true };
+        }
+
+        return response.json();
+      })
+      .then((data: { ok?: boolean; local?: boolean }) => {
+        setSyncStatus(data.local ? "local" : data.ok ? "saved" : "error");
+      })
       .catch((error) => {
         if ((error as Error).name !== "AbortError") {
           setSyncStatus("error");

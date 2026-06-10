@@ -1,4 +1,5 @@
 import { ensureDatabaseSchema, getPool, query } from "../../../lib/db";
+import { getCurrentUser, requireCurrentUser } from "../../../lib/current-user";
 
 export const dynamic = "force-dynamic";
 
@@ -9,10 +10,6 @@ type SlotPayload = {
   end: string;
 };
 
-function normalizeEmail(email: string | null) {
-  return email?.trim().toLowerCase() || "";
-}
-
 function isSlot(value: unknown): value is SlotPayload {
   if (!value || typeof value !== "object") {
     return false;
@@ -22,13 +19,12 @@ function isSlot(value: unknown): value is SlotPayload {
   return Boolean(slot.id && slot.name && slot.start && slot.end);
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const url = new URL(request.url);
-    const email = normalizeEmail(url.searchParams.get("email"));
+    const user = await getCurrentUser();
 
-    if (!email) {
-      return Response.json({ ok: false, error: "Email manquant." }, { status: 400 });
+    if (!user) {
+      return Response.json({ ok: false, error: "Non connecte." }, { status: 401 });
     }
 
     await ensureDatabaseSchema();
@@ -41,10 +37,10 @@ export async function GET(request: Request) {
       `
         select id, name, start_time, end_time
         from off_peak_slots
-        where user_email = $1
+        where user_id = $1
         order by start_time asc, created_at asc
       `,
-      [email],
+      [user.id],
     );
 
     return Response.json({
@@ -68,35 +64,21 @@ export async function PUT(request: Request) {
   const client = await getPool().connect();
 
   try {
-    const body = (await request.json()) as { email?: string; name?: string; slots?: unknown[] };
-    const email = normalizeEmail(body.email || null);
-    const name = body.name?.trim() || "Utilisateur";
+    const user = await requireCurrentUser();
+    const body = (await request.json()) as { slots?: unknown[] };
     const slots = Array.isArray(body.slots) ? body.slots.filter(isSlot) : [];
-
-    if (!email) {
-      return Response.json({ ok: false, error: "Email manquant." }, { status: 400 });
-    }
 
     await ensureDatabaseSchema();
     await client.query("begin");
-    await client.query(
-      `
-        insert into users (email, name)
-        values ($1, $2)
-        on conflict (email)
-        do update set name = excluded.name, updated_at = now()
-      `,
-      [email, name],
-    );
-    await client.query("delete from off_peak_slots where user_email = $1", [email]);
+    await client.query("delete from off_peak_slots where user_id = $1", [user.id]);
 
     for (const slot of slots) {
       await client.query(
         `
-          insert into off_peak_slots (id, user_email, name, start_time, end_time)
+          insert into off_peak_slots (id, user_id, name, start_time, end_time)
           values ($1, $2, $3, $4, $5)
         `,
-        [slot.id, email, slot.name, slot.start, slot.end],
+        [slot.id, user.id, slot.name, slot.start, slot.end],
       );
     }
 
@@ -105,6 +87,10 @@ export async function PUT(request: Request) {
     return Response.json({ ok: true, saved: slots.length });
   } catch (error) {
     await client.query("rollback");
+
+    if (error instanceof Error && error.message === "UNAUTHENTICATED") {
+      return Response.json({ ok: false, error: "Non connecte." }, { status: 401 });
+    }
 
     return Response.json(
       { ok: false, error: error instanceof Error ? error.message : "Erreur serveur." },

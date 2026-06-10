@@ -1,17 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { useLocalUser } from "../../../lib/auth-store";
-import { useCycle } from "../../../lib/cycle-store";
+import { LogoutButton } from "../../../components/logout-button";
+import { getCurrentUser } from "../../../lib/current-user";
 
-export default function ProfilPage() {
-  const { signOut, user } = useLocalUser();
-  const { clearSlots } = useCycle();
-
-  function handleSignOut() {
-    signOut();
-    clearSlots();
-  }
+export default async function ProfilPage() {
+  const user = await getCurrentUser();
 
   if (!user) {
     return (
@@ -57,18 +49,11 @@ export default function ProfilPage() {
       <section className="rounded-[24px] bg-white p-5 shadow-sm">
         <p className="text-lg font-bold">Synchronisation</p>
         <p className="mt-2 leading-6 text-slate-500">
-          Ton compte est actif localement. La synchronisation PostgreSQL sera branchee quand la
-          connexion base de donnees sera complete.
+          Tes creneaux sont associes a ton compte et sauvegardes dans PostgreSQL.
         </p>
       </section>
 
-      <button
-        className="h-14 w-full rounded-2xl border border-red-200 bg-white px-4 font-bold text-red-600"
-        type="button"
-        onClick={handleSignOut}
-      >
-        Deconnexion
-      </button>
+      <LogoutButton />
     </div>
   );
 }

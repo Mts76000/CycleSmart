@@ -46,6 +46,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             placeholder="Marc Dupont"
             type="text"
             autoComplete="name"
+            defaultValue={state?.values?.name || ""}
           />
           {state?.errors?.name && <FormError messages={state.errors.name} />}
         </>
@@ -61,6 +62,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         placeholder="nom@exemple.com"
         type="email"
         autoComplete="email"
+        defaultValue={state?.values?.email || ""}
       />
       {state?.errors?.email && <FormError messages={state.errors.email} />}
 

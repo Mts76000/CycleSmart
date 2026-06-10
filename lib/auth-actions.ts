@@ -15,6 +15,10 @@ export type AuthFormState =
         password?: string[];
       };
       message?: string;
+      values?: {
+        name?: string;
+        email?: string;
+      };
     }
   | undefined;
 
@@ -32,14 +36,18 @@ const signupSchema = z.object({
 const loginSchema = signupSchema.pick({ email: true, password: true });
 
 export async function signup(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const values = {
+    name: String(formData.get("name") || ""),
+    email: String(formData.get("email") || ""),
+  };
   const validated = signupSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
+    name: values.name,
+    email: values.email,
     password: formData.get("password"),
   });
 
   if (!validated.success) {
-    return { errors: validated.error.flatten().fieldErrors };
+    return { errors: validated.error.flatten().fieldErrors, values };
   }
 
   const { name, email, password } = validated.data;
@@ -47,7 +55,7 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
 
   const existing = await query<{ id: string }>("select id from users where email = $1 limit 1", [email]);
   if (existing.rowCount) {
-    return { message: "Un compte existe deja avec cette adresse e-mail." };
+    return { message: "Un compte existe deja avec cette adresse e-mail.", values: { name, email } };
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -65,13 +73,16 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
 }
 
 export async function login(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const values = {
+    email: String(formData.get("email") || ""),
+  };
   const validated = loginSchema.safeParse({
-    email: formData.get("email"),
+    email: values.email,
     password: formData.get("password"),
   });
 
   if (!validated.success) {
-    return { errors: validated.error.flatten().fieldErrors };
+    return { errors: validated.error.flatten().fieldErrors, values };
   }
 
   const { email, password } = validated.data;
@@ -84,12 +95,12 @@ export async function login(_state: AuthFormState, formData: FormData): Promise<
   const user = result.rows[0];
 
   if (!user || !user.password_hash) {
-    return { message: "Identifiants invalides." };
+    return { message: "Identifiants invalides.", values: { email } };
   }
 
   const passwordMatches = await bcrypt.compare(password, user.password_hash);
   if (!passwordMatches) {
-    return { message: "Identifiants invalides." };
+    return { message: "Identifiants invalides.", values: { email } };
   }
 
   await createSession(user.id);

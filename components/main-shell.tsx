@@ -16,7 +16,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
 
   return (
     <CycleProvider>
-      <main className="min-h-dvh bg-[#eef3f2] text-slate-950">
+      <main className="min-h-dvh bg-[#f5f7f7] text-slate-950">
         <div className="mx-auto flex min-h-dvh w-full max-w-7xl flex-col bg-[#f8faf9] shadow-2xl shadow-slate-300/30 md:grid md:grid-cols-[260px_minmax(0,1fr)] md:bg-transparent md:p-6 md:shadow-none">
           <aside className="hidden rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70 md:sticky md:top-6 md:flex md:h-[calc(100dvh-3rem)] md:flex-col">
             <Brand />

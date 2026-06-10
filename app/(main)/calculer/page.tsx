@@ -95,44 +95,45 @@ export default function CalculerPage() {
           </div>
 
           <div className="mt-8">
-            <p className="font-semibold">Suggestions de depart</p>
-            <div className="mt-3 grid gap-3 xl:grid-cols-3">
-            {suggestions.slice(0, 3).map((suggestion, index) => (
-              <article
-                className="rounded-2xl bg-slate-100 p-4"
-                key={suggestion.id}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-bold ${
-                      index === 0
-                        ? "bg-teal-700 text-white"
-                        : "bg-white text-slate-600"
-                    }`}
-                  >
-                    {index === 0 ? "Recommande" : "Option"}
-                  </span>
-                  <span className="text-sm text-slate-500">
-                    {suggestion.slot.name}
-                  </span>
-                </div>
-                <div className="mt-3 flex items-end justify-between">
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-semibold">Suggestions de depart</p>
+              <p className="text-sm text-slate-400">{suggestions.length > 0 ? `${suggestions.length} option${suggestions.length > 1 ? "s" : ""}` : ""}</p>
+            </div>
+            <div className="mt-3 grid gap-3">
+            {suggestions.slice(0, 3).map((suggestion, index) => {
+              const isRecommended = index === 0;
+
+              return (
+                <article
+                  className={`grid gap-4 rounded-3xl border p-4 md:grid-cols-[96px_minmax(0,1fr)_140px] md:items-center ${
+                    isRecommended
+                      ? "border-cyan-300 bg-cyan-50 shadow-sm shadow-cyan-200/40"
+                      : "border-slate-200 bg-white"
+                  }`}
+                  key={suggestion.id}
+                >
                   <div>
-                    <p className="text-2xl font-bold">
-                      {minutesToTime(suggestion.start)}
-                    </p>
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+                        isRecommended ? "bg-cyan-400 text-teal-950" : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {isRecommended ? "Recommande" : "Option"}
+                    </span>
+                    <p className="mt-3 text-3xl font-black text-slate-950">{minutesToTime(suggestion.start)}</p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-900">{suggestion.slot.name}</p>
                     <p className="mt-1 text-sm text-slate-500">
-                      Fin prevue a {minutesToTime(suggestion.end)}
+                      Cycle termine a {minutesToTime(suggestion.end)}
                     </p>
                   </div>
-                  <p className="text-right text-sm font-semibold text-teal-700">
-                    {suggestion.wait === 0
-                      ? "Maintenant"
-                      : `Dans ${formatDuration(suggestion.wait)}`}
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-teal-700 md:text-right">
+                    {suggestion.wait === 0 ? "Maintenant" : `Dans ${formatDuration(suggestion.wait)}`}
                   </p>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
 
             {suggestions.length === 0 && (
               <div className="rounded-2xl border border-dashed border-slate-300 p-5 text-sm leading-6 text-slate-500 xl:col-span-3">
@@ -145,19 +146,19 @@ export default function CalculerPage() {
         </section>
 
         <aside className="space-y-5 lg:sticky lg:top-6">
-          <section className="rounded-[28px] bg-teal-700 p-6 text-white shadow-xl shadow-teal-900/10">
+          <section className="rounded-[28px] bg-cyan-400 p-6 text-teal-950 shadow-xl shadow-cyan-300/30">
             <div className="flex items-center gap-3">
-              <span className="grid size-11 place-items-center rounded-2xl bg-white/15">
+              <span className="grid size-11 place-items-center rounded-2xl bg-white/35">
                 <ClockIcon className="size-5" />
               </span>
               <div>
-                <p className="text-sm font-semibold text-teal-50/80">Depart recommande</p>
+                <p className="text-sm font-bold text-teal-900/75">Depart recommande</p>
                 <p className="mt-1 text-4xl font-black">
                   {recommended ? minutesToTime(recommended.start) : "--:--"}
                 </p>
               </div>
             </div>
-            <div className="mt-6 rounded-2xl bg-white/10 p-4 text-sm leading-6 text-teal-50">
+            <div className="mt-6 rounded-2xl bg-white/35 p-4 text-sm font-semibold leading-6 text-teal-950/80">
               {recommended
                 ? `Fin prevue a ${minutesToTime(recommended.end)} avec le creneau ${recommended.slot.name}.`
                 : "Ajoute un creneau compatible pour obtenir une recommandation."}

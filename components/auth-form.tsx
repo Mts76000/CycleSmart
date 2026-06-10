@@ -42,7 +42,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           <input
             id="name"
             name="name"
-            className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-cyan-300 focus:ring-4"
+            className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
             placeholder="Marc Dupont"
             type="text"
             autoComplete="name"
@@ -58,7 +58,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <input
         id="email"
         name="email"
-        className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-cyan-300 focus:ring-4"
+        className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
         placeholder="nom@exemple.com"
         type="email"
         autoComplete="email"
@@ -72,7 +72,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <input
         id="password"
         name="password"
-        className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-cyan-300 focus:ring-4"
+        className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
         placeholder="••••••••"
         type="password"
         autoComplete={isSignup ? "new-password" : "current-password"}
@@ -85,7 +85,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <button
-        className="mt-6 h-14 w-full rounded-2xl bg-cyan-400 px-4 font-bold text-teal-950 shadow-lg shadow-cyan-300/40 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-lg shadow-emerald-300/40 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >

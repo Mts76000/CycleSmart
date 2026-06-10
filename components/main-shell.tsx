@@ -31,9 +31,9 @@ export function MainShell({ children }: { children: React.ReactNode }) {
                 />
               ))}
             </nav>
-            <div className="mt-auto rounded-3xl bg-cyan-50 p-4 text-sm leading-6 text-teal-900">
+            <div className="mt-auto rounded-3xl bg-green-50 p-4 text-sm leading-6 text-emerald-900">
               <p className="font-bold">Heures creuses</p>
-              <p className="mt-1 text-teal-800/75">Configure tes creneaux une fois, puis lance tes cycles au bon moment.</p>
+              <p className="mt-1 text-emerald-800/75">Configure tes creneaux une fois, puis lance tes cycles au bon moment.</p>
             </div>
           </aside>
 
@@ -43,7 +43,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
                 <Brand />
               </div>
               <div className="hidden md:block">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">CycleSmart</p>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">CycleSmart</p>
                 <h1 className="mt-2 text-4xl font-black tracking-normal text-slate-950">
                   Optimisation des cycles
                 </h1>
@@ -76,10 +76,10 @@ export function MainShell({ children }: { children: React.ReactNode }) {
 function Brand() {
   return (
     <Link className="flex items-center gap-3" href="/calculer">
-      <span className="grid size-10 place-items-center rounded-2xl bg-cyan-400 text-lg font-black text-teal-950">
+      <span className="grid size-10 place-items-center rounded-2xl bg-emerald-500 text-lg font-black text-white">
         CS
       </span>
-      <span className="text-2xl font-bold tracking-normal text-teal-700">CycleSmart</span>
+      <span className="text-2xl font-bold tracking-normal text-emerald-700">CycleSmart</span>
     </Link>
   );
 }
@@ -101,7 +101,7 @@ function NavItem({
     <Link
       className={`flex items-center justify-center gap-2 rounded-[20px] font-bold transition ${
         compact ? "h-12 text-xs" : "h-12 justify-start px-4 text-sm"
-      } ${active ? "bg-cyan-400 text-teal-950 shadow-sm" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}
+      } ${active ? "bg-emerald-500 text-white shadow-sm" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}
       href={href}
     >
       <Icon className="size-5" />

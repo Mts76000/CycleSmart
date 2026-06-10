@@ -43,7 +43,7 @@ export default function CreneauxPage() {
             <article className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm" key={slot.id}>
               <span
                 className={`grid size-10 place-items-center rounded-2xl ${
-                  index === 0 ? "bg-cyan-400 text-slate-950" : "bg-white/80 text-teal-700"
+                  index === 0 ? "bg-emerald-500 text-white" : "bg-white/80 text-emerald-700"
                 }`}
                 aria-hidden="true"
               >
@@ -69,24 +69,24 @@ export default function CreneauxPage() {
       </div>
 
       <aside className="space-y-5 md:sticky md:top-6">
-        <section className="rounded-[24px] border border-cyan-200 bg-cyan-50 p-5">
-          <p className="text-lg font-bold text-teal-900">Sauvegarde des creneaux</p>
-          <p className="mt-2 text-sm leading-6 text-teal-900/75">
+        <section className="rounded-[24px] border border-emerald-200 bg-green-50 p-5">
+          <p className="text-lg font-bold text-emerald-900">Sauvegarde des creneaux</p>
+          <p className="mt-2 text-sm leading-6 text-emerald-900/75">
             Pour retrouver tes heures creuses sur tous tes appareils, cree un compte ou connecte-toi.
             Sans compte, les changements restent seulement sur ce navigateur.
           </p>
-          <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-bold text-teal-800">
+          <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-bold text-emerald-800">
             {syncLabel}
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <Link
-              className="flex h-11 items-center justify-center rounded-2xl bg-cyan-400 text-sm font-bold text-teal-950"
+              className="flex h-11 items-center justify-center rounded-2xl bg-emerald-500 text-sm font-bold text-white"
               href="/inscription"
             >
               Creer un compte
             </Link>
             <Link
-              className="flex h-11 items-center justify-center rounded-2xl bg-white text-sm font-bold text-teal-700"
+              className="flex h-11 items-center justify-center rounded-2xl bg-white text-sm font-bold text-emerald-700"
               href="/connexion"
             >
               Connexion
@@ -101,39 +101,39 @@ export default function CreneauxPage() {
           <div className="mt-3 flex items-end justify-between">
             <div>
               <p className="text-lg font-bold">{best?.slot.name || "Aucun creneau"}</p>
-              <p className="mt-5 text-4xl font-black text-teal-700">
+              <p className="mt-5 text-4xl font-black text-emerald-700">
                 {best ? `${best.slot.start} - ${best.slot.end}` : "--:--"}
               </p>
             </div>
-            <span className="grid size-10 place-items-center rounded-2xl bg-white/80 text-teal-700">
+            <span className="grid size-10 place-items-center rounded-2xl bg-white/80 text-emerald-700">
               <ClockIcon className="size-5" />
             </span>
           </div>
         </section>
 
-        <section className="rounded-[24px] border border-dashed border-teal-200 bg-white/70 p-4">
+        <section className="rounded-[24px] border border-dashed border-emerald-200 bg-white/70 p-4">
           <input
-            className="h-12 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-cyan-300 focus:ring-4"
+            className="h-12 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
             placeholder="Nom du creneau"
             value={newSlot.name}
             onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
           />
           <div className="mt-3 grid grid-cols-2 gap-3">
             <input
-              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-teal-700 outline-none ring-cyan-300 focus:ring-4"
+              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
               type="time"
               value={newSlot.start}
               onChange={(event) => setNewSlot((slot) => ({ ...slot, start: event.target.value }))}
             />
             <input
-              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-teal-700 outline-none ring-cyan-300 focus:ring-4"
+              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
               type="time"
               value={newSlot.end}
               onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
             />
           </div>
           <button
-            className="mt-3 h-14 w-full rounded-2xl bg-cyan-400 px-4 font-bold text-teal-950 transition active:scale-[0.99]"
+            className="mt-3 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white transition active:scale-[0.99]"
             type="button"
             onClick={addSlot}
           >

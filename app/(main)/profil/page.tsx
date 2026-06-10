@@ -9,7 +9,7 @@ export default async function ProfilPage() {
     return (
       <div className="mx-auto max-w-2xl space-y-5 pt-6 md:pt-0">
         <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70">
-          <div className="mx-auto grid size-20 place-items-center rounded-full bg-cyan-100 text-3xl font-black text-teal-700">
+          <div className="mx-auto grid size-20 place-items-center rounded-full bg-green-100 text-3xl font-black text-emerald-700">
             CS
           </div>
           <p className="mt-5 text-3xl font-bold">Aucun compte connecte</p>
@@ -20,13 +20,13 @@ export default async function ProfilPage() {
 
         <section className="grid gap-3">
           <Link
-            className="flex h-14 items-center justify-center rounded-2xl bg-cyan-400 px-4 font-bold text-teal-950 shadow-lg shadow-cyan-300/40"
+            className="flex h-14 items-center justify-center rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-lg shadow-emerald-300/40"
             href="/connexion"
           >
             Connexion
           </Link>
           <Link
-            className="flex h-14 items-center justify-center rounded-2xl border border-teal-200 bg-white px-4 font-bold text-teal-700"
+            className="flex h-14 items-center justify-center rounded-2xl border border-emerald-200 bg-white px-4 font-bold text-emerald-700"
             href="/inscription"
           >
             Creer un compte
@@ -39,7 +39,7 @@ export default async function ProfilPage() {
   return (
     <div className="grid gap-5 pt-6 md:grid-cols-[minmax(0,1fr)_360px] md:items-start md:pt-0">
       <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70 md:p-8">
-        <div className="mx-auto grid size-20 place-items-center rounded-full bg-cyan-400 text-2xl font-black text-teal-950">
+        <div className="mx-auto grid size-20 place-items-center rounded-full bg-emerald-500 text-2xl font-black text-white">
           {user.name.slice(0, 2).toUpperCase()}
         </div>
         <p className="mt-5 text-3xl font-bold">{user.name}</p>

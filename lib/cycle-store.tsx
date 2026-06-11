@@ -49,6 +49,7 @@ type NewDevice = {
 };
 
 type CycleContextValue = {
+  isAuthenticated: boolean;
   currentTime: string;
   todayLabel: string;
   duration: number;
@@ -162,7 +163,7 @@ function alignStartToDelayStep(
   finishMode: FinishMode,
 ) {
   if (finishMode === "last") {
-    const wait = Math.floor((latestStart - now - 1) / delayStep) * delayStep;
+    const wait = Math.floor((latestStart - now) / delayStep) * delayStep;
     return wait >= 0 ? now + wait : null;
   }
 
@@ -187,7 +188,7 @@ function getSuggestions(
       const slotStart = start + offset;
       const slotEnd = end + offset;
       const earliestStart = Math.max(now, slotStart);
-      const latestStart = slotEnd;
+      const latestStart = finishMode === "last" ? slotEnd - duration : slotEnd;
 
       if (latestStart < earliestStart) {
         return [];
@@ -324,7 +325,13 @@ function normalizeDelayStep(delayStep: number | undefined) {
   return delayStepOptions.includes(value) ? value : 60;
 }
 
-export function CycleProvider({ children }: { children: ReactNode }) {
+export function CycleProvider({
+  children,
+  isAuthenticated = false,
+}: {
+  children: ReactNode;
+  isAuthenticated?: boolean;
+}) {
   const [currentTime, setCurrentTime] = useState("12:00");
   const [todayLabel, setTodayLabel] = useState("");
   const [duration, setDuration] = useState(150);
@@ -615,6 +622,7 @@ export function CycleProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
+      isAuthenticated,
       currentTime,
       todayLabel,
       duration,
@@ -649,6 +657,7 @@ export function CycleProvider({ children }: { children: ReactNode }) {
       devices,
       duration,
       finishMode,
+      isAuthenticated,
       newDevice,
       newSlot,
       removeDevice,

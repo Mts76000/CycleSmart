@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   ClockIcon,
   DeviceIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
-} from "../../../components/icons";
-import { delayStepOptions, formatDuration, useCycle } from "../../../lib/cycle-store";
+} from "@/components/icons";
+import { delayStepOptions, formatDuration, useCycle } from "@/lib/cycle-store";
 
 function slotCountLabel(count: number) {
   return `${count} creneau${count > 1 ? "x" : ""}`;
@@ -86,6 +87,8 @@ function DurationFields({
 }
 
 export default function CreneauxPage() {
+  const [showSlotForm, setShowSlotForm] = useState(false);
+  const [showDeviceForm, setShowDeviceForm] = useState(false);
   const {
     addDevice,
     addSlot,
@@ -104,11 +107,11 @@ export default function CreneauxPage() {
   } = useCycle();
 
   const syncLabel = {
-    local: "Local seulement",
+    local: "Sur cet appareil",
     loading: "Verification...",
-    saving: "Sauvegarde...",
-    saved: "Synchronise",
-    error: "Local seulement",
+    saving: "Enregistrement...",
+    saved: "Enregistre",
+    error: "Sur cet appareil",
   }[syncStatus];
   const isSyncedWithAccount = syncStatus === "saved" || syncStatus === "saving";
 
@@ -143,36 +146,48 @@ export default function CreneauxPage() {
           </p>
         </div>
 
-        <div className="mt-5 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
-          <p className="font-bold text-slate-950">Ajouter une plage</p>
-          <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_140px_auto]">
-            <input
-              className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
-              placeholder="Nom automatique si vide"
-              value={newSlot.name}
-              onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
-            />
-            <input
-              className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
-              type="time"
-              value={newSlot.start}
-              onChange={(event) => setNewSlot((slot) => ({ ...slot, start: event.target.value }))}
-            />
-            <input
-              className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
-              type="time"
-              value={newSlot.end}
-              onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
-            />
-            <button
-              className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99]"
-              type="button"
-              onClick={addSlot}
-            >
-              Ajouter
-            </button>
+        <button
+          className="mt-5 h-12 w-full rounded-2xl border border-emerald-200 bg-green-50 font-bold text-emerald-800"
+          type="button"
+          onClick={() => setShowSlotForm((visible) => !visible)}
+        >
+          {showSlotForm ? "Fermer" : "Ajouter une plage"}
+        </button>
+
+        {showSlotForm && (
+          <div className="mt-3 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
+            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_140px_auto]">
+              <input
+                className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
+                placeholder="Nom automatique si vide"
+                value={newSlot.name}
+                onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
+              />
+              <input
+                className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                type="time"
+                value={newSlot.start}
+                onChange={(event) => setNewSlot((slot) => ({ ...slot, start: event.target.value }))}
+              />
+              <input
+                className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                type="time"
+                value={newSlot.end}
+                onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
+              />
+              <button
+                className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99]"
+                type="button"
+                onClick={() => {
+                  addSlot();
+                  setShowSlotForm(false);
+                }}
+              >
+                Valider
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="mt-5 space-y-3">
           {slots.length === 0 && (
@@ -259,6 +274,54 @@ export default function CreneauxPage() {
           </div>
         </div>
 
+        <button
+          className="mt-5 h-12 w-full rounded-2xl border border-emerald-200 bg-green-50 font-bold text-emerald-800"
+          type="button"
+          onClick={() => setShowDeviceForm((visible) => !visible)}
+        >
+          {showDeviceForm ? "Fermer" : "Ajouter une machine"}
+        </button>
+
+        {showDeviceForm && (
+          <div className="mt-3 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
+            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_190px_auto]">
+              <input
+                className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
+                placeholder="Ex: Seche-linge"
+                value={newDevice.name}
+                onChange={(event) =>
+                  setNewDevice((device) => ({ ...device, name: event.target.value }))
+                }
+              />
+              <DurationFields
+                value={newDevice.duration}
+                onChange={(value) =>
+                  setNewDevice((device) => ({
+                    ...device,
+                    duration: value,
+                  }))
+                }
+              />
+              <StepSelect
+                className="bg-white"
+                value={newDevice.delayStep}
+                onChange={(delayStep) => setNewDevice((device) => ({ ...device, delayStep }))}
+              />
+              <button
+                className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                type="button"
+                disabled={!newDevice.name.trim()}
+                onClick={() => {
+                  addDevice();
+                  setShowDeviceForm(false);
+                }}
+              >
+                Valider
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="mt-5 space-y-3">
           {devices.map((device) => {
             const active = selectedDeviceId === device.id;
@@ -266,7 +329,7 @@ export default function CreneauxPage() {
             return (
               <article
                 className={`grid gap-3 rounded-2xl border p-4 md:grid-cols-[minmax(180px,1fr)_140px_190px_44px] md:items-end ${
-                  active ? "border-emerald-300 bg-green-50" : "border-slate-100 bg-slate-50"
+                  active ? "border-emerald-300 bg-slate-50 shadow-sm" : "border-slate-100 bg-slate-50"
                 }`}
                 key={device.id}
               >
@@ -276,18 +339,23 @@ export default function CreneauxPage() {
                   </span>
                   <div className="mt-1 flex items-center gap-3">
                     <span
-                      className={`grid size-10 shrink-0 place-items-center rounded-2xl ${
-                        active ? "bg-emerald-500 text-white" : "bg-white text-emerald-700"
-                      }`}
+                      className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700"
                     >
                       <DeviceIcon className="size-5" />
                     </span>
-                    <input
-                      className="min-w-0 flex-1 bg-transparent text-lg font-bold text-slate-950 outline-none"
-                      aria-label={`Nom de ${device.name}`}
-                      value={device.name}
-                      onChange={(event) => updateDevice(device.id, { name: event.target.value })}
-                    />
+                    <div className="min-w-0 flex-1">
+                      <input
+                        className="w-full min-w-0 bg-transparent text-lg font-bold text-slate-950 outline-none"
+                        aria-label={`Nom de ${device.name}`}
+                        value={device.name}
+                        onChange={(event) => updateDevice(device.id, { name: event.target.value })}
+                      />
+                      {active && (
+                        <span className="mt-1 inline-flex rounded-full bg-white px-2 py-1 text-[11px] font-black uppercase tracking-[0.08em] text-emerald-700">
+                          Utilisee dans le calcul
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </label>
 
@@ -329,55 +397,19 @@ export default function CreneauxPage() {
             );
           })}
         </div>
-
-        <div className="mt-5 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
-          <p className="font-bold text-slate-950">Ajouter une machine</p>
-          <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_190px_auto]">
-            <input
-              className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
-              placeholder="Ex: Seche-linge"
-              value={newDevice.name}
-              onChange={(event) =>
-                setNewDevice((device) => ({ ...device, name: event.target.value }))
-              }
-            />
-            <DurationFields
-              value={newDevice.duration}
-              onChange={(value) =>
-                setNewDevice((device) => ({
-                  ...device,
-                  duration: value,
-                }))
-              }
-            />
-            <StepSelect
-              className="bg-white"
-              value={newDevice.delayStep}
-              onChange={(delayStep) => setNewDevice((device) => ({ ...device, delayStep }))}
-            />
-            <button
-              className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-              type="button"
-              disabled={!newDevice.name.trim()}
-              onClick={addDevice}
-            >
-              Ajouter
-            </button>
-          </div>
-        </div>
       </section>
 
       <section className="rounded-[24px] border border-emerald-100 bg-green-50 p-4 text-sm leading-6 text-emerald-950">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {isSyncedWithAccount ? (
             <p>
-              Sauvegarde : <span className="font-bold">{syncLabel}</span>. Tes reglages sont lies
+              Reglages : <span className="font-bold">{syncLabel}</span>. Tes reglages sont lies
               a ton compte.
             </p>
           ) : (
             <>
               <p>
-                Sauvegarde : <span className="font-bold">{syncLabel}</span>. Connecte-toi pour
+                Reglages : <span className="font-bold">{syncLabel}</span>. Connecte-toi pour
                 retrouver tes reglages sur plusieurs appareils.
               </p>
               <div className="flex gap-2 font-bold text-emerald-800">

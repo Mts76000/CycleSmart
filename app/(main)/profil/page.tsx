@@ -1,40 +1,7 @@
 import Link from "next/link";
-import {
-  BellIcon,
-  DeviceIcon,
-  LockIcon,
-  MoneyIcon,
-  UserIcon,
-} from "../../../components/icons";
+import { UserIcon } from "../../../components/icons";
 import { LogoutButton } from "../../../components/logout-button";
 import { getCurrentUser } from "../../../lib/current-user";
-
-const profileSections = [
-  {
-    title: "Mes appareils",
-    description: "Lave-linge, lave-vaisselle et machines ajoutees",
-    status: "Disponible",
-    icon: DeviceIcon,
-  },
-  {
-    title: "Mes tarifs",
-    description: "Prix heures pleines et heures creuses",
-    status: "A venir",
-    icon: MoneyIcon,
-  },
-  {
-    title: "Notifications",
-    description: "Rappels avant le meilleur depart",
-    status: "A venir",
-    icon: BellIcon,
-  },
-  {
-    title: "Changer mot de passe",
-    description: "Securite du compte",
-    status: "A venir",
-    icon: LockIcon,
-  },
-];
 
 export default async function ProfilPage() {
   const user = await getCurrentUser();
@@ -71,7 +38,7 @@ export default async function ProfilPage() {
   }
 
   return (
-    <div className="grid gap-5 pt-6 md:grid-cols-[minmax(0,1fr)_360px] md:items-start md:pt-0">
+    <div className="mx-auto grid max-w-3xl gap-5 pt-6 md:grid-cols-[minmax(0,1fr)_260px] md:items-start md:pt-0">
       <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70 md:p-8">
         <div className="mx-auto grid size-20 place-items-center rounded-full bg-emerald-500 text-2xl font-black text-white">
           {user.name.slice(0, 2).toUpperCase()}
@@ -85,32 +52,6 @@ export default async function ProfilPage() {
         <p className="mt-2 leading-6 text-slate-500">
           Tes creneaux sont associes a ton compte et sauvegardes automatiquement.
         </p>
-      </section>
-
-      <section className="rounded-[28px] bg-white p-3 shadow-xl shadow-slate-200/70 md:col-start-1">
-        {profileSections.map((section) => {
-          const Icon = section.icon;
-
-          return (
-            <div
-              className="flex w-full items-center gap-4 rounded-3xl p-4"
-              key={section.title}
-            >
-              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-green-50 text-emerald-700">
-                <Icon className="size-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold text-slate-950">{section.title}</span>
-                <span className="mt-1 block text-sm leading-5 text-slate-500">
-                  {section.description}
-                </span>
-              </span>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-                {section.status}
-              </span>
-            </div>
-          );
-        })}
       </section>
 
       <section className="rounded-[24px] bg-green-50 p-5 md:col-start-2">

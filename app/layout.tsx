@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ServiceWorkerRegister from "../components/service-worker-register";
+import ServiceWorkerRegister from "@/components/service-worker-register";
 import "./globals.css";
 
 export const metadata: Metadata = {

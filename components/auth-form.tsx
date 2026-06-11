@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { login, signup, type AuthFormState } from "../lib/auth-actions";
+import { login, signup, type AuthFormState } from "@/lib/auth-actions";
 
 type AuthMode = "login" | "signup";
 

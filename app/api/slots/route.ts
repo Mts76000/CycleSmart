@@ -1,6 +1,6 @@
 import type { PoolClient } from "pg";
-import { ensureDatabaseSchema, getPool, query } from "../../../lib/db";
-import { getCurrentUser, requireCurrentUser } from "../../../lib/current-user";
+import { getCurrentUser, requireCurrentUser } from "@/lib/current-user";
+import { ensureDatabaseSchema, getPool, query } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

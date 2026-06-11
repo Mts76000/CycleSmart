@@ -19,6 +19,14 @@ export type Slot = {
 
 export type FinishMode = "soon" | "last";
 
+export type CycleDevice = {
+  id: string;
+  name: string;
+  description: string;
+  defaultDuration: number;
+  builtIn?: boolean;
+};
+
 export type Suggestion = {
   id: string;
   slot: Slot;
@@ -33,10 +41,18 @@ type NewSlot = {
   end: string;
 };
 
+type NewDevice = {
+  name: string;
+  duration: number;
+};
+
 type CycleContextValue = {
   currentTime: string;
   todayLabel: string;
   duration: number;
+  selectedDeviceId: string;
+  devices: CycleDevice[];
+  newDevice: NewDevice;
   finishMode: FinishMode;
   slots: Slot[];
   newSlot: NewSlot;
@@ -45,6 +61,10 @@ type CycleContextValue = {
   syncStatus: "local" | "loading" | "saving" | "saved" | "error";
   setCurrentTime: (time: string) => void;
   setDuration: (duration: number) => void;
+  selectDevice: (deviceId: string) => void;
+  setNewDevice: (device: NewDevice | ((device: NewDevice) => NewDevice)) => void;
+  addDevice: () => void;
+  removeDevice: (deviceId: string) => void;
   setFinishMode: (mode: FinishMode) => void;
   setNewSlot: (slot: NewSlot | ((slot: NewSlot) => NewSlot)) => void;
   addSlot: () => void;
@@ -56,7 +76,28 @@ const defaultSlots: Slot[] = [];
 
 const defaultNewSlot = { name: "", start: "22:00", end: "06:00" };
 const storageKey = "cyclesmart-slots";
+const settingsStorageKey = "cyclesmart-settings";
 export const dayMinutes = 24 * 60;
+
+export const defaultCycleDevices: CycleDevice[] = [
+  {
+    id: "washing-machine",
+    name: "Lave-linge",
+    description: "Programme coton ou mixte",
+    defaultDuration: 150,
+    builtIn: true,
+  },
+  {
+    id: "dishwasher",
+    name: "Lave-vaisselle",
+    description: "Cycle eco quotidien",
+    defaultDuration: 195,
+    builtIn: true,
+  },
+];
+
+export const favoriteDurations = [30, 75, 150, 180];
+const defaultNewDevice: NewDevice = { name: "", duration: 120 };
 
 const CycleContext = createContext<CycleContextValue | null>(null);
 
@@ -161,10 +202,51 @@ function getDefaultSlotName(startTime: string) {
   return "Soir";
 }
 
+function getStoredSettings() {
+  const stored = window.localStorage.getItem(settingsStorageKey);
+
+  if (!stored) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(stored) as Partial<{
+      duration: number;
+      finishMode: FinishMode;
+      selectedDeviceId: string;
+      devices: CycleDevice[];
+    }>;
+  } catch {
+    window.localStorage.removeItem(settingsStorageKey);
+    return null;
+  }
+}
+
+function mergeStoredDevices(storedDevices: CycleDevice[] | undefined) {
+  if (!Array.isArray(storedDevices)) {
+    return defaultCycleDevices;
+  }
+
+  const customDevices = storedDevices.filter((device) => {
+    return (
+      device &&
+      typeof device.id === "string" &&
+      typeof device.name === "string" &&
+      typeof device.defaultDuration === "number" &&
+      !defaultCycleDevices.some((defaultDevice) => defaultDevice.id === device.id)
+    );
+  });
+
+  return [...defaultCycleDevices, ...customDevices];
+}
+
 export function CycleProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState("12:00");
   const [todayLabel, setTodayLabel] = useState("");
   const [duration, setDuration] = useState(150);
+  const [selectedDeviceId, setSelectedDeviceId] = useState("washing-machine");
+  const [devices, setDevices] = useState<CycleDevice[]>(defaultCycleDevices);
+  const [newDevice, setNewDevice] = useState<NewDevice>(defaultNewDevice);
   const [finishMode, setFinishMode] = useState<FinishMode>("last");
   const [slots, setSlots] = useState<Slot[]>(defaultSlots);
   const [newSlot, setNewSlot] = useState<NewSlot>(defaultNewSlot);
@@ -190,6 +272,23 @@ export function CycleProvider({ children }: { children: ReactNode }) {
         } catch {
           window.localStorage.removeItem(storageKey);
         }
+      }
+
+      const storedSettings = getStoredSettings();
+      const nextDevices = mergeStoredDevices(storedSettings?.devices);
+      setDevices(nextDevices);
+
+      if (storedSettings?.duration && storedSettings.duration >= 30 && storedSettings.duration <= 480) {
+        setDuration(storedSettings.duration);
+      }
+      if (
+        storedSettings?.selectedDeviceId &&
+        nextDevices.some((device) => device.id === storedSettings.selectedDeviceId)
+      ) {
+        setSelectedDeviceId(storedSettings.selectedDeviceId);
+      }
+      if (storedSettings?.finishMode === "soon" || storedSettings?.finishMode === "last") {
+        setFinishMode(storedSettings.finishMode);
       }
 
       syncTime();
@@ -220,6 +319,17 @@ export function CycleProvider({ children }: { children: ReactNode }) {
       window.clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    window.localStorage.setItem(
+      settingsStorageKey,
+      JSON.stringify({ devices, duration, finishMode, selectedDeviceId }),
+    );
+  }, [devices, duration, finishMode, hydrated, selectedDeviceId]);
 
   useEffect(() => {
     if (!hydrated || !remoteHydrated) {
@@ -263,6 +373,64 @@ export function CycleProvider({ children }: { children: ReactNode }) {
     [currentTime, duration, finishMode, slots],
   );
 
+  const updateDuration = useCallback((nextDuration: number) => {
+    setDuration(nextDuration);
+    setSelectedDeviceId("custom");
+  }, []);
+
+  const selectDevice = useCallback((deviceId: string) => {
+    const device = devices.find((item) => item.id === deviceId);
+
+    if (!device) {
+      return;
+    }
+
+    setSelectedDeviceId(device.id);
+    setDuration(device.defaultDuration);
+  }, [devices]);
+
+  const addDevice = useCallback(() => {
+    const name = newDevice.name.trim();
+    const defaultDuration = Math.min(Math.max(Number(newDevice.duration) || 120, 30), 480);
+
+    if (!name) {
+      return;
+    }
+
+    const device: CycleDevice = {
+      id: crypto.randomUUID(),
+      name,
+      description: "Machine personnalisee",
+      defaultDuration,
+    };
+
+    setDevices((current) => [...current, device]);
+    setSelectedDeviceId(device.id);
+    setDuration(device.defaultDuration);
+    setNewDevice(defaultNewDevice);
+  }, [newDevice]);
+
+  const removeDevice = useCallback((deviceId: string) => {
+    setDevices((current) => {
+      const device = current.find((item) => item.id === deviceId);
+
+      if (!device || device.builtIn) {
+        return current;
+      }
+
+      return current.filter((item) => item.id !== deviceId);
+    });
+
+    setSelectedDeviceId((current) => {
+      if (current !== deviceId) {
+        return current;
+      }
+
+      setDuration(defaultCycleDevices[0].defaultDuration);
+      return defaultCycleDevices[0].id;
+    });
+  }, []);
+
   const addSlot = useCallback(() => {
     setSlots((current) => [
       ...current,
@@ -291,6 +459,9 @@ export function CycleProvider({ children }: { children: ReactNode }) {
       currentTime,
       todayLabel,
       duration,
+      selectedDeviceId,
+      devices,
+      newDevice,
       finishMode,
       slots,
       newSlot,
@@ -298,7 +469,11 @@ export function CycleProvider({ children }: { children: ReactNode }) {
       best: suggestions[0],
       syncStatus,
       setCurrentTime,
-      setDuration,
+      setDuration: updateDuration,
+      selectDevice,
+      setNewDevice,
+      addDevice,
+      removeDevice,
       setFinishMode,
       setNewSlot,
       addSlot,
@@ -307,15 +482,22 @@ export function CycleProvider({ children }: { children: ReactNode }) {
     }),
     [
       addSlot,
+      addDevice,
       clearSlots,
       currentTime,
+      devices,
       duration,
       finishMode,
+      newDevice,
       newSlot,
+      removeDevice,
       removeSlot,
+      selectDevice,
+      selectedDeviceId,
       slots,
       suggestions,
       syncStatus,
+      updateDuration,
       todayLabel,
     ],
   );

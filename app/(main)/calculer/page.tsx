@@ -1,12 +1,13 @@
 "use client";
 
 import {
+  favoriteDurations,
   formatDuration,
   minutesToTime,
   type Suggestion,
   useCycle,
 } from "../../../lib/cycle-store";
-import { CalendarIcon, ClockIcon } from "../../../components/icons";
+import { CalendarIcon, ClockIcon, DeviceIcon } from "../../../components/icons";
 
 function formatWait(wait: number) {
   return wait === 0 ? "Maintenant" : formatDuration(wait);
@@ -66,30 +67,48 @@ function SuggestionCard({ index, suggestion }: { index: number; suggestion: Sugg
 export default function CalculerPage() {
   const {
     currentTime,
+    devices,
     duration,
     finishMode,
+    selectedDeviceId,
+    selectDevice,
     setDuration,
     setFinishMode,
     suggestions,
     todayLabel,
   } = useCycle();
   const recommended = suggestions[0];
+  const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[28px] border border-white bg-white p-5 shadow-xl shadow-slate-200/70 md:p-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
-              Heure actuelle
+      <section className="rounded-[28px] bg-emerald-700 p-5 text-white shadow-xl shadow-emerald-300/30 md:p-7">
+        <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+          <div className="min-w-0">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/70">
+              Prochain lancement
             </p>
-            <div className="mt-3 flex items-end gap-4">
-              <p className="text-5xl font-black text-slate-950 md:text-6xl">{currentTime}</p>
-              <p className="pb-2 capitalize text-slate-500">{todayLabel || "Aujourd'hui"}</p>
-            </div>
+            <p className="mt-3 text-5xl font-black tracking-normal md:text-6xl">
+              {recommended ? formatWait(recommended.wait) : "--"}
+            </p>
+            <p className="mt-3 text-sm font-semibold leading-6 text-white/75">
+              {recommended
+                ? `Depart a ${minutesToTime(recommended.start)} · fin a ${minutesToTime(
+                    recommended.end,
+                  )}`
+                : "Ajoute un creneau pour obtenir une recommandation precise."}
+            </p>
           </div>
-          <div className="rounded-3xl bg-green-50 px-4 py-3 text-sm font-semibold leading-6 text-emerald-800 md:max-w-xs">
-            Le calcul se met a jour automatiquement avec l&apos;heure de ton appareil.
+
+          <div className="grid grid-cols-2 gap-2 md:min-w-[320px]">
+            <div className="rounded-3xl bg-white/12 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">Appareil</p>
+              <p className="mt-2 text-lg font-black">{selectedDevice?.name || "Personnalise"}</p>
+            </div>
+            <div className="rounded-3xl bg-white/12 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">Cycle</p>
+              <p className="mt-2 text-lg font-black">{formatDuration(duration)}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -99,8 +118,49 @@ export default function CalculerPage() {
           <div>
             <p className="text-2xl font-bold md:text-3xl">Calculateur de cycle</p>
             <p className="mt-2 max-w-2xl leading-6 text-slate-600">
-              Configure la duree et le comportement souhaite pour trouver le meilleur depart.
+              Choisis ton appareil, ajuste la duree si besoin, puis garde le delai de lancement sous
+              les yeux.
             </p>
+          </div>
+
+          <div className="mt-7 rounded-3xl bg-slate-50 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700">
+                  <DeviceIcon className="size-5" />
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-slate-950">Machine</p>
+                  <p className="text-xs text-slate-500">
+                    Les machines se gerent depuis la page Creneaux.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              {devices.map((device) => {
+                const active = selectedDeviceId === device.id;
+
+                return (
+                  <button
+                    className={`shrink-0 rounded-2xl px-4 py-3 text-left transition ${
+                      active
+                        ? "bg-emerald-500 text-white shadow-sm"
+                        : "bg-white text-slate-600 hover:text-emerald-700"
+                    }`}
+                    key={device.id}
+                    type="button"
+                    onClick={() => selectDevice(device.id)}
+                  >
+                    <span className="block text-sm font-bold">{device.name}</span>
+                    <span className={`mt-1 block text-xs ${active ? "text-white/75" : "text-slate-400"}`}>
+                      {formatDuration(device.defaultDuration)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="mt-8 rounded-3xl bg-slate-50 p-5">
@@ -126,6 +186,22 @@ export default function CalculerPage() {
               <span>30 min</span>
               <span>4 h</span>
               <span>8 h</span>
+            </div>
+            <div className="mt-4 grid grid-cols-4 gap-2">
+              {favoriteDurations.map((favorite) => (
+                <button
+                  className={`h-11 rounded-2xl text-sm font-bold transition ${
+                    duration === favorite
+                      ? "bg-emerald-500 text-white"
+                      : "bg-white text-slate-600 hover:text-emerald-700"
+                  }`}
+                  key={favorite}
+                  type="button"
+                  onClick={() => setDuration(favorite)}
+                >
+                  {formatDuration(favorite)}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -180,21 +256,21 @@ export default function CalculerPage() {
         </section>
 
         <aside className="space-y-5 lg:sticky lg:top-6">
-          <section className="rounded-[28px] bg-emerald-700 p-6 text-white shadow-xl shadow-emerald-300/30">
+          <section className="rounded-[28px] bg-white p-6 shadow-xl shadow-slate-200/70">
             <div className="flex items-center gap-3">
-              <span className="grid size-11 place-items-center rounded-2xl bg-white/15">
+              <span className="grid size-11 place-items-center rounded-2xl bg-green-50 text-emerald-700">
                 <ClockIcon className="size-5" />
               </span>
               <div>
-                <p className="text-sm font-bold text-white/75">
+                <p className="text-sm font-bold text-slate-500">
                   {recommended ? formatWaitPrefix(recommended.wait) : "Depart recommande"}
                 </p>
-                <p className="mt-1 text-4xl font-black">
+                <p className="mt-1 text-4xl font-black text-slate-950">
                   {recommended ? formatWait(recommended.wait) : "--"}
                 </p>
               </div>
             </div>
-            <div className="mt-6 rounded-2xl bg-white/15 p-4 text-sm font-semibold leading-6 text-white/85">
+            <div className="mt-6 rounded-2xl bg-green-50 p-4 text-sm font-semibold leading-6 text-emerald-900">
               {recommended
                 ? `Depart a ${minutesToTime(recommended.start)}. Fin prevue a ${minutesToTime(
                     recommended.end,
@@ -209,12 +285,19 @@ export default function CalculerPage() {
                 <CalendarIcon className="size-5" />
               </span>
               <div>
-                <p className="font-bold">Mode de calcul</p>
+                <p className="font-bold">Heure actuelle</p>
                 <p className="text-sm text-slate-500">
-                  {finishMode === "last" ? "Fin au dernier moment" : "Depart des que possible"}
+                  {currentTime} · {todayLabel || "Aujourd'hui"}
                 </p>
               </div>
             </div>
+          </section>
+
+          <section className="rounded-[24px] bg-white p-5 shadow-sm">
+            <p className="font-bold">Mode de calcul</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {finishMode === "last" ? "Fin au dernier moment" : "Depart des que possible"}
+            </p>
           </section>
         </aside>
       </div>

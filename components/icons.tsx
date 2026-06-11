@@ -78,3 +78,42 @@ export function SparkIcon(props: IconProps) {
     </SvgIcon>
   );
 }
+
+export function DeviceIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect height="18" rx="3" width="14" x="5" y="3" />
+      <path d="M9 7h.01M15 7h.01" />
+      <circle cx="12" cy="14" r="4" />
+      <path d="M9.5 14a4 4 0 0 0 5 0" />
+    </SvgIcon>
+  );
+}
+
+export function BellIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </SvgIcon>
+  );
+}
+
+export function LockIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect height="11" rx="2" width="16" x="4" y="11" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </SvgIcon>
+  );
+}
+
+export function MoneyIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect height="14" rx="2" width="18" x="3" y="5" />
+      <circle cx="12" cy="12" r="3" />
+      <path d="M6 9v.01M18 15v.01" />
+    </SvgIcon>
+  );
+}

@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CycleSmart
 
-## Getting Started
+Application Next.js pour calculer le bon moment de lancement des machines pendant les heures creuses.
 
-First, run the development server:
+## Demarrage local
 
 ```bash
+npm install
+cp .env.example .env.local
+npm run db:up
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvre ensuite [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## PostgreSQL local
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Le fichier `compose.yaml` lance un PostgreSQL local avec ces valeurs :
 
-## Learn More
+```env
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DATABASE=cyclesmart
+POSTGRES_USER=cyclesmart
+POSTGRES_PASSWORD=cyclesmart_local_password
+POSTGRES_SSL=false
+```
 
-To learn more about Next.js, take a look at the following resources:
+Ajoute aussi un secret de session dans `.env.local` :
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+openssl rand -base64 32
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Puis colle le resultat dans :
 
-## Deploy on Vercel
+```env
+SESSION_SECRET=<secret-genere>
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Commandes utiles :
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run db:up
+npm run db:logs
+npm run db:down
+```
+
+## Verification
+
+```bash
+npm run lint
+npm run build
+```

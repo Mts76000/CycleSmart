@@ -1,14 +1,94 @@
 "use client";
 
 import Link from "next/link";
-import { ClockIcon, DeviceIcon, MoonIcon, SunIcon, TrashIcon } from "../../../components/icons";
-import { formatDuration, useCycle } from "../../../lib/cycle-store";
+import {
+  ClockIcon,
+  DeviceIcon,
+  MoonIcon,
+  SunIcon,
+  TrashIcon,
+} from "../../../components/icons";
+import { delayStepOptions, formatDuration, useCycle } from "../../../lib/cycle-store";
+
+function slotCountLabel(count: number) {
+  return `${count} creneau${count > 1 ? "x" : ""}`;
+}
+
+function durationToTime(minutes: number) {
+  const hours = Math.floor(minutes / 60).toString().padStart(2, "0");
+  const rest = (minutes % 60).toString().padStart(2, "0");
+
+  return `${hours}:${rest}`;
+}
+
+function durationTimeToMinutes(value: string) {
+  const [hours = "0", minutes = "0"] = value.split(":");
+
+  return Number(hours) * 60 + Number(minutes);
+}
+
+function getSlotIcon(startTime: string) {
+  const hour = Number(startTime.split(":")[0]);
+
+  if (hour < 6 || hour >= 21) {
+    return MoonIcon;
+  }
+
+  if (hour >= 7 && hour < 18) {
+    return SunIcon;
+  }
+
+  return ClockIcon;
+}
+
+function StepSelect({
+  className = "",
+  value,
+  onChange,
+}: {
+  className?: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <select
+      className={`h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 ${className}`}
+      value={value}
+      onChange={(event) => onChange(Number(event.target.value))}
+    >
+      {delayStepOptions.map((step) => (
+        <option key={step} value={step}>
+          Tous les {formatDuration(step)}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function DurationFields({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <input
+      className="mt-1 h-12 w-full rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+      type="time"
+      min="00:30"
+      max="08:00"
+      step="300"
+      value={durationToTime(value)}
+      onChange={(event) => onChange(durationTimeToMinutes(event.target.value))}
+    />
+  );
+}
 
 export default function CreneauxPage() {
   const {
     addDevice,
     addSlot,
-    best,
     devices,
     newDevice,
     newSlot,
@@ -19,231 +99,296 @@ export default function CreneauxPage() {
     setNewSlot,
     slots,
     syncStatus,
+    updateDevice,
+    updateSlot,
   } = useCycle();
+
   const syncLabel = {
-    local: "Sauvegarde locale uniquement",
-    loading: "Chargement de tes creneaux...",
-    saving: "Sauvegarde en cours...",
-    saved: "Creneaux sauvegardes sur ton compte",
-    error: "Connexion au compte indisponible",
+    local: "Local seulement",
+    loading: "Verification...",
+    saving: "Sauvegarde...",
+    saved: "Synchronise",
+    error: "Local seulement",
   }[syncStatus];
+  const isSyncedWithAccount = syncStatus === "saved" || syncStatus === "saving";
 
   return (
-    <div className="space-y-5 md:grid md:grid-cols-[minmax(0,1fr)_360px] md:items-start md:gap-6 md:space-y-0">
-      <div className="space-y-5">
-        <section className="pt-4 md:pt-0">
-          <p className="text-3xl font-bold">Mes heures creuses</p>
-          <p className="mt-2 leading-6 text-slate-500">
-            Ajoute tes plages tarifaires. Le calculateur placera le cycle dedans, meme si un creneau
-            traverse minuit.
-          </p>
-        </section>
+    <div className="mx-auto max-w-4xl space-y-5">
+      <section className="rounded-[30px] bg-emerald-700 p-6 text-white shadow-xl shadow-emerald-200/50 md:p-8">
+        <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/65">
+          Reglages du calcul
+        </p>
+        <h2 className="mt-3 text-3xl font-black tracking-normal md:text-5xl">
+          Tes heures creuses et tes machines
+        </h2>
+        <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-white/75 md:text-base">
+          Le calculateur utilise seulement l&apos;heure de depart. Si le cycle finit apres le
+          creneau, ce n&apos;est pas un probleme.
+        </p>
+      </section>
 
-        <section className="space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-              Creneaux enregistres
-            </p>
-          </div>
-
-          {slots.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-sm leading-6 text-slate-500">
-              Aucun creneau enregistre pour le moment. Ajoute ta premiere plage depuis le panneau a
-              droite.
-            </div>
-          )}
-
-          {slots.map((slot, index) => (
-            <article className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm" key={slot.id}>
-              <span
-                className={`grid size-10 place-items-center rounded-2xl ${
-                  index === 0 ? "bg-emerald-500 text-white" : "bg-white/80 text-emerald-700"
-                }`}
-                aria-hidden="true"
-              >
-                {index === 0 ? <MoonIcon className="size-5" /> : <SunIcon className="size-5" />}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-lg font-bold">
-                  {slot.start} - {slot.end}
-                </p>
-                <p className="text-sm text-slate-500">{slot.name} · Quotidien</p>
-              </div>
-              <button
-                className="grid size-9 place-items-center rounded-full text-slate-500"
-                type="button"
-                onClick={() => removeSlot(slot.id)}
-                aria-label={`Supprimer ${slot.name}`}
-              >
-                <TrashIcon className="size-4" />
-              </button>
-            </article>
-          ))}
-        </section>
-
-        <section className="space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-              Machines
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            {devices.map((device) => {
-              const active = selectedDeviceId === device.id;
-
-              return (
-                <article
-                  className={`rounded-2xl bg-white p-4 shadow-sm ${
-                    active ? "ring-2 ring-emerald-200" : ""
-                  }`}
-                  key={device.id}
-                >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={`grid size-10 shrink-0 place-items-center rounded-2xl ${
-                        active ? "bg-emerald-500 text-white" : "bg-green-50 text-emerald-700"
-                      }`}
-                    >
-                      <DeviceIcon className="size-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-slate-950">{device.name}</p>
-                      <p className="mt-1 text-sm leading-5 text-slate-500">{device.description}</p>
-                      <p className="mt-2 text-sm font-bold text-emerald-700">
-                        {formatDuration(device.defaultDuration)}
-                      </p>
-                    </div>
-                  </div>
-                  {!device.builtIn && (
-                    <button
-                      className="mt-3 text-sm font-bold text-slate-400 hover:text-red-600"
-                      type="button"
-                      onClick={() => removeDevice(device.id)}
-                    >
-                      Supprimer
-                    </button>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      </div>
-
-      <aside className="space-y-5 md:sticky md:top-6">
-        <section className="rounded-[24px] border border-emerald-200 bg-green-50 p-5">
-          <p className="text-lg font-bold text-emerald-900">Sauvegarde des creneaux</p>
-          <p className="mt-2 text-sm leading-6 text-emerald-900/75">
-            Pour retrouver tes heures creuses sur tous tes appareils, cree un compte ou connecte-toi.
-            Sans compte, les changements restent seulement sur ce navigateur.
-          </p>
-          <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-bold text-emerald-800">
-            {syncLabel}
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Link
-              className="flex h-11 items-center justify-center rounded-2xl bg-emerald-500 text-sm font-bold text-white"
-              href="/inscription"
-            >
-              Creer un compte
-            </Link>
-            <Link
-              className="flex h-11 items-center justify-center rounded-2xl bg-white text-sm font-bold text-emerald-700"
-              href="/connexion"
-            >
-              Connexion
-            </Link>
-          </div>
-        </section>
-
-        <section className="rounded-[24px] bg-white p-6 shadow-xl shadow-slate-200/70">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-            Prochain creneau
-          </p>
-          <div className="mt-3 flex items-end justify-between">
-            <div>
-              <p className="text-lg font-bold">{best?.slot.name || "Aucun creneau"}</p>
-              <p className="mt-5 text-4xl font-black text-emerald-700">
-                {best ? `${best.slot.start} - ${best.slot.end}` : "--:--"}
-              </p>
-            </div>
-            <span className="grid size-10 place-items-center rounded-2xl bg-white/80 text-emerald-700">
+      <section className="rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70 md:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-green-50 text-emerald-700">
               <ClockIcon className="size-5" />
             </span>
+            <div>
+              <p className="text-xl font-bold text-slate-950">Heures creuses</p>
+              <p className="text-sm text-slate-500">{slotCountLabel(slots.length)} enregistre</p>
+            </div>
           </div>
-        </section>
+          <p className="rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-emerald-800">
+            Depart dans le creneau
+          </p>
+        </div>
 
-        <section className="rounded-[24px] border border-dashed border-emerald-200 bg-white/70 p-4">
-          <p className="mb-3 font-bold">Ajouter un creneau</p>
-          <input
-            className="h-12 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
-            placeholder="Nom du creneau"
-            value={newSlot.name}
-            onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
-          />
-          <div className="mt-3 grid grid-cols-2 gap-3">
+        <div className="mt-5 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
+          <p className="font-bold text-slate-950">Ajouter une plage</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_140px_auto]">
             <input
-              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+              className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
+              placeholder="Nom automatique si vide"
+              value={newSlot.name}
+              onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
+            />
+            <input
+              className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
               type="time"
               value={newSlot.start}
               onChange={(event) => setNewSlot((slot) => ({ ...slot, start: event.target.value }))}
             />
             <input
-              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+              className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
               type="time"
               value={newSlot.end}
               onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
             />
+            <button
+              className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99]"
+              type="button"
+              onClick={addSlot}
+            >
+              Ajouter
+            </button>
           </div>
-          <button
-            className="mt-3 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white transition active:scale-[0.99]"
-            type="button"
-            onClick={addSlot}
-          >
-            Ajouter un creneau
-          </button>
-        </section>
+        </div>
 
-        <section className="rounded-[24px] border border-dashed border-emerald-200 bg-white/70 p-4">
-          <p className="font-bold">Ajouter une machine</p>
-          <p className="mt-1 text-sm leading-5 text-slate-500">
-            Elle apparaitra ensuite dans le calculateur avec sa duree par defaut.
-          </p>
-          <div className="mt-3 grid gap-3">
+        <div className="mt-5 space-y-3">
+          {slots.length === 0 && (
+            <div className="rounded-2xl bg-slate-50 p-5 text-sm leading-6 text-slate-500">
+              Ajoute tes plages d&apos;heures creuses. Exemple : 01:06 - 07:06 et 14:36 - 16:36.
+            </div>
+          )}
+
+          {slots.map((slot, index) => (
+            (() => {
+              const SlotIcon = getSlotIcon(slot.start);
+
+              return (
+                <article
+                  className="grid gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 md:grid-cols-[minmax(180px,1fr)_140px_140px_44px] md:items-end"
+                  key={slot.id}
+                >
+                  <label className="block">
+                    <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                      Plage {index + 1}
+                    </span>
+                    <div className="mt-1 flex items-center gap-3">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-emerald-500 text-white">
+                        <SlotIcon className="size-5" />
+                      </span>
+                      <input
+                        className="min-w-0 flex-1 bg-transparent text-lg font-bold text-slate-950 outline-none"
+                        aria-label={`Nom du creneau ${index + 1}`}
+                        value={slot.name}
+                        onChange={(event) => updateSlot(slot.id, { name: event.target.value })}
+                      />
+                    </div>
+                  </label>
+
+                  <label className="block">
+                    <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                      Debut
+                    </span>
+                    <input
+                      className="mt-1 h-12 w-full rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                      type="time"
+                      value={slot.start}
+                      onChange={(event) => updateSlot(slot.id, { start: event.target.value })}
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                      Fin
+                    </span>
+                    <input
+                      className="mt-1 h-12 w-full rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                      type="time"
+                      value={slot.end}
+                      onChange={(event) => updateSlot(slot.id, { end: event.target.value })}
+                    />
+                  </label>
+
+                  <button
+                    className="grid h-12 place-items-center rounded-2xl bg-white text-slate-400 hover:text-red-600"
+                    type="button"
+                    onClick={() => removeSlot(slot.id)}
+                    aria-label={`Supprimer ${slot.name}`}
+                  >
+                    <TrashIcon className="size-4" />
+                  </button>
+                </article>
+              );
+            })()
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70 md:p-6">
+        <div className="flex items-center gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-green-50 text-emerald-700">
+            <DeviceIcon className="size-5" />
+          </span>
+          <div>
+            <p className="text-xl font-bold text-slate-950">Machines</p>
+            <p className="text-sm text-slate-500">
+              Duree du cycle et precision du depart differe.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          {devices.map((device) => {
+            const active = selectedDeviceId === device.id;
+
+            return (
+              <article
+                className={`grid gap-3 rounded-2xl border p-4 md:grid-cols-[minmax(180px,1fr)_140px_190px_44px] md:items-end ${
+                  active ? "border-emerald-300 bg-green-50" : "border-slate-100 bg-slate-50"
+                }`}
+                key={device.id}
+              >
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    Machine
+                  </span>
+                  <div className="mt-1 flex items-center gap-3">
+                    <span
+                      className={`grid size-10 shrink-0 place-items-center rounded-2xl ${
+                        active ? "bg-emerald-500 text-white" : "bg-white text-emerald-700"
+                      }`}
+                    >
+                      <DeviceIcon className="size-5" />
+                    </span>
+                    <input
+                      className="min-w-0 flex-1 bg-transparent text-lg font-bold text-slate-950 outline-none"
+                      aria-label={`Nom de ${device.name}`}
+                      value={device.name}
+                      onChange={(event) => updateDevice(device.id, { name: event.target.value })}
+                    />
+                  </div>
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    Duree
+                  </span>
+                  <DurationFields
+                    value={device.defaultDuration}
+                    onChange={(value) =>
+                      updateDevice(device.id, {
+                        defaultDuration: value,
+                      })
+                    }
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    Depart differe
+                  </span>
+                  <StepSelect
+                    className="mt-1 w-full bg-white"
+                    value={device.delayStep}
+                    onChange={(delayStep) => updateDevice(device.id, { delayStep })}
+                  />
+                </label>
+
+                <button
+                  className="grid h-12 place-items-center rounded-2xl bg-white text-slate-400 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                  type="button"
+                  disabled={devices.length <= 1}
+                  onClick={() => removeDevice(device.id)}
+                  aria-label={`Supprimer ${device.name}`}
+                >
+                  <TrashIcon className="size-4" />
+                </button>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="mt-5 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
+          <p className="font-bold text-slate-950">Ajouter une machine</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_190px_auto]">
             <input
-              className="h-12 rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
+              className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
               placeholder="Ex: Seche-linge"
               value={newDevice.name}
               onChange={(event) =>
                 setNewDevice((device) => ({ ...device, name: event.target.value }))
               }
             />
-            <input
-              className="h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
-              min="30"
-              max="480"
-              step="5"
-              type="number"
+            <DurationFields
               value={newDevice.duration}
-              onChange={(event) =>
+              onChange={(value) =>
                 setNewDevice((device) => ({
                   ...device,
-                  duration: Number(event.target.value),
+                  duration: value,
                 }))
               }
             />
+            <StepSelect
+              className="bg-white"
+              value={newDevice.delayStep}
+              onChange={(delayStep) => setNewDevice((device) => ({ ...device, delayStep }))}
+            />
+            <button
+              className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              disabled={!newDevice.name.trim()}
+              onClick={addDevice}
+            >
+              Ajouter
+            </button>
           </div>
-          <button
-            className="mt-3 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-            type="button"
-            disabled={!newDevice.name.trim()}
-            onClick={addDevice}
-          >
-            Ajouter la machine
-          </button>
-        </section>
-      </aside>
+        </div>
+      </section>
+
+      <section className="rounded-[24px] border border-emerald-100 bg-green-50 p-4 text-sm leading-6 text-emerald-950">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {isSyncedWithAccount ? (
+            <p>
+              Sauvegarde : <span className="font-bold">{syncLabel}</span>. Tes reglages sont lies
+              a ton compte.
+            </p>
+          ) : (
+            <>
+              <p>
+                Sauvegarde : <span className="font-bold">{syncLabel}</span>. Connecte-toi pour
+                retrouver tes reglages sur plusieurs appareils.
+              </p>
+              <div className="flex gap-2 font-bold text-emerald-800">
+                <Link href="/connexion">Connexion</Link>
+                <span aria-hidden="true">·</span>
+                <Link href="/inscription">Inscription</Link>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

@@ -117,3 +117,23 @@ export function MoneyIcon(props: IconProps) {
     </SvgIcon>
   );
 }
+
+export function EyeIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </SvgIcon>
+  );
+}
+
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M3 3l18 18" />
+      <path d="M10.6 10.6A2 2 0 0 0 12 14a2 2 0 0 0 1.4-.6" />
+      <path d="M9.9 5.2A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a16 16 0 0 1-3.1 4.1" />
+      <path d="M6.6 6.6C3.6 8.5 2 12 2 12s3.5 7 10 7a10.5 10.5 0 0 0 4.2-.9" />
+    </SvgIcon>
+  );
+}

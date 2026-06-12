@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
 const sessionCookieName = "session";
-const sessionDurationMs = 7 * 24 * 60 * 60 * 1000;
+const defaultSessionDurationMs = 7 * 24 * 60 * 60 * 1000;
+const rememberedSessionDurationMs = 90 * 24 * 60 * 60 * 1000;
 
 type SessionPayload = {
   userId: string;
@@ -21,11 +22,11 @@ function getEncodedSecret() {
   return new TextEncoder().encode(secret);
 }
 
-export async function encryptSession(payload: SessionPayload) {
+export async function encryptSession(payload: SessionPayload, duration = "7d") {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime(duration)
     .sign(getEncodedSecret());
 }
 
@@ -41,9 +42,13 @@ export async function decryptSession(session: string | undefined = "") {
   }
 }
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string, remember = false) {
+  const sessionDurationMs = remember ? rememberedSessionDurationMs : defaultSessionDurationMs;
   const expiresAt = new Date(Date.now() + sessionDurationMs);
-  const session = await encryptSession({ userId, expiresAt: expiresAt.toISOString() });
+  const session = await encryptSession(
+    { userId, expiresAt: expiresAt.toISOString() },
+    remember ? "90d" : "7d",
+  );
   const cookieStore = await cookies();
 
   cookieStore.set(sessionCookieName, session, {

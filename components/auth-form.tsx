@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { login, signup, type AuthFormState } from "@/lib/auth-actions";
+import { PasswordInput } from "@/components/password-input";
 
 type AuthMode = "login" | "signup";
 
@@ -69,15 +70,27 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <label className="mt-4 block text-sm font-semibold text-slate-600" htmlFor="password">
         Mot de passe
       </label>
-      <input
+      <PasswordInput
         id="password"
         name="password"
-        className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
-        placeholder="••••••••"
-        type="password"
         autoComplete={isSignup ? "new-password" : "current-password"}
       />
       {state?.errors?.password && <FormError messages={state.errors.password} />}
+
+      {!isSignup && (
+        <>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <label className="flex flex-1 items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+              <input className="size-4 accent-emerald-600" type="checkbox" name="remember" value="yes" />
+              Rester connecte plus longtemps
+            </label>
+            <Link className="text-sm font-bold text-emerald-800" href="/mot-de-passe-oublie">
+              Mot de passe oublie ?
+            </Link>
+          </div>
+        </>
+      )}
+
       {state?.message && (
         <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
           {state.message}

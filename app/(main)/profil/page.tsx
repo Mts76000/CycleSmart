@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChangePasswordForm } from "@/components/change-password-form";
 import { DeviceIcon, SparkIcon } from "@/components/icons";
 import { LogoutButton } from "@/components/logout-button";
 import { getCurrentUser } from "@/lib/current-user";
@@ -121,6 +122,10 @@ export default async function ProfilPage() {
       </section>
 
       <InstallGuide />
+
+      <div className="md:col-span-2">
+        <ChangePasswordForm />
+      </div>
 
       <div className="md:col-start-2">
         <LogoutButton />

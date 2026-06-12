@@ -120,4 +120,31 @@ export async function ensureDatabaseSchema() {
   `);
 
   await query(`create index if not exists password_reset_tokens_user_id_idx on password_reset_tokens(user_id)`);
+
+  await query(`
+    create table if not exists cycle_devices (
+      id text not null,
+      user_id text not null references users(id) on delete cascade,
+      name text not null,
+      description text not null default '',
+      default_duration integer not null,
+      delay_step integer not null,
+      built_in boolean not null default false,
+      sort_order integer not null default 0,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now(),
+      primary key (user_id, id)
+    )
+  `);
+
+  await query(`
+    create table if not exists cycle_preferences (
+      user_id text primary key references users(id) on delete cascade,
+      selected_device_id text,
+      duration integer not null default 150,
+      finish_mode text not null default 'soon',
+      finish_mode_configured boolean not null default false,
+      updated_at timestamptz not null default now()
+    )
+  `);
 }

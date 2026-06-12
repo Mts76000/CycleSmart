@@ -48,6 +48,14 @@ type NewDevice = {
   delayStep: number;
 };
 
+type StoredSettings = Partial<{
+  duration: number;
+  finishMode: FinishMode;
+  finishModeConfigured: boolean;
+  selectedDeviceId: string;
+  devices: CycleDevice[];
+}>;
+
 type CycleContextValue = {
   isAuthenticated: boolean;
   currentTime: string;
@@ -253,13 +261,7 @@ function getStoredSettings() {
   }
 
   try {
-    return JSON.parse(stored) as Partial<{
-      duration: number;
-      finishMode: FinishMode;
-      finishModeConfigured: boolean;
-      selectedDeviceId: string;
-      devices: CycleDevice[];
-    }>;
+    return JSON.parse(stored) as StoredSettings;
   } catch {
     window.localStorage.removeItem(settingsStorageKey);
     return null;
@@ -401,19 +403,62 @@ export function CycleProvider({
       }
 
       setSyncStatus("loading");
-      fetch("/api/slots")
-        .then((response) => response.json())
-        .then((data: { ok?: boolean; slots?: Slot[] }) => {
-          if (data.ok && Array.isArray(data.slots)) {
-            if (data.slots.length > 0 || storedSlots.length === 0) {
-              setSlots(data.slots);
+      Promise.allSettled([
+        fetch("/api/settings").then((response) => response.json()),
+        fetch("/api/slots").then((response) => response.json()),
+      ])
+        .then(([settingsResult, slotsResult]) => {
+          let hasError = false;
+
+          if (settingsResult.status === "fulfilled") {
+            const data = settingsResult.value as { ok?: boolean; settings?: StoredSettings | null };
+
+            if (data.ok && data.settings) {
+              const remoteDevices = mergeStoredDevices(data.settings.devices);
+              setDevices(remoteDevices);
+
+              if (
+                data.settings.duration &&
+                data.settings.duration >= 30 &&
+                data.settings.duration <= 480
+              ) {
+                setDuration(data.settings.duration);
+              }
+              if (
+                data.settings.selectedDeviceId &&
+                remoteDevices.some((device) => device.id === data.settings?.selectedDeviceId)
+              ) {
+                setSelectedDeviceId(data.settings.selectedDeviceId);
+              }
+              if (
+                data.settings.finishModeConfigured &&
+                (data.settings.finishMode === "soon" || data.settings.finishMode === "last")
+              ) {
+                setFinishMode(data.settings.finishMode);
+                setFinishModeConfigured(true);
+              }
+            } else if (!data.ok) {
+              hasError = true;
             }
-            setSyncStatus("saved");
-          } else if ("error" in data) {
-            setSyncStatus("local");
           } else {
-            setSyncStatus("error");
+            hasError = true;
           }
+
+          if (slotsResult.status === "fulfilled") {
+            const data = slotsResult.value as { ok?: boolean; slots?: Slot[]; error?: string };
+
+            if (data.ok && Array.isArray(data.slots)) {
+              if (data.slots.length > 0 || storedSlots.length === 0) {
+                setSlots(data.slots);
+              }
+            } else if (!("error" in data)) {
+              hasError = true;
+            }
+          } else {
+            hasError = true;
+          }
+
+          setSyncStatus(hasError ? "error" : "saved");
         })
         .catch(() => setSyncStatus("error"))
         .finally(() => setRemoteHydrated(true));
@@ -436,6 +481,56 @@ export function CycleProvider({
       JSON.stringify({ devices, duration, finishMode, finishModeConfigured, selectedDeviceId }),
     );
   }, [devices, duration, finishMode, finishModeConfigured, hydrated, selectedDeviceId]);
+
+  useEffect(() => {
+    if (!hydrated || !remoteHydrated || !isAuthenticated) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const statusTimer = window.setTimeout(() => setSyncStatus("saving"), 0);
+    fetch("/api/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        devices,
+        duration,
+        finishMode,
+        finishModeConfigured,
+        selectedDeviceId,
+      }),
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (response.status === 401) {
+          return { ok: false, local: true };
+        }
+
+        return response.json();
+      })
+      .then((data: { ok?: boolean; local?: boolean }) => {
+        setSyncStatus(data.local ? "local" : data.ok ? "saved" : "error");
+      })
+      .catch((error) => {
+        if ((error as Error).name !== "AbortError") {
+          setSyncStatus("error");
+        }
+      });
+
+    return () => {
+      window.clearTimeout(statusTimer);
+      controller.abort();
+    };
+  }, [
+    devices,
+    duration,
+    finishMode,
+    finishModeConfigured,
+    hydrated,
+    isAuthenticated,
+    remoteHydrated,
+    selectedDeviceId,
+  ]);
 
   useEffect(() => {
     if (!hydrated || !remoteHydrated || !isAuthenticated) {

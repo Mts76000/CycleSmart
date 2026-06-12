@@ -394,6 +394,12 @@ export function CycleProvider({
       syncTime();
       setHydrated(true);
 
+      if (!isAuthenticated) {
+        setSyncStatus("local");
+        setRemoteHydrated(true);
+        return;
+      }
+
       setSyncStatus("loading");
       fetch("/api/slots")
         .then((response) => response.json())
@@ -418,7 +424,7 @@ export function CycleProvider({
       window.clearTimeout(timer);
       window.clearInterval(interval);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!hydrated) {
@@ -432,7 +438,7 @@ export function CycleProvider({
   }, [devices, duration, finishMode, finishModeConfigured, hydrated, selectedDeviceId]);
 
   useEffect(() => {
-    if (!hydrated || !remoteHydrated) {
+    if (!hydrated || !remoteHydrated || !isAuthenticated) {
       return;
     }
 
@@ -466,7 +472,7 @@ export function CycleProvider({
       window.clearTimeout(statusTimer);
       controller.abort();
     };
-  }, [hydrated, remoteHydrated, slots]);
+  }, [hydrated, isAuthenticated, remoteHydrated, slots]);
 
   const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
   const selectedDelayStep = selectedDevice?.delayStep || 30;

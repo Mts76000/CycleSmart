@@ -37,9 +37,18 @@ const signupSchema = z.object({
 
 const loginSchema = signupSchema.pick({ email: true, password: true });
 
-function authUnavailable(values: AuthFormValues): NonNullable<AuthFormState> {
+function databaseUnavailable(values: AuthFormValues): NonNullable<AuthFormState> {
   return {
-    message: "Connexion au compte indisponible pour le moment. Reessaie dans quelques instants.",
+    message:
+      "Base de donnees indisponible. Verifie les variables PostgreSQL dans Coolify.",
+    values,
+  };
+}
+
+function sessionUnavailable(values: AuthFormValues): NonNullable<AuthFormState> {
+  return {
+    message:
+      "Session mal configuree. Verifie SESSION_SECRET dans les variables Coolify.",
     values,
   };
 }
@@ -81,14 +90,14 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
     );
   } catch (error) {
     console.error("Signup failed", error);
-    return authUnavailable({ name, email });
+    return databaseUnavailable({ name, email });
   }
 
   try {
     await createSession(userId);
   } catch (error) {
     console.error("Session creation failed", error);
-    return authUnavailable({ name, email });
+    return sessionUnavailable({ name, email });
   }
 
   redirect("/profil");
@@ -131,14 +140,14 @@ export async function login(_state: AuthFormState, formData: FormData): Promise<
     userId = user.id;
   } catch (error) {
     console.error("Login failed", error);
-    return authUnavailable({ email });
+    return databaseUnavailable({ email });
   }
 
   try {
     await createSession(userId);
   } catch (error) {
     console.error("Session creation failed", error);
-    return authUnavailable({ email });
+    return sessionUnavailable({ email });
   }
 
   redirect("/profil");

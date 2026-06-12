@@ -1,13 +1,4 @@
-import { Pool } from "pg";
-
-type DbConfig = {
-  host: string;
-  port: number;
-  database: string;
-  user: string;
-  password: string;
-  ssl: boolean;
-};
+import { Pool, type PoolConfig } from "pg";
 
 let pool: Pool | undefined;
 
@@ -21,25 +12,52 @@ function getRequiredEnv(name: string) {
   return value;
 }
 
-function getDbConfig(): DbConfig {
+function shouldUseSsl(connectionString?: string) {
+  const envSsl = process.env.POSTGRES_SSL?.trim().toLowerCase();
+
+  if (envSsl) {
+    return ["1", "true", "require", "required"].includes(envSsl);
+  }
+
+  if (connectionString) {
+    try {
+      return new URL(connectionString).searchParams.get("sslmode") === "require";
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+function getSslConfig(connectionString?: string) {
+  return shouldUseSsl(connectionString) ? { rejectUnauthorized: false } : false;
+}
+
+function getDbConfig(): PoolConfig {
+  const connectionString =
+    process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
+
+  if (connectionString) {
+    return {
+      connectionString,
+      ssl: getSslConfig(connectionString),
+    };
+  }
+
   return {
     host: getRequiredEnv("POSTGRES_HOST"),
     port: Number(process.env.POSTGRES_PORT || 5432),
     database: getRequiredEnv("POSTGRES_DATABASE"),
     user: getRequiredEnv("POSTGRES_USER"),
     password: getRequiredEnv("POSTGRES_PASSWORD"),
-    ssl: process.env.POSTGRES_SSL !== "false",
+    ssl: getSslConfig(),
   };
 }
 
 export function getPool() {
   if (!pool) {
-    const config = getDbConfig();
-
-    pool = new Pool({
-      ...config,
-      ssl: config.ssl ? { rejectUnauthorized: false } : false,
-    });
+    pool = new Pool(getDbConfig());
   }
 
   return pool;

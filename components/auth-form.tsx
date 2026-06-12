@@ -10,13 +10,22 @@ type AuthMode = "login" | "signup";
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const isSignup = mode === "signup";
   const action = isSignup ? signup : login;
-  const [state, formAction, pending] = useActionState<AuthFormState, FormData>(action, undefined);
+  const [state, formAction, pending] = useActionState<AuthFormState, FormData>(
+    action,
+    undefined,
+  );
 
   return (
-    <form className="mt-8 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-200/80" action={formAction}>
+    <form
+      className="mt-8 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-200/80"
+      action={formAction}
+    >
       <div className="grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
         {isSignup ? (
-          <Link className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500" href="/connexion">
+          <Link
+            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500"
+            href="/connexion"
+          >
             Connexion
           </Link>
         ) : (
@@ -29,7 +38,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             Inscription
           </span>
         ) : (
-          <Link className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500" href="/inscription">
+          <Link
+            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500"
+            href="/inscription"
+          >
             Inscription
           </Link>
         )}
@@ -37,7 +49,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
       {isSignup && (
         <>
-          <label className="mt-6 block text-sm font-semibold text-slate-600" htmlFor="name">
+          <label
+            className="mt-6 block text-sm font-semibold text-slate-600"
+            htmlFor="name"
+          >
             Nom
           </label>
           <input
@@ -53,7 +68,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </>
       )}
 
-      <label className={`${isSignup ? "mt-4" : "mt-6"} block text-sm font-semibold text-slate-600`} htmlFor="email">
+      <label
+        className={`${isSignup ? "mt-4" : "mt-6"} block text-sm font-semibold text-slate-600`}
+        htmlFor="email"
+      >
         Adresse e-mail
       </label>
       <input
@@ -67,7 +85,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       />
       {state?.errors?.email && <FormError messages={state.errors.email} />}
 
-      <label className="mt-4 block text-sm font-semibold text-slate-600" htmlFor="password">
+      <label
+        className="mt-4 block text-sm font-semibold text-slate-600"
+        htmlFor="password"
+      >
         Mot de passe
       </label>
       <PasswordInput
@@ -75,16 +96,26 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         name="password"
         autoComplete={isSignup ? "new-password" : "current-password"}
       />
-      {state?.errors?.password && <FormError messages={state.errors.password} />}
+      {state?.errors?.password && (
+        <FormError messages={state.errors.password} />
+      )}
 
       {!isSignup && (
         <>
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="mt-4 flex items-center justify-between gap-3 flex-col">
             <label className="flex flex-1 items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
-              <input className="size-4 accent-emerald-600" type="checkbox" name="remember" value="yes" />
+              <input
+                className="size-4 accent-emerald-600"
+                type="checkbox"
+                name="remember"
+                value="yes"
+              />
               Rester connecte plus longtemps
             </label>
-            <Link className="text-sm font-bold text-emerald-800" href="/mot-de-passe-oublie">
+            <Link
+              className="text-sm font-bold text-emerald-800"
+              href="/mot-de-passe-oublie"
+            >
               Mot de passe oublie ?
             </Link>
           </div>
@@ -102,7 +133,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         type="submit"
         disabled={pending}
       >
-        {pending ? "Verification..." : isSignup ? "Creer mon compte →" : "Me connecter →"}
+        {pending
+          ? "Verification..."
+          : isSignup
+            ? "Creer mon compte →"
+            : "Me connecter →"}
       </button>
 
       <p className="mt-5 rounded-full bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
@@ -113,5 +148,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 }
 
 function FormError({ messages }: { messages: string[] }) {
-  return <p className="mt-2 text-sm font-semibold text-red-600">{messages[0]}</p>;
+  return (
+    <p className="mt-2 text-sm font-semibold text-red-600">{messages[0]}</p>
+  );
 }

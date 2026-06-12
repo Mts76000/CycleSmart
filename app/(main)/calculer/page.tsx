@@ -173,7 +173,7 @@ export default function CalculerPage() {
         </span>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <div className="rounded-3xl bg-white/12 p-4">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">Appareil</p>
           <p className="mt-2 text-lg font-black">{selectedDevice?.name || "Machine"}</p>
@@ -228,7 +228,7 @@ export default function CalculerPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-3xl bg-slate-50 p-4">
+      <div className="mt-6 rounded-3xl bg-slate-50 p-4 sm:p-5">
         <div className="flex items-center gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700">
             <DeviceIcon className="size-5" />
@@ -243,13 +243,13 @@ export default function CalculerPage() {
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {devices.map((device) => {
             const active = selectedDeviceId === device.id;
 
             return (
               <button
-                className={`relative rounded-2xl border bg-white px-3 py-3 text-left text-slate-700 transition ${
+                className={`relative min-h-24 rounded-2xl border bg-white px-4 py-4 text-left text-slate-700 transition ${
                   active
                     ? "border-emerald-300 shadow-sm"
                     : "border-transparent hover:border-emerald-100 hover:text-emerald-800"
@@ -261,8 +261,8 @@ export default function CalculerPage() {
                 {active && (
                   <span className="absolute right-3 top-3 size-2 rounded-full bg-emerald-500" />
                 )}
-                <span className="block pr-4 font-bold leading-5">{device.name}</span>
-                <span className="mt-1 block text-sm text-slate-500">
+                <span className="block pr-4 text-lg font-bold leading-6">{device.name}</span>
+                <span className="mt-2 block text-sm text-slate-500">
                   {formatDuration(device.defaultDuration)} · pas {formatDuration(device.delayStep)}
                 </span>
               </button>

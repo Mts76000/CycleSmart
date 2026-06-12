@@ -124,10 +124,6 @@ export default function CreneauxPage() {
         <h2 className="mt-3 text-3xl font-black tracking-normal md:text-5xl">
           Tes heures creuses et tes machines
         </h2>
-        <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-white/75 md:text-base">
-          Le calculateur utilise seulement l&apos;heure de depart. Si le cycle finit apres le
-          creneau, ce n&apos;est pas un probleme.
-        </p>
       </section>
 
       <section className="rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70 md:p-6">
@@ -328,7 +324,7 @@ export default function CreneauxPage() {
 
             return (
               <article
-                className={`grid gap-3 rounded-2xl border p-4 md:grid-cols-[minmax(180px,1fr)_140px_190px_44px] md:items-end ${
+                className={`grid gap-4 rounded-2xl border p-4 md:grid-cols-[minmax(180px,1fr)_140px_190px_44px] md:items-end ${
                   active ? "border-emerald-300 bg-slate-50 shadow-sm" : "border-slate-100 bg-slate-50"
                 }`}
                 key={device.id}
@@ -350,11 +346,6 @@ export default function CreneauxPage() {
                         value={device.name}
                         onChange={(event) => updateDevice(device.id, { name: event.target.value })}
                       />
-                      {active && (
-                        <span className="mt-1 inline-flex rounded-full bg-white px-2 py-1 text-[11px] font-black uppercase tracking-[0.08em] text-emerald-700">
-                          Utilisee dans le calcul
-                        </span>
-                      )}
                     </div>
                   </div>
                 </label>

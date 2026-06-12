@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 import {
   dayMinutes,
+  delayStepOptions,
   formatDuration,
   minutesToTime,
   timeToMinutes,
@@ -117,11 +118,13 @@ export default function CalculerPage() {
     slots,
     suggestions,
     syncStatus,
+    updateDevice,
     updateSlot,
   } = useCycle();
   const recommended = suggestions[0];
   const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
   const delayStep = selectedDevice?.delayStep || 30;
+  const selectedDelayStepIndex = Math.max(0, delayStepOptions.indexOf(delayStep));
   const exactStartAdvice = getExactStartAdvice(recommended, currentTime, delayStep);
   const earlyStartWarning = getEarlyStartWarning(recommended, currentTime, delayStep);
   const endsOutsideSlot = recommended
@@ -258,7 +261,7 @@ export default function CalculerPage() {
             type="button"
             onClick={() => setFinishMode("soon")}
           >
-            Je regle maintenant
+            Depart des que possible
           </button>
           <button
             className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
@@ -267,7 +270,7 @@ export default function CalculerPage() {
             type="button"
             onClick={() => setFinishMode("last")}
           >
-            Le plus tard possible
+            Fin au dernier moment
           </button>
         </div>
 
@@ -306,9 +309,9 @@ export default function CalculerPage() {
         <section className="rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-2xl font-black tracking-normal text-slate-950">Test rapide</p>
+              <p className="text-2xl font-black tracking-normal text-slate-950">Calcul simple</p>
               <p className="mt-1 text-sm leading-5 text-slate-500">
-                Heures creuses, machine et duree sur le meme ecran.
+                Fais un calcul simple, sans creer de compte.
               </p>
             </div>
             {!showSlotForm && (
@@ -421,35 +424,8 @@ export default function CalculerPage() {
             </span>
             <div>
               <p className="font-bold text-slate-950">Cycle</p>
-              <p className="text-sm text-slate-500">Choisis la machine et la duree.</p>
+              <p className="text-sm text-slate-500">Entre juste la duree et le pas du depart differe.</p>
             </div>
-          </div>
-
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {devices.map((device) => {
-              const active = selectedDeviceId === device.id;
-
-              return (
-                <button
-                  className={`relative rounded-2xl border bg-white px-3 py-3 text-left text-slate-700 transition ${
-                    active
-                      ? "border-emerald-300 shadow-sm"
-                      : "border-transparent hover:border-emerald-100 hover:text-emerald-800"
-                  }`}
-                  key={device.id}
-                  type="button"
-                  onClick={() => selectDevice(device.id)}
-                >
-                  {active && (
-                    <span className="absolute right-3 top-3 size-2 rounded-full bg-emerald-500" />
-                  )}
-                  <span className="block pr-4 font-bold leading-5">{device.name}</span>
-                  <span className="mt-1 block text-sm text-slate-500">
-                    {formatDuration(device.defaultDuration)} · pas {formatDuration(device.delayStep)}
-                  </span>
-                </button>
-              );
-            })}
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
@@ -460,7 +436,7 @@ export default function CalculerPage() {
               type="button"
               onClick={() => setFinishMode("soon")}
             >
-              Je regle maintenant
+              Depart des que possible
             </button>
             <button
               className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
@@ -469,7 +445,7 @@ export default function CalculerPage() {
               type="button"
               onClick={() => setFinishMode("last")}
             >
-              Finir au plus tard
+              Fin au dernier moment
             </button>
           </div>
 
@@ -496,12 +472,42 @@ export default function CalculerPage() {
             <span>4 h</span>
             <span>8 h</span>
           </div>
+
+          <div className="mt-5 flex items-center justify-between gap-4">
+            <label className="text-sm font-bold text-slate-700" htmlFor="guest-delay-step">
+              Pas du depart differe
+            </label>
+            <span className="rounded-full bg-slate-50 px-4 py-2 text-base font-black text-emerald-700">
+              {formatDuration(delayStep)}
+            </span>
+          </div>
+          <input
+            id="guest-delay-step"
+            className="mt-4 w-full accent-emerald-700"
+            type="range"
+            min="0"
+            max={delayStepOptions.length - 1}
+            step="1"
+            value={selectedDelayStepIndex}
+            onChange={(event) => {
+              if (selectedDevice) {
+                updateDevice(selectedDevice.id, {
+                  delayStep: delayStepOptions[Number(event.target.value)],
+                });
+              }
+            }}
+          />
+          <div className="mt-2 flex justify-between text-xs font-semibold text-slate-400">
+            {delayStepOptions.map((step) => (
+              <span key={step}>{formatDuration(step)}</span>
+            ))}
+          </div>
         </section>
 
         <section className="rounded-2xl border border-emerald-100 bg-green-50 px-4 py-3 text-sm font-semibold leading-6 text-emerald-950">
           <p>
-            Sans compte, tes reglages restent seulement sur cet appareil. Avec un compte, tu les
-            retrouves sur ton telephone et ton ordinateur.
+            Tu peux utiliser le calculateur sans compte. Cree un compte seulement si tu veux garder
+            tes heures creuses et tes appareils.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Link className="rounded-xl bg-emerald-500 px-4 py-2 text-white" href="/inscription">

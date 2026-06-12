@@ -19,8 +19,27 @@ import {
   useCycle,
 } from "@/lib/cycle-store";
 
+const durationMin = 30;
+const durationMax = 480;
+
 function formatWait(wait: number) {
   return wait === 0 ? "0 h" : formatDuration(wait);
+}
+
+function getTickPosition(value: number) {
+  return `${((value - durationMin) / (durationMax - durationMin)) * 100}%`;
+}
+
+function DurationTicks() {
+  return (
+    <div className="relative mt-2 h-5 text-xs font-semibold text-slate-400">
+      <span className="absolute left-0">30 min</span>
+      <span className="absolute -translate-x-1/2" style={{ left: getTickPosition(240) }}>
+        4 h
+      </span>
+      <span className="absolute right-0">8 h</span>
+    </div>
+  );
 }
 
 function getSlotIcon(startTime: string) {
@@ -286,17 +305,13 @@ export default function CalculerPage() {
           id="duration"
           className="mt-4 w-full accent-emerald-700"
           type="range"
-          min="30"
-          max="480"
+          min={durationMin}
+          max={durationMax}
           step="5"
           value={duration}
           onChange={(event) => setDuration(Number(event.target.value))}
         />
-        <div className="mt-2 flex justify-between text-xs font-semibold text-slate-400">
-          <span>30 min</span>
-          <span>4 h</span>
-          <span>8 h</span>
-        </div>
+        <DurationTicks />
       </div>
     </section>
   );
@@ -461,17 +476,13 @@ export default function CalculerPage() {
             id="duration"
             className="mt-4 w-full accent-emerald-700"
             type="range"
-            min="30"
-            max="480"
+            min={durationMin}
+            max={durationMax}
             step="5"
             value={duration}
             onChange={(event) => setDuration(Number(event.target.value))}
           />
-          <div className="mt-2 flex justify-between text-xs font-semibold text-slate-400">
-            <span>30 min</span>
-            <span>4 h</span>
-            <span>8 h</span>
-          </div>
+          <DurationTicks />
 
           <div className="mt-5 flex items-center justify-between gap-4">
             <label className="text-sm font-bold text-slate-700" htmlFor="guest-delay-step">

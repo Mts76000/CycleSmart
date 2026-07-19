@@ -53,15 +53,36 @@ function StepSelect({
 }) {
   return (
     <select
-      className={`h-12 rounded-2xl bg-slate-100 px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 ${className}`}
+      className={`h-12 min-w-0 rounded-2xl bg-slate-100 px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 ${className}`}
       value={value}
       onChange={(event) => onChange(Number(event.target.value))}
     >
       {delayStepOptions.map((step) => (
         <option key={step} value={step}>
-          Tous les {formatDuration(step)}
+          Pas {formatDuration(step)}
         </option>
       ))}
+    </select>
+  );
+}
+
+function ModeSelect({
+  className = "",
+  value,
+  onChange,
+}: {
+  className?: string;
+  value: "soon" | "last";
+  onChange: (value: "soon" | "last") => void;
+}) {
+  return (
+    <select
+      className={`h-12 min-w-0 rounded-2xl bg-slate-100 px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 ${className}`}
+      value={value}
+      onChange={(event) => onChange(event.target.value as "soon" | "last")}
+    >
+      <option value="soon">Depart dans</option>
+      <option value="last">Fin dans</option>
     </select>
   );
 }
@@ -106,6 +127,9 @@ export default function CreneauxPage() {
     updateSlot,
   } = useCycle();
 
+  const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
+  const modeLabel = selectedDevice?.mode === "last" ? "Fin dans le creneau" : "Depart dans le creneau";
+
   const syncLabel = {
     local: "Sur cet appareil",
     loading: "Verification...",
@@ -137,8 +161,8 @@ export default function CreneauxPage() {
               <p className="text-sm text-slate-500">{slotCountLabel(slots.length)} enregistre</p>
             </div>
           </div>
-          <p className="rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-emerald-800">
-            Depart dans le creneau
+          <p className="max-w-full rounded-full bg-green-50 px-4 py-2 text-sm font-bold leading-snug text-emerald-800">
+            {modeLabel}
           </p>
         </div>
 
@@ -280,9 +304,9 @@ export default function CreneauxPage() {
 
         {showDeviceForm && (
           <div className="mt-3 rounded-3xl border border-dashed border-emerald-200 bg-green-50/50 p-4">
-            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_190px_auto]">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_140px_minmax(160px,1fr)_minmax(130px,1fr)_auto] xl:items-end">
               <input
-                className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
+                className="h-12 min-w-0 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4 sm:col-span-2 xl:col-span-1"
                 placeholder="Ex: Seche-linge"
                 value={newDevice.name}
                 onChange={(event) =>
@@ -303,8 +327,13 @@ export default function CreneauxPage() {
                 value={newDevice.delayStep}
                 onChange={(delayStep) => setNewDevice((device) => ({ ...device, delayStep }))}
               />
+              <ModeSelect
+                className="bg-white"
+                value={newDevice.mode}
+                onChange={(mode) => setNewDevice((device) => ({ ...device, mode }))}
+              />
               <button
-                className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2 xl:col-span-1"
                 type="button"
                 disabled={!newDevice.name.trim()}
                 onClick={() => {
@@ -324,12 +353,12 @@ export default function CreneauxPage() {
 
             return (
               <article
-                className={`grid gap-4 rounded-2xl border p-4 md:grid-cols-[minmax(180px,1fr)_140px_190px_44px] md:items-end ${
+                className={`grid gap-4 rounded-2xl border p-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(120px,140px)_minmax(0,1fr)_minmax(0,1fr)_44px] xl:items-end ${
                   active ? "border-emerald-300 bg-slate-50 shadow-sm" : "border-slate-100 bg-slate-50"
                 }`}
                 key={device.id}
               >
-                <label className="block">
+                <label className="block md:col-span-2 xl:col-span-1">
                   <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
                     Machine
                   </span>
@@ -375,8 +404,19 @@ export default function CreneauxPage() {
                   />
                 </label>
 
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    Mode
+                  </span>
+                  <ModeSelect
+                    className="mt-1 w-full bg-white"
+                    value={device.mode}
+                    onChange={(mode) => updateDevice(device.id, { mode })}
+                  />
+                </label>
+
                 <button
-                  className="grid h-12 place-items-center rounded-2xl bg-white text-slate-400 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="grid h-12 place-items-center rounded-2xl bg-white text-slate-400 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30 md:col-span-2 md:justify-self-end xl:col-span-1 xl:justify-self-auto"
                   type="button"
                   disabled={devices.length <= 1}
                   onClick={() => removeDevice(device.id)}

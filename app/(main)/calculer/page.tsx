@@ -56,6 +56,37 @@ function getSlotIcon(startTime: string) {
   return ClockIcon;
 }
 
+function ModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: "soon" | "last";
+  onChange: (mode: "soon" | "last") => void;
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-1 rounded-2xl bg-slate-100 p-1 sm:grid-cols-2">
+      <button
+        className={`rounded-xl px-3 py-3 text-sm font-bold leading-snug transition ${
+          mode === "soon" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
+        }`}
+        type="button"
+        onClick={() => onChange("soon")}
+      >
+        Depart des que possible
+      </button>
+      <button
+        className={`rounded-xl px-3 py-3 text-sm font-bold leading-snug transition ${
+          mode === "last" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
+        }`}
+        type="button"
+        onClick={() => onChange("last")}
+      >
+        Fin au dernier moment
+      </button>
+    </div>
+  );
+}
+
 function getSlotBoundsForSuggestion(suggestion: Suggestion) {
   let slotStart = timeToMinutes(suggestion.slot.start);
   const rawEnd = timeToMinutes(suggestion.slot.end);
@@ -125,17 +156,16 @@ export default function CalculerPage() {
     currentTime,
     devices,
     duration,
-    finishMode,
     isAuthenticated,
     newSlot,
     removeSlot,
     selectedDeviceId,
     selectDevice,
     setDuration,
-    setFinishMode,
     setNewSlot,
     slots,
     suggestions,
+    alternativeSuggestion,
     syncStatus,
     updateDevice,
     updateSlot,
@@ -143,26 +173,35 @@ export default function CalculerPage() {
   const recommended = suggestions[0];
   const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
   const delayStep = selectedDevice?.delayStep || 30;
+  const selectedMode = selectedDevice?.mode || "soon";
   const selectedDelayStepIndex = Math.max(0, delayStepOptions.indexOf(delayStep));
   const exactStartAdvice = getExactStartAdvice(recommended, currentTime, delayStep);
   const earlyStartWarning = getEarlyStartWarning(recommended, currentTime, delayStep);
   const endsOutsideSlot = recommended
     ? recommended.end > getSlotBoundsForSuggestion(recommended).slotEnd
     : false;
+  const alternativeEndsOutside = alternativeSuggestion
+    ? alternativeSuggestion.end > getSlotBoundsForSuggestion(alternativeSuggestion).slotEnd
+    : false;
+  const setSelectedMode = (mode: "soon" | "last") => {
+    if (selectedDevice) {
+      updateDevice(selectedDevice.id, { mode });
+    }
+  };
   const isSynced = syncStatus === "saved" || syncStatus === "saving";
   const resultCard = (
     <section className="rounded-[28px] bg-emerald-700 p-5 text-white shadow-xl shadow-emerald-300/30 md:p-7">
       <div className="flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/70">
             Prochain lancement
           </p>
-          <h2 className="mt-3 text-6xl font-black tracking-normal md:text-7xl">
+          <h2 className="mt-3 text-5xl font-black tracking-normal sm:text-6xl md:text-7xl">
             {recommended ? formatWait(recommended.wait) : "--"}
           </h2>
-          <p className="mt-3 text-base font-bold leading-6 text-white/80">
+          <p className="mt-3 break-words text-base font-bold leading-6 text-white/80">
             {recommended
-              ? `Depart a ${minutesToTime(recommended.start)} · fin a ${minutesToTime(
+              ? `${recommended.slot.name} · depart ${minutesToTime(recommended.start)} · fin ${minutesToTime(
                   recommended.end,
                 )}`
               : "Ajoute un creneau pour obtenir une recommandation."}
@@ -204,6 +243,30 @@ export default function CalculerPage() {
               Fin hors heures creuses, mais depart bien dans {recommended.slot.name}.
             </p>
           )}
+        </div>
+      )}
+
+      {alternativeSuggestion && (
+        <div className="mt-4 rounded-3xl border border-white/15 bg-white/10 p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">
+            Autre creneau possible
+          </p>
+          <p className="mt-2 break-words text-sm font-semibold leading-6 text-white/90">
+            {alternativeSuggestion.slot.name} · depart {minutesToTime(alternativeSuggestion.start)} ·
+            fin {minutesToTime(alternativeSuggestion.end)}
+          </p>
+          {alternativeEndsOutside && (
+            <p className="mt-1 text-sm leading-6 text-white/75">
+              Le cycle depasse ce creneau, mais le depart reste bien dans les heures creuses.
+            </p>
+          )}
+          <button
+            className="mt-3 rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/25"
+            type="button"
+            onClick={() => setSelectedMode("soon")}
+          >
+            Utiliser ce creneau
+          </button>
         </div>
       )}
     </section>
@@ -272,28 +335,12 @@ export default function CalculerPage() {
       </div>
 
       <div className="mt-4 rounded-3xl bg-slate-50 p-4">
-        <div className="grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
-          <button
-            className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
-              finishMode === "soon" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
-            }`}
-            type="button"
-            onClick={() => setFinishMode("soon")}
-          >
-            Depart des que possible
-          </button>
-          <button
-            className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
-              finishMode === "last" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
-            }`}
-            type="button"
-            onClick={() => setFinishMode("last")}
-          >
-            Fin au dernier moment
-          </button>
+        <p className="text-sm font-bold text-slate-700">Mode de calcul</p>
+        <div className="mt-3">
+          <ModeToggle mode={selectedMode} onChange={setSelectedMode} />
         </div>
 
-        <div className="mt-5 flex items-center justify-between gap-4">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <label className="text-sm font-bold text-slate-700" htmlFor="duration">
             Duree du programme
           </label>
@@ -443,28 +490,14 @@ export default function CalculerPage() {
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
-            <button
-              className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
-                finishMode === "soon" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
-              }`}
-              type="button"
-              onClick={() => setFinishMode("soon")}
-            >
-              Depart des que possible
-            </button>
-            <button
-              className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
-                finishMode === "last" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
-              }`}
-              type="button"
-              onClick={() => setFinishMode("last")}
-            >
-              Fin au dernier moment
-            </button>
+          <div className="mt-4 rounded-2xl bg-slate-50 p-3">
+            <p className="text-sm font-bold text-slate-700">Mode de calcul</p>
+            <div className="mt-3">
+              <ModeToggle mode={selectedMode} onChange={setSelectedMode} />
+            </div>
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-4">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <label className="text-sm font-bold text-slate-700" htmlFor="duration">
               Duree du programme
             </label>

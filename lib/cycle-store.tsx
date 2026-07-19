@@ -25,6 +25,7 @@ export type CycleDevice = {
   description: string;
   defaultDuration: number;
   delayStep: number;
+  mode: FinishMode;
   builtIn?: boolean;
 };
 
@@ -46,6 +47,7 @@ type NewDevice = {
   name: string;
   duration: number;
   delayStep: number;
+  mode: FinishMode;
 };
 
 type StoredSettings = Partial<{
@@ -68,6 +70,7 @@ type CycleContextValue = {
   slots: Slot[];
   newSlot: NewSlot;
   suggestions: Suggestion[];
+  alternativeSuggestion: Suggestion | null;
   best: Suggestion | undefined;
   syncStatus: "local" | "loading" | "saving" | "saved" | "error";
   setCurrentTime: (time: string) => void;
@@ -77,7 +80,7 @@ type CycleContextValue = {
   addDevice: () => void;
   updateDevice: (
     deviceId: string,
-    patch: Partial<Pick<CycleDevice, "name" | "defaultDuration" | "delayStep">>,
+    patch: Partial<Pick<CycleDevice, "name" | "defaultDuration" | "delayStep" | "mode">>,
   ) => void;
   removeDevice: (deviceId: string) => void;
   setFinishMode: (mode: FinishMode) => void;
@@ -102,6 +105,7 @@ export const defaultCycleDevices: CycleDevice[] = [
     description: "Programme coton ou mixte",
     defaultDuration: 150,
     delayStep: 30,
+    mode: "soon",
     builtIn: true,
   },
   {
@@ -110,13 +114,14 @@ export const defaultCycleDevices: CycleDevice[] = [
     description: "Cycle eco quotidien",
     defaultDuration: 195,
     delayStep: 60,
+    mode: "last",
     builtIn: true,
   },
 ];
 
 export const favoriteDurations = [30, 75, 150, 180];
 export const delayStepOptions = [30, 60, 120];
-const defaultNewDevice: NewDevice = { name: "", duration: 120, delayStep: 60 };
+const defaultNewDevice: NewDevice = { name: "", duration: 120, delayStep: 60, mode: "soon" };
 
 const CycleContext = createContext<CycleContextValue | null>(null);
 
@@ -294,6 +299,7 @@ function mergeStoredDevices(storedDevices: CycleDevice[] | undefined) {
           ? normalizeDuration(storedDevice.defaultDuration)
           : defaultDevice.defaultDuration,
       delayStep: normalizeDelayStep(storedDevice?.delayStep),
+      mode: (storedDevice?.mode === "soon" || storedDevice?.mode === "last") ? storedDevice.mode : defaultDevice.mode,
     };
   });
 
@@ -314,6 +320,7 @@ function mergeStoredDevices(storedDevices: CycleDevice[] | undefined) {
       description: device.description || "Machine personnalisee",
       defaultDuration: normalizeDuration(device.defaultDuration),
       delayStep: normalizeDelayStep(device.delayStep),
+      mode: (device.mode === "soon" || device.mode === "last") ? device.mode : "soon",
     })),
   ];
 }
@@ -571,10 +578,37 @@ export function CycleProvider({
 
   const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
   const selectedDelayStep = selectedDevice?.delayStep || 30;
+  const selectedMode = selectedDevice?.mode || "soon";
   const suggestions = useMemo(
-    () => getSuggestions(slots, currentTime, duration, finishMode, selectedDelayStep),
-    [currentTime, duration, finishMode, selectedDelayStep, slots],
+    () => getSuggestions(slots, currentTime, duration, selectedMode, selectedDelayStep),
+    [currentTime, duration, selectedMode, selectedDelayStep, slots],
   );
+  const alternativeSuggestion = useMemo(() => {
+    if (selectedMode !== "last") {
+      return null;
+    }
+
+    const primary = suggestions[0];
+
+    if (!primary) {
+      return null;
+    }
+
+    const soonSuggestions = getSuggestions(
+      slots,
+      currentTime,
+      duration,
+      "soon",
+      selectedDelayStep,
+    );
+
+    return (
+      soonSuggestions.find(
+        (suggestion) =>
+          suggestion.slot.id !== primary.slot.id && suggestion.start < primary.start,
+      ) ?? null
+    );
+  }, [currentTime, duration, selectedDelayStep, selectedMode, slots, suggestions]);
 
   const updateDuration = useCallback((nextDuration: number) => {
     setDuration(nextDuration);
@@ -600,6 +634,7 @@ export function CycleProvider({
     const name = newDevice.name.trim();
     const defaultDuration = normalizeDuration(newDevice.duration);
     const delayStep = normalizeDelayStep(newDevice.delayStep);
+    const mode = newDevice.mode === "soon" || newDevice.mode === "last" ? newDevice.mode : "soon";
 
     if (!name) {
       return;
@@ -611,6 +646,7 @@ export function CycleProvider({
       description: "Machine personnalisee",
       defaultDuration,
       delayStep,
+      mode,
     };
 
     setDevices((current) => [...current, device]);
@@ -622,7 +658,7 @@ export function CycleProvider({
   const updateDevice = useCallback(
     (
       deviceId: string,
-      patch: Partial<Pick<CycleDevice, "name" | "defaultDuration" | "delayStep">>,
+      patch: Partial<Pick<CycleDevice, "name" | "defaultDuration" | "delayStep" | "mode">>,
     ) => {
       setDevices((current) =>
         current.map((device) => {
@@ -636,6 +672,10 @@ export function CycleProvider({
               : normalizeDuration(patch.defaultDuration);
           const nextDelayStep =
             patch.delayStep === undefined ? device.delayStep : normalizeDelayStep(patch.delayStep);
+          const nextMode =
+            patch.mode === undefined
+              ? device.mode
+              : (patch.mode === "soon" || patch.mode === "last" ? patch.mode : device.mode);
 
           if (selectedDeviceId === deviceId) {
             setDuration(nextDuration);
@@ -646,6 +686,7 @@ export function CycleProvider({
             name: patch.name === undefined ? device.name : patch.name,
             defaultDuration: nextDuration,
             delayStep: nextDelayStep,
+            mode: nextMode,
           };
         }),
       );
@@ -734,6 +775,7 @@ export function CycleProvider({
       slots,
       newSlot,
       suggestions,
+      alternativeSuggestion,
       best: suggestions[0],
       syncStatus,
       setCurrentTime,
@@ -753,6 +795,7 @@ export function CycleProvider({
     [
       addSlot,
       addDevice,
+      alternativeSuggestion,
       clearSlots,
       currentTime,
       devices,

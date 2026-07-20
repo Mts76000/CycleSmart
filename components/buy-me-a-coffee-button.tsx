@@ -1,21 +1,15 @@
-"use client";
-
-import Script from "next/script";
-
 export function BuyMeACoffeeButton() {
   return (
-    <Script
-      src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-      strategy="lazyOnload"
-      data-name="bmc-button"
-      data-slug="mlamote"
-      data-color="#FFDD00"
-      data-emoji=""
-      data-font="Cookie"
-      data-text="Buy me a coffee"
-      data-outline-color="#000000"
-      data-font-color="#000000"
-      data-coffee-color="#ffffff"
-    />
+    <div className="mt-6 flex justify-center">
+      <a
+        className="flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-300/40 transition hover:bg-emerald-600 active:scale-[0.98]"
+        href="https://www.buymeacoffee.com/mlamote"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <span aria-hidden="true">☕</span>
+        Buy me a coffee
+      </a>
+    </div>
   );
 }

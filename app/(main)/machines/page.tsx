@@ -213,7 +213,7 @@ export default function MachinesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      className="h-9 rounded-xl bg-emerald-100 px-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-200 sm:h-10 sm:px-3 sm:text-sm"
+                      className="h-9 shrink-0 whitespace-nowrap rounded-xl bg-emerald-100 px-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-200 sm:h-10 sm:px-3 sm:text-sm"
                       type="button"
                       onClick={() => {
                         if (isExpanded) {
@@ -227,11 +227,16 @@ export default function MachinesPage() {
                         }
                       }}
                     >
-                      {isExpanded
-                        ? "Masquer"
-                        : machine.programs.length === 0
-                          ? "Ajouter un programme"
-                          : `${machine.programs.length} prog.`}
+                      {isExpanded ? (
+                        "Masquer"
+                      ) : machine.programs.length === 0 ? (
+                        <>
+                          <span className="sm:hidden">Ajouter</span>
+                          <span className="hidden sm:inline">Ajouter un programme</span>
+                        </>
+                      ) : (
+                        `${machine.programs.length} prog.`
+                      )}
                     </button>
                     <span className="h-6 w-px shrink-0 bg-slate-200" aria-hidden="true" />
                     <button

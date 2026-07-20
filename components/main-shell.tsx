@@ -24,7 +24,6 @@ export function MainShell({
 
   return (
     <CycleProvider isAuthenticated={isAuthenticated}>
-      {!isAuthenticated && <BuyMeACoffeeButton />}
       <main className="min-h-dvh bg-[#f5f7f7] text-slate-950">
         <div
           className={`mx-auto flex min-h-dvh w-full flex-col bg-[#f8faf9] shadow-2xl shadow-slate-300/30 md:bg-transparent md:p-6 md:shadow-none ${
@@ -95,6 +94,7 @@ export function MainShell({
               }`}
             >
               {children}
+              <BuyMeACoffeeButton />
             </section>
           </div>
 

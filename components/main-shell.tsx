@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarIcon, ClockIcon, DeviceIcon, UserIcon } from "./icons";
+import { BuyMeACoffeeButton } from "./buy-me-a-coffee-button";
 import { CycleProvider } from "@/lib/cycle-store";
 
 const tabs = [
@@ -23,6 +24,7 @@ export function MainShell({
 
   return (
     <CycleProvider isAuthenticated={isAuthenticated}>
+      {!isAuthenticated && <BuyMeACoffeeButton />}
       <main className="min-h-dvh bg-[#f5f7f7] text-slate-950">
         <div
           className={`mx-auto flex min-h-dvh w-full flex-col bg-[#f8faf9] shadow-2xl shadow-slate-300/30 md:bg-transparent md:p-6 md:shadow-none ${

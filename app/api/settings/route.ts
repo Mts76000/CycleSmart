@@ -4,21 +4,27 @@ import { ensureDatabaseSchema, getPool, query } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-type DevicePayload = {
+type ProgramPayload = {
   id: string;
   name: string;
   description?: string;
-  defaultDuration: number;
+  duration: number;
   delayStep: number;
+  delayMode?: string;
+};
+
+type MachinePayload = {
+  id: string;
+  name: string;
+  programs?: unknown[];
   builtIn?: boolean;
 };
 
 type SettingsPayload = {
-  devices?: unknown[];
+  machines?: unknown[];
   duration?: unknown;
-  selectedDeviceId?: unknown;
-  finishMode?: unknown;
-  finishModeConfigured?: unknown;
+  selectedProgramId?: unknown;
+  calculationMode?: unknown;
 };
 
 const allowedDelaySteps = [30, 60, 120];
@@ -33,28 +39,45 @@ function normalizeDelayStep(value: unknown) {
   return allowedDelaySteps.includes(step) ? step : 60;
 }
 
-function isDevice(value: unknown): value is DevicePayload {
+function normalizeDelayMode(value: unknown) {
+  return value === "fin" ? "fin" : "depart";
+}
+
+function isProgram(value: unknown): value is ProgramPayload {
   if (!value || typeof value !== "object") {
     return false;
   }
 
-  const device = value as DevicePayload;
-  return Boolean(
-    device.id &&
-      device.name &&
-      typeof device.defaultDuration === "number" &&
-      typeof device.delayStep === "number",
-  );
+  const program = value as ProgramPayload;
+  return Boolean(program.id && program.name && typeof program.duration === "number");
 }
 
-function normalizeDevices(devices: unknown[]) {
-  return devices.filter(isDevice).map((device) => ({
-    id: device.id,
-    name: device.name.trim() || "Machine",
-    description: device.description?.trim() || "Machine personnalisee",
-    defaultDuration: normalizeDuration(device.defaultDuration),
-    delayStep: normalizeDelayStep(device.delayStep),
-    builtIn: Boolean(device.builtIn),
+function normalizePrograms(programs: unknown[]) {
+  return programs.filter(isProgram).map((program) => ({
+    id: program.id,
+    name: program.name.trim() || "Programme",
+    description: program.description?.trim() || "",
+    duration: normalizeDuration(program.duration),
+    delayStep: normalizeDelayStep(program.delayStep),
+    delayMode: normalizeDelayMode(program.delayMode),
+  }));
+}
+
+function isMachine(value: unknown): value is MachinePayload {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const machine = value as MachinePayload;
+  return Boolean(machine.id && machine.name);
+}
+
+function normalizeMachines(machines: unknown[]) {
+  return machines.filter(isMachine).map((machine) => ({
+    id: machine.id,
+    name: machine.name.trim() || "Machine",
+    programs: normalizePrograms(Array.isArray(machine.programs) ? machine.programs : []),
+    builtIn: Boolean(machine.builtIn),
   }));
 }
 
@@ -71,13 +94,11 @@ export async function GET() {
       query<{
         id: string;
         name: string;
-        description: string;
-        default_duration: number;
-        delay_step: number;
+        programs: ProgramPayload[];
         built_in: boolean;
       }>(
         `
-          select id, name, description, default_duration, delay_step, built_in
+          select id, name, programs, built_in
           from cycle_devices
           where user_id = $1
           order by sort_order asc, created_at asc
@@ -85,13 +106,12 @@ export async function GET() {
         [user.id],
       ),
       query<{
-        selected_device_id: string | null;
+        selected_program_id: string | null;
         duration: number;
-        finish_mode: "soon" | "last";
-        finish_mode_configured: boolean;
+        calculation_mode: "soon" | "last";
       }>(
         `
-          select selected_device_id, duration, finish_mode, finish_mode_configured
+          select selected_program_id, duration, calculation_mode
           from cycle_preferences
           where user_id = $1
           limit 1
@@ -101,27 +121,24 @@ export async function GET() {
     ]);
 
     const preferences = preferencesResult.rows[0];
-    const devices = devicesResult.rows.map((device) => ({
+    const machines = devicesResult.rows.map((device) => ({
       id: device.id,
       name: device.name,
-      description: device.description,
-      defaultDuration: device.default_duration,
-      delayStep: device.delay_step,
+      programs: device.programs,
       builtIn: device.built_in,
     }));
 
-    if (!preferences && devices.length === 0) {
+    if (!preferences && machines.length === 0) {
       return Response.json({ ok: true, settings: null });
     }
 
     return Response.json({
       ok: true,
       settings: {
-        devices,
+        machines,
         duration: preferences?.duration,
-        selectedDeviceId: preferences?.selected_device_id,
-        finishMode: preferences?.finish_mode,
-        finishModeConfigured: preferences?.finish_mode_configured,
+        selectedProgramId: preferences?.selected_program_id,
+        calculationMode: preferences?.calculation_mode,
       },
     });
   } catch (error) {
@@ -139,20 +156,19 @@ export async function PUT(request: Request) {
   try {
     const user = await requireCurrentUser();
     const body = (await request.json()) as SettingsPayload;
-    const devices = normalizeDevices(Array.isArray(body.devices) ? body.devices : []);
+    const machines = normalizeMachines(Array.isArray(body.machines) ? body.machines : []);
 
-    if (devices.length === 0) {
+    if (machines.length === 0) {
       return Response.json({ ok: false, error: "Aucune machine a enregistrer." }, { status: 400 });
     }
 
-    const selectedDeviceId =
-      typeof body.selectedDeviceId === "string" &&
-      devices.some((device) => device.id === body.selectedDeviceId)
-        ? body.selectedDeviceId
-        : devices[0].id;
-    const finishMode = body.finishMode === "last" ? "last" : "soon";
+    const allProgramIds = machines.flatMap((machine) => machine.programs.map((program) => program.id));
+    const selectedProgramId =
+      typeof body.selectedProgramId === "string" && allProgramIds.includes(body.selectedProgramId)
+        ? body.selectedProgramId
+        : allProgramIds[0] ?? null;
+    const calculationMode = body.calculationMode === "last" ? "last" : "soon";
     const duration = normalizeDuration(body.duration);
-    const finishModeConfigured = Boolean(body.finishModeConfigured);
 
     await ensureDatabaseSchema();
     client = await getPool().connect();
@@ -161,22 +177,20 @@ export async function PUT(request: Request) {
 
     await client.query("delete from cycle_devices where user_id = $1", [user.id]);
 
-    for (const [index, device] of devices.entries()) {
+    for (const [index, machine] of machines.entries()) {
       await client.query(
         `
           insert into cycle_devices (
-            id, user_id, name, description, default_duration, delay_step, built_in, sort_order, updated_at
+            id, user_id, name, programs, built_in, sort_order, updated_at
           )
-          values ($1, $2, $3, $4, $5, $6, $7, $8, now())
+          values ($1, $2, $3, $4, $5, $6, now())
         `,
         [
-          device.id,
+          machine.id,
           user.id,
-          device.name,
-          device.description,
-          device.defaultDuration,
-          device.delayStep,
-          device.builtIn,
+          machine.name,
+          JSON.stringify(machine.programs),
+          machine.builtIn,
           index,
         ],
       );
@@ -185,22 +199,21 @@ export async function PUT(request: Request) {
     await client.query(
       `
         insert into cycle_preferences (
-          user_id, selected_device_id, duration, finish_mode, finish_mode_configured, updated_at
+          user_id, selected_program_id, duration, calculation_mode, updated_at
         )
-        values ($1, $2, $3, $4, $5, now())
+        values ($1, $2, $3, $4, now())
         on conflict (user_id) do update set
-          selected_device_id = excluded.selected_device_id,
+          selected_program_id = excluded.selected_program_id,
           duration = excluded.duration,
-          finish_mode = excluded.finish_mode,
-          finish_mode_configured = excluded.finish_mode_configured,
+          calculation_mode = excluded.calculation_mode,
           updated_at = now()
       `,
-      [user.id, selectedDeviceId, duration, finishMode, finishModeConfigured],
+      [user.id, selectedProgramId, duration, calculationMode],
     );
 
     await client.query("commit");
 
-    return Response.json({ ok: true, saved: devices.length });
+    return Response.json({ ok: true, saved: machines.length });
   } catch (error) {
     if (client && transactionStarted) {
       await client.query("rollback");

@@ -17,15 +17,23 @@ export type Slot = {
   end: string;
 };
 
-export type FinishMode = "soon" | "last";
+export type CalculationMode = "soon" | "last";
 
-export type CycleDevice = {
+export type ProgramDelayMode = "depart" | "fin";
+
+export type Program = {
   id: string;
   name: string;
   description: string;
-  defaultDuration: number;
+  duration: number;
   delayStep: number;
-  mode: FinishMode;
+  delayMode: ProgramDelayMode;
+};
+
+export type Machine = {
+  id: string;
+  name: string;
+  programs: Program[];
   builtIn?: boolean;
 };
 
@@ -43,19 +51,22 @@ type NewSlot = {
   end: string;
 };
 
-type NewDevice = {
+type NewProgram = {
   name: string;
   duration: number;
   delayStep: number;
-  mode: FinishMode;
+  delayMode: ProgramDelayMode;
+};
+
+type NewMachine = {
+  name: string;
 };
 
 type StoredSettings = Partial<{
   duration: number;
-  finishMode: FinishMode;
-  finishModeConfigured: boolean;
-  selectedDeviceId: string;
-  devices: CycleDevice[];
+  calculationMode: CalculationMode;
+  selectedProgramId: string;
+  machines: Machine[];
 }>;
 
 type CycleContextValue = {
@@ -63,10 +74,11 @@ type CycleContextValue = {
   currentTime: string;
   todayLabel: string;
   duration: number;
-  selectedDeviceId: string;
-  devices: CycleDevice[];
-  newDevice: NewDevice;
-  finishMode: FinishMode;
+  selectedProgramId: string;
+  machines: Machine[];
+  newProgram: NewProgram;
+  newMachine: NewMachine;
+  calculationMode: CalculationMode;
   slots: Slot[];
   newSlot: NewSlot;
   suggestions: Suggestion[];
@@ -75,15 +87,22 @@ type CycleContextValue = {
   syncStatus: "local" | "loading" | "saving" | "saved" | "error";
   setCurrentTime: (time: string) => void;
   setDuration: (duration: number) => void;
-  selectDevice: (deviceId: string) => void;
-  setNewDevice: (device: NewDevice | ((device: NewDevice) => NewDevice)) => void;
-  addDevice: () => void;
-  updateDevice: (
-    deviceId: string,
-    patch: Partial<Pick<CycleDevice, "name" | "defaultDuration" | "delayStep" | "mode">>,
+  selectProgram: (programId: string) => void;
+  setNewProgram: (program: NewProgram | ((program: NewProgram) => NewProgram)) => void;
+  setNewMachine: (machine: NewMachine | ((machine: NewMachine) => NewMachine)) => void;
+  addMachine: () => string | null;
+  addProgram: (machineId: string) => void;
+  updateMachine: (
+    machineId: string,
+    patch: Partial<Pick<Machine, "name">>,
   ) => void;
-  removeDevice: (deviceId: string) => void;
-  setFinishMode: (mode: FinishMode) => void;
+  updateProgram: (
+    programId: string,
+    patch: Partial<Pick<Program, "name" | "duration" | "delayStep" | "delayMode">>,
+  ) => void;
+  removeMachine: (machineId: string) => void;
+  removeProgram: (programId: string) => void;
+  setCalculationMode: (mode: CalculationMode) => void;
   setNewSlot: (slot: NewSlot | ((slot: NewSlot) => NewSlot)) => void;
   addSlot: () => void;
   updateSlot: (slotId: string, patch: Partial<Pick<Slot, "name" | "start" | "end">>) => void;
@@ -91,37 +110,83 @@ type CycleContextValue = {
   clearSlots: () => void;
 };
 
-const defaultSlots: Slot[] = [];
+const defaultSlots: Slot[] = [
+  {
+    id: "default-1",
+    name: "Nuit",
+    start: "01:30",
+    end: "07:30",
+  },
+  {
+    id: "default-2",
+    name: "Apres-midi",
+    start: "14:00",
+    end: "16:00",
+  },
+];
 
 const defaultNewSlot = { name: "", start: "22:00", end: "06:00" };
 const storageKey = "cyclesmart-slots";
 const settingsStorageKey = "cyclesmart-settings";
 export const dayMinutes = 24 * 60;
 
-export const defaultCycleDevices: CycleDevice[] = [
+export const defaultMachines: Machine[] = [
   {
     id: "washing-machine",
     name: "Lave-linge",
-    description: "Programme coton ou mixte",
-    defaultDuration: 150,
-    delayStep: 30,
-    mode: "soon",
+    programs: [
+      {
+        id: "washing-machine-cotton",
+        name: "Coton",
+        description: "Programme standard",
+        duration: 150,
+        delayStep: 30,
+        delayMode: "depart",
+      },
+      {
+        id: "washing-machine-quick",
+        name: "Rapide",
+        description: "Cycle court",
+        duration: 45,
+        delayStep: 30,
+        delayMode: "depart",
+      },
+    ],
     builtIn: true,
   },
   {
     id: "dishwasher",
     name: "Lave-vaisselle",
-    description: "Cycle eco quotidien",
-    defaultDuration: 195,
-    delayStep: 60,
-    mode: "last",
+    programs: [
+      {
+        id: "dishwasher-eco",
+        name: "Eco",
+        description: "Cycle economique",
+        duration: 195,
+        delayStep: 60,
+        delayMode: "fin",
+      },
+      {
+        id: "dishwasher-intense",
+        name: "Intense",
+        description: "Cycle intensif",
+        duration: 150,
+        delayStep: 60,
+        delayMode: "fin",
+      },
+    ],
     builtIn: true,
   },
 ];
 
 export const favoriteDurations = [30, 75, 150, 180];
 export const delayStepOptions = [30, 60, 120];
-const defaultNewDevice: NewDevice = { name: "", duration: 120, delayStep: 60, mode: "soon" };
+const defaultNewProgram: NewProgram = { name: "", duration: 120, delayStep: 60, delayMode: "depart" };
+const defaultNewMachine: NewMachine = { name: "" };
+
+function getAllPrograms(machines: Machine[]): Program[] {
+  return machines.flatMap((machine) => machine.programs);
+}
 
 const CycleContext = createContext<CycleContextValue | null>(null);
 
@@ -168,19 +233,19 @@ function getNowTime() {
     .padStart(2, "0")}`;
 }
 
-function alignStartToDelayStep(
-  earliestStart: number,
-  latestStart: number,
+function alignEventToDelayStep(
+  earliestEvent: number,
+  latestEvent: number,
   now: number,
   delayStep: number,
-  finishMode: FinishMode,
+  calculationMode: CalculationMode,
 ) {
-  if (finishMode === "last") {
-    const wait = Math.floor((latestStart - now) / delayStep) * delayStep;
+  if (calculationMode === "last") {
+    const wait = Math.floor((latestEvent - now) / delayStep) * delayStep;
     return wait >= 0 ? now + wait : null;
   }
 
-  const wait = Math.ceil((earliestStart - now) / delayStep) * delayStep;
+  const wait = Math.ceil((earliestEvent - now) / delayStep) * delayStep;
   return now + Math.max(0, wait);
 }
 
@@ -188,10 +253,12 @@ function getSuggestions(
   slots: Slot[],
   currentTime: string,
   duration: number,
-  finishMode: FinishMode,
+  calculationMode: CalculationMode,
   delayStep: number,
+  programDelayMode: "depart" | "fin",
 ) {
   const now = timeToMinutes(currentTime);
+
   const candidates = slots.flatMap((slot) => {
     const start = timeToMinutes(slot.start);
     const rawEnd = timeToMinutes(slot.end);
@@ -201,19 +268,28 @@ function getSuggestions(
       const slotStart = start + offset;
       const slotEnd = end + offset;
       const earliestStart = Math.max(now, slotStart);
-      const latestStart = finishMode === "last" ? slotEnd - duration : slotEnd;
+      const latestStart = calculationMode === "last" ? slotEnd - duration : slotEnd;
 
       if (latestStart < earliestStart) {
         return [];
       }
 
-      const targetStart = alignStartToDelayStep(
-        earliestStart,
-        latestStart,
-        now,
-        delayStep,
-        finishMode,
-      );
+      // "depart" machines dial in a wait-until-start; "fin" machines dial in a
+      // wait-until-finish, so the delay-step rounding must apply to whichever
+      // instant the machine's timer actually counts down to.
+      const targetStart =
+        programDelayMode === "fin"
+          ? (() => {
+              const targetFinish = alignEventToDelayStep(
+                earliestStart + duration,
+                latestStart + duration,
+                now,
+                delayStep,
+                calculationMode,
+              );
+              return targetFinish === null ? null : targetFinish - duration;
+            })()
+          : alignEventToDelayStep(earliestStart, latestStart, now, delayStep, calculationMode);
 
       if (targetStart === null || targetStart < earliestStart || targetStart > latestStart) {
         return [];
@@ -232,7 +308,7 @@ function getSuggestions(
   });
 
   return candidates.sort((a, b) => {
-    if (finishMode === "last") {
+    if (calculationMode === "last") {
       return a.end - b.end;
     }
 
@@ -273,54 +349,62 @@ function getStoredSettings() {
   }
 }
 
-function mergeStoredDevices(storedDevices: CycleDevice[] | undefined) {
-  if (!Array.isArray(storedDevices)) {
-    return defaultCycleDevices;
+function mergeStoredMachines(storedMachines: Machine[] | undefined) {
+  if (!Array.isArray(storedMachines)) {
+    return defaultMachines;
   }
 
   const storedById = new Map(
-    storedDevices
-      .filter((device) => device && typeof device.id === "string")
-      .map((device) => [device.id, device]),
+    storedMachines
+      .filter((machine) => machine && typeof machine.id === "string")
+      .map((machine) => [machine.id, machine]),
   );
-  const builtInSource = storedDevices.some((device) =>
-    defaultCycleDevices.some((defaultDevice) => defaultDevice.id === device.id),
+  const builtInSource = storedMachines.some((machine) =>
+    defaultMachines.some((defaultMachine) => defaultMachine.id === machine.id),
   )
-    ? defaultCycleDevices.filter((defaultDevice) => storedById.has(defaultDevice.id))
-    : defaultCycleDevices;
-  const builtInDevices = builtInSource.map((defaultDevice) => {
-    const storedDevice = storedById.get(defaultDevice.id);
+    ? defaultMachines.filter((defaultMachine) => storedById.has(defaultMachine.id))
+    : defaultMachines;
+  const builtInMachines = builtInSource.map((defaultMachine) => {
+    const storedMachine = storedById.get(defaultMachine.id);
 
     return {
-      ...defaultDevice,
-      name: typeof storedDevice?.name === "string" ? storedDevice.name : defaultDevice.name,
-      defaultDuration:
-        typeof storedDevice?.defaultDuration === "number"
-          ? normalizeDuration(storedDevice.defaultDuration)
-          : defaultDevice.defaultDuration,
-      delayStep: normalizeDelayStep(storedDevice?.delayStep),
-      mode: (storedDevice?.mode === "soon" || storedDevice?.mode === "last") ? storedDevice.mode : defaultDevice.mode,
+      ...defaultMachine,
+      name: typeof storedMachine?.name === "string" ? storedMachine.name : defaultMachine.name,
+      programs: defaultMachine.programs.map((defaultProgram) => {
+        const storedProgram = storedMachine?.programs?.find((p) => p.id === defaultProgram.id);
+        return {
+          ...defaultProgram,
+          name: typeof storedProgram?.name === "string" ? storedProgram.name : defaultProgram.name,
+          duration: typeof storedProgram?.duration === "number"
+            ? normalizeDuration(storedProgram.duration)
+            : defaultProgram.duration,
+          delayStep: normalizeDelayStep(storedProgram?.delayStep),
+          delayMode: (storedProgram?.delayMode === "depart" || storedProgram?.delayMode === "fin") ? storedProgram.delayMode : defaultProgram.delayMode,
+        };
+      }),
     };
   });
 
-  const customDevices = storedDevices.filter((device) => {
+  const customMachines = storedMachines.filter((machine) => {
     return (
-      device &&
-      typeof device.id === "string" &&
-      typeof device.name === "string" &&
-      typeof device.defaultDuration === "number" &&
-      !defaultCycleDevices.some((defaultDevice) => defaultDevice.id === device.id)
+      machine &&
+      typeof machine.id === "string" &&
+      typeof machine.name === "string" &&
+      Array.isArray(machine.programs) &&
+      !defaultMachines.some((defaultMachine) => defaultMachine.id === machine.id)
     );
   });
 
   return [
-    ...builtInDevices,
-    ...customDevices.map((device) => ({
-      ...device,
-      description: device.description || "Machine personnalisee",
-      defaultDuration: normalizeDuration(device.defaultDuration),
-      delayStep: normalizeDelayStep(device.delayStep),
-      mode: (device.mode === "soon" || device.mode === "last") ? device.mode : "soon",
+    ...builtInMachines,
+    ...customMachines.map((machine) => ({
+      ...machine,
+      programs: machine.programs.map((program) => ({
+        ...program,
+        duration: normalizeDuration(program.duration),
+        delayStep: normalizeDelayStep(program.delayStep),
+        delayMode: (program.delayMode === "depart" || program.delayMode === "fin") ? program.delayMode : "depart",
+      })),
     })),
   ];
 }
@@ -344,11 +428,11 @@ export function CycleProvider({
   const [currentTime, setCurrentTime] = useState("12:00");
   const [todayLabel, setTodayLabel] = useState("");
   const [duration, setDuration] = useState(150);
-  const [selectedDeviceId, setSelectedDeviceId] = useState("washing-machine");
-  const [devices, setDevices] = useState<CycleDevice[]>(defaultCycleDevices);
-  const [newDevice, setNewDevice] = useState<NewDevice>(defaultNewDevice);
-  const [finishMode, setFinishMode] = useState<FinishMode>("soon");
-  const [finishModeConfigured, setFinishModeConfigured] = useState(false);
+  const [selectedProgramId, setSelectedProgramId] = useState("washing-machine-cotton");
+  const [machines, setMachines] = useState<Machine[]>(defaultMachines);
+  const [newProgram, setNewProgram] = useState<NewProgram>(defaultNewProgram);
+  const [newMachine, setNewMachine] = useState<NewMachine>(defaultNewMachine);
+  const [calculationMode, setCalculationMode] = useState<CalculationMode>("soon");
   const [slots, setSlots] = useState<Slot[]>(defaultSlots);
   const [newSlot, setNewSlot] = useState<NewSlot>(defaultNewSlot);
   const [hydrated, setHydrated] = useState(false);
@@ -376,8 +460,8 @@ export function CycleProvider({
       }
 
       const storedSettings = getStoredSettings();
-      const nextDevices = mergeStoredDevices(storedSettings?.devices);
-      setDevices(nextDevices);
+      const nextMachines = mergeStoredMachines(storedSettings?.machines);
+      setMachines(nextMachines);
 
       if (
         storedSettings?.duration &&
@@ -387,17 +471,15 @@ export function CycleProvider({
         setDuration(storedSettings.duration);
       }
       if (
-        storedSettings?.selectedDeviceId &&
-        nextDevices.some((device) => device.id === storedSettings.selectedDeviceId)
+        storedSettings?.selectedProgramId &&
+        getAllPrograms(nextMachines).some((program) => program.id === storedSettings.selectedProgramId)
       ) {
-        setSelectedDeviceId(storedSettings.selectedDeviceId);
+        setSelectedProgramId(storedSettings.selectedProgramId);
       }
       if (
-        storedSettings?.finishModeConfigured &&
-        (storedSettings.finishMode === "soon" || storedSettings.finishMode === "last")
+        storedSettings?.calculationMode === "soon" || storedSettings?.calculationMode === "last"
       ) {
-        setFinishMode(storedSettings.finishMode);
-        setFinishModeConfigured(true);
+        setCalculationMode(storedSettings.calculationMode);
       }
 
       syncTime();
@@ -421,8 +503,8 @@ export function CycleProvider({
             const data = settingsResult.value as { ok?: boolean; settings?: StoredSettings | null };
 
             if (data.ok && data.settings) {
-              const remoteDevices = mergeStoredDevices(data.settings.devices);
-              setDevices(remoteDevices);
+              const remoteMachines = mergeStoredMachines(data.settings.machines);
+              setMachines(remoteMachines);
 
               if (
                 data.settings.duration &&
@@ -432,17 +514,15 @@ export function CycleProvider({
                 setDuration(data.settings.duration);
               }
               if (
-                data.settings.selectedDeviceId &&
-                remoteDevices.some((device) => device.id === data.settings?.selectedDeviceId)
+                data.settings.selectedProgramId &&
+                getAllPrograms(remoteMachines).some((program) => program.id === data.settings?.selectedProgramId)
               ) {
-                setSelectedDeviceId(data.settings.selectedDeviceId);
+                setSelectedProgramId(data.settings.selectedProgramId);
               }
               if (
-                data.settings.finishModeConfigured &&
-                (data.settings.finishMode === "soon" || data.settings.finishMode === "last")
+                data.settings.calculationMode === "soon" || data.settings.calculationMode === "last"
               ) {
-                setFinishMode(data.settings.finishMode);
-                setFinishModeConfigured(true);
+                setCalculationMode(data.settings.calculationMode);
               }
             } else if (!data.ok) {
               hasError = true;
@@ -485,9 +565,9 @@ export function CycleProvider({
 
     window.localStorage.setItem(
       settingsStorageKey,
-      JSON.stringify({ devices, duration, finishMode, finishModeConfigured, selectedDeviceId }),
+      JSON.stringify({ machines, duration, calculationMode, selectedProgramId }),
     );
-  }, [devices, duration, finishMode, finishModeConfigured, hydrated, selectedDeviceId]);
+  }, [machines, duration, calculationMode, hydrated, selectedProgramId]);
 
   useEffect(() => {
     if (!hydrated || !remoteHydrated || !isAuthenticated) {
@@ -500,11 +580,10 @@ export function CycleProvider({
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        devices,
+        machines,
         duration,
-        finishMode,
-        finishModeConfigured,
-        selectedDeviceId,
+        calculationMode,
+        selectedProgramId,
       }),
       signal: controller.signal,
     })
@@ -529,14 +608,13 @@ export function CycleProvider({
       controller.abort();
     };
   }, [
-    devices,
+    machines,
     duration,
-    finishMode,
-    finishModeConfigured,
+    calculationMode,
     hydrated,
     isAuthenticated,
     remoteHydrated,
-    selectedDeviceId,
+    selectedProgramId,
   ]);
 
   useEffect(() => {
@@ -576,15 +654,15 @@ export function CycleProvider({
     };
   }, [hydrated, isAuthenticated, remoteHydrated, slots]);
 
-  const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
-  const selectedDelayStep = selectedDevice?.delayStep || 30;
-  const selectedMode = selectedDevice?.mode || "soon";
+  const selectedProgram = getAllPrograms(machines).find((program) => program.id === selectedProgramId);
+  const selectedDelayStep = selectedProgram?.delayStep || 30;
+  const selectedDelayMode = selectedProgram?.delayMode || "depart";
   const suggestions = useMemo(
-    () => getSuggestions(slots, currentTime, duration, selectedMode, selectedDelayStep),
-    [currentTime, duration, selectedMode, selectedDelayStep, slots],
+    () => getSuggestions(slots, currentTime, duration, calculationMode, selectedDelayStep, selectedDelayMode),
+    [currentTime, duration, calculationMode, selectedDelayStep, selectedDelayMode, slots],
   );
   const alternativeSuggestion = useMemo(() => {
-    if (selectedMode !== "last") {
+    if (calculationMode !== "last") {
       return null;
     }
 
@@ -600,6 +678,7 @@ export function CycleProvider({
       duration,
       "soon",
       selectedDelayStep,
+      selectedDelayMode,
     );
 
     return (
@@ -608,111 +687,190 @@ export function CycleProvider({
           suggestion.slot.id !== primary.slot.id && suggestion.start < primary.start,
       ) ?? null
     );
-  }, [currentTime, duration, selectedDelayStep, selectedMode, slots, suggestions]);
+  }, [currentTime, duration, selectedDelayStep, calculationMode, selectedDelayMode, slots, suggestions]);
 
   const updateDuration = useCallback((nextDuration: number) => {
     setDuration(nextDuration);
   }, []);
 
-  const updateFinishMode = useCallback((mode: FinishMode) => {
-    setFinishMode(mode);
-    setFinishModeConfigured(true);
+  const updateCalculationMode = useCallback((mode: CalculationMode) => {
+    setCalculationMode(mode);
   }, []);
 
-  const selectDevice = useCallback((deviceId: string) => {
-    const device = devices.find((item) => item.id === deviceId);
+  const selectProgram = useCallback((programId: string) => {
+    const program = getAllPrograms(machines).find((item) => item.id === programId);
 
-    if (!device) {
+    if (!program) {
       return;
     }
 
-    setSelectedDeviceId(device.id);
-    setDuration(device.defaultDuration);
-  }, [devices]);
+    setSelectedProgramId(program.id);
+    setDuration(program.duration);
+  }, [machines]);
 
-  const addDevice = useCallback(() => {
-    const name = newDevice.name.trim();
-    const defaultDuration = normalizeDuration(newDevice.duration);
-    const delayStep = normalizeDelayStep(newDevice.delayStep);
-    const mode = newDevice.mode === "soon" || newDevice.mode === "last" ? newDevice.mode : "soon";
+  const addMachine = useCallback(() => {
+    const name = newMachine.name.trim();
+
+    if (!name) {
+      return null;
+    }
+
+    const machine: Machine = {
+      id: crypto.randomUUID(),
+      name,
+      programs: [],
+    };
+
+    setMachines((current) => [...current, machine]);
+    setNewMachine(defaultNewMachine);
+    return machine.id;
+  }, [newMachine]);
+
+  const addProgram = useCallback((machineId: string) => {
+    const name = newProgram.name.trim();
+    const duration = normalizeDuration(newProgram.duration);
+    const delayStep = normalizeDelayStep(newProgram.delayStep);
+    const delayMode = (newProgram.delayMode === "depart" || newProgram.delayMode === "fin") ? newProgram.delayMode : "depart";
 
     if (!name) {
       return;
     }
 
-    const device: CycleDevice = {
+    const program: Program = {
       id: crypto.randomUUID(),
       name,
-      description: "Machine personnalisee",
-      defaultDuration,
+      description: "Programme personnalise",
+      duration,
       delayStep,
-      mode,
+      delayMode,
     };
 
-    setDevices((current) => [...current, device]);
-    setSelectedDeviceId(device.id);
-    setDuration(device.defaultDuration);
-    setNewDevice(defaultNewDevice);
-  }, [newDevice]);
+    setMachines((current) =>
+      current.map((machine) => {
+        if (machine.id !== machineId) {
+          return machine;
+        }
+        return {
+          ...machine,
+          programs: [...machine.programs, program],
+        };
+      }),
+    );
+    setSelectedProgramId(program.id);
+    setDuration(program.duration);
+    setNewProgram(defaultNewProgram);
+  }, [newProgram]);
 
-  const updateDevice = useCallback(
+  const updateMachine = useCallback((machineId: string, patch: Partial<Pick<Machine, "name">>) => {
+    setMachines((current) =>
+      current.map((machine) => {
+        if (machine.id !== machineId) {
+          return machine;
+        }
+
+        return {
+          ...machine,
+          name: patch.name === undefined ? machine.name : patch.name,
+        };
+      }),
+    );
+  }, []);
+
+  const updateProgram = useCallback(
     (
-      deviceId: string,
-      patch: Partial<Pick<CycleDevice, "name" | "defaultDuration" | "delayStep" | "mode">>,
+      programId: string,
+      patch: Partial<Pick<Program, "name" | "duration" | "delayStep" | "delayMode">>,
     ) => {
-      setDevices((current) =>
-        current.map((device) => {
-          if (device.id !== deviceId) {
-            return device;
+    setMachines((current) =>
+      current.map((machine) => {
+        const updatedPrograms = machine.programs.map((program) => {
+          if (program.id !== programId) {
+            return program;
           }
 
           const nextDuration =
-            patch.defaultDuration === undefined
-              ? device.defaultDuration
-              : normalizeDuration(patch.defaultDuration);
+            patch.duration === undefined
+              ? program.duration
+              : normalizeDuration(patch.duration);
           const nextDelayStep =
-            patch.delayStep === undefined ? device.delayStep : normalizeDelayStep(patch.delayStep);
-          const nextMode =
-            patch.mode === undefined
-              ? device.mode
-              : (patch.mode === "soon" || patch.mode === "last" ? patch.mode : device.mode);
+            patch.delayStep === undefined ? program.delayStep : normalizeDelayStep(patch.delayStep);
+          const nextDelayMode =
+            patch.delayMode === undefined ? program.delayMode : (patch.delayMode === "depart" || patch.delayMode === "fin" ? patch.delayMode : program.delayMode);
 
-          if (selectedDeviceId === deviceId) {
+          if (selectedProgramId === programId) {
             setDuration(nextDuration);
           }
 
           return {
-            ...device,
-            name: patch.name === undefined ? device.name : patch.name,
-            defaultDuration: nextDuration,
+            ...program,
+            name: patch.name === undefined ? program.name : patch.name,
+            duration: nextDuration,
             delayStep: nextDelayStep,
-            mode: nextMode,
+            delayMode: nextDelayMode,
           };
-        }),
-      );
-    },
-    [selectedDeviceId],
-  );
+        });
 
-  const removeDevice = useCallback((deviceId: string) => {
-    setDevices((current) => {
-      const device = current.find((item) => item.id === deviceId);
+        return {
+          ...machine,
+          programs: updatedPrograms,
+        };
+      }),
+    );
+  }, [selectedProgramId]);
 
-      if (!device || current.length <= 1) {
+  const removeMachine = useCallback((machineId: string) => {
+    setMachines((current) => {
+      const machine = current.find((item) => item.id === machineId);
+
+      if (!machine || current.length <= 1) {
         return current;
       }
 
-      const nextDevices = current.filter((item) => item.id !== deviceId);
+      const nextMachines = current.filter((item) => item.id !== machineId);
+      const allPrograms = getAllPrograms(nextMachines);
 
-      if (selectedDeviceId === deviceId) {
-        const nextDevice = nextDevices[0];
-        setSelectedDeviceId(nextDevice.id);
-        setDuration(nextDevice.defaultDuration);
+      if (selectedProgramId && !allPrograms.find((p) => p.id === selectedProgramId)) {
+        const nextProgram = allPrograms[0];
+        if (nextProgram) {
+          setSelectedProgramId(nextProgram.id);
+          setDuration(nextProgram.duration);
+        }
       }
 
-      return nextDevices;
+      return nextMachines;
     });
-  }, [selectedDeviceId]);
+  }, [selectedProgramId]);
+
+  const removeProgram = useCallback((programId: string) => {
+    setMachines((current) => {
+      let found = false;
+      const nextMachines = current.map((machine) => {
+        const hasProgram = machine.programs.some((p) => p.id === programId);
+        if (hasProgram) {
+          found = true;
+          if (machine.programs.length <= 1) {
+            return machine;
+          }
+          return {
+            ...machine,
+            programs: machine.programs.filter((p) => p.id !== programId),
+          };
+        }
+        return machine;
+      });
+
+      if (selectedProgramId === programId && found) {
+        const allPrograms = getAllPrograms(nextMachines);
+        const nextProgram = allPrograms[0];
+        if (nextProgram) {
+          setSelectedProgramId(nextProgram.id);
+          setDuration(nextProgram.duration);
+        }
+      }
+
+      return nextMachines;
+    });
+  }, [selectedProgramId]);
 
   const addSlot = useCallback(() => {
     setSlots((current) => [
@@ -768,10 +926,11 @@ export function CycleProvider({
       currentTime,
       todayLabel,
       duration,
-      selectedDeviceId,
-      devices,
-      newDevice,
-      finishMode,
+      selectedProgramId,
+      machines,
+      newProgram,
+      newMachine,
+      calculationMode,
       slots,
       newSlot,
       suggestions,
@@ -780,12 +939,16 @@ export function CycleProvider({
       syncStatus,
       setCurrentTime,
       setDuration: updateDuration,
-      selectDevice,
-      setNewDevice,
-      addDevice,
-      updateDevice,
-      removeDevice,
-      setFinishMode: updateFinishMode,
+      selectProgram,
+      setNewProgram,
+      setNewMachine,
+      addMachine,
+      addProgram,
+      updateMachine,
+      updateProgram,
+      removeMachine,
+      removeProgram,
+      setCalculationMode: updateCalculationMode,
       setNewSlot,
       addSlot,
       updateSlot,
@@ -794,27 +957,31 @@ export function CycleProvider({
     }),
     [
       addSlot,
-      addDevice,
+      addMachine,
+      addProgram,
       alternativeSuggestion,
       clearSlots,
       currentTime,
-      devices,
       duration,
-      finishMode,
+      calculationMode,
       isAuthenticated,
-      newDevice,
+      machines,
+      newProgram,
+      newMachine,
       newSlot,
-      removeDevice,
+      removeMachine,
+      removeProgram,
       removeSlot,
-      selectDevice,
-      selectedDeviceId,
+      selectProgram,
+      selectedProgramId,
       slots,
       suggestions,
       syncStatus,
       updateDuration,
-      updateFinishMode,
+      updateCalculationMode,
       todayLabel,
-      updateDevice,
+      updateMachine,
+      updateProgram,
       updateSlot,
     ],
   );

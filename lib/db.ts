@@ -127,8 +127,8 @@ export async function ensureDatabaseSchema() {
       user_id text not null references users(id) on delete cascade,
       name text not null,
       description text not null default '',
-      default_duration integer not null,
-      delay_step integer not null,
+      default_duration integer,
+      delay_step integer,
       built_in boolean not null default false,
       sort_order integer not null default 0,
       created_at timestamptz not null default now(),
@@ -136,6 +136,10 @@ export async function ensureDatabaseSchema() {
       primary key (user_id, id)
     )
   `);
+
+  await query(`alter table cycle_devices add column if not exists programs jsonb not null default '[]'::jsonb`);
+  await query(`alter table cycle_devices alter column default_duration drop not null`);
+  await query(`alter table cycle_devices alter column delay_step drop not null`);
 
   await query(`
     create table if not exists cycle_preferences (
@@ -147,4 +151,7 @@ export async function ensureDatabaseSchema() {
       updated_at timestamptz not null default now()
     )
   `);
+
+  await query(`alter table cycle_preferences add column if not exists calculation_mode text not null default 'soon'`);
+  await query(`alter table cycle_preferences add column if not exists selected_program_id text`);
 }

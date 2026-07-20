@@ -72,7 +72,7 @@ function ModeToggle({
         type="button"
         onClick={() => onChange("soon")}
       >
-        Depart des que possible
+        Plus tot possible
       </button>
       <button
         className={`rounded-xl px-3 py-3 text-sm font-bold leading-snug transition ${
@@ -81,7 +81,38 @@ function ModeToggle({
         type="button"
         onClick={() => onChange("last")}
       >
-        Fin au dernier moment
+        Plus tard possible
+      </button>
+    </div>
+  );
+}
+
+function DelayModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: "depart" | "fin";
+  onChange: (mode: "depart" | "fin") => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
+      <button
+        className={`rounded-xl px-3 py-2 text-xs font-bold leading-snug transition sm:text-sm ${
+          mode === "depart" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
+        }`}
+        type="button"
+        onClick={() => onChange("depart")}
+      >
+        Départ dans
+      </button>
+      <button
+        className={`rounded-xl px-3 py-2 text-xs font-bold leading-snug transition sm:text-sm ${
+          mode === "fin" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"
+        }`}
+        type="button"
+        onClick={() => onChange("fin")}
+      >
+        Fin à
       </button>
     </div>
   );
@@ -100,205 +131,111 @@ function getSlotBoundsForSuggestion(suggestion: Suggestion) {
   return { slotStart, slotEnd };
 }
 
-function getExactStartAdvice(
-  suggestion: Suggestion | undefined,
-  currentTime: string,
-  delayStep: number,
-) {
-  if (!suggestion) {
-    return null;
-  }
-
-  const now = timeToMinutes(currentTime);
-  const { slotStart } = getSlotBoundsForSuggestion(suggestion);
-  const waitUntilSlot = slotStart - now;
-
-  if (waitUntilSlot <= 0 || suggestion.start === slotStart) {
-    return null;
-  }
-
-  const exactDelay = Math.floor(waitUntilSlot / delayStep) * delayStep;
-  const setupAt = slotStart - exactDelay;
-
-  if (exactDelay <= 0 || setupAt <= now) {
-    return null;
-  }
-
-  return { exactDelay, setupAt, slotStart };
-}
-
-function getEarlyStartWarning(
-  suggestion: Suggestion | undefined,
-  currentTime: string,
-  delayStep: number,
-) {
-  if (!suggestion) {
-    return null;
-  }
-
-  const now = timeToMinutes(currentTime);
-  const { slotStart } = getSlotBoundsForSuggestion(suggestion);
-  const waitUntilSlot = slotStart - now;
-  const earlyDelay = Math.floor(waitUntilSlot / delayStep) * delayStep;
-  const earlyStart = now + earlyDelay;
-
-  if (earlyDelay <= 0 || earlyStart >= slotStart || suggestion.start === slotStart) {
-    return null;
-  }
-
-  return { earlyDelay, earlyStart, minutesBefore: slotStart - earlyStart };
-}
-
 export default function CalculerPage() {
   const [showSlotForm, setShowSlotForm] = useState(false);
   const {
     addSlot,
+    calculationMode,
     currentTime,
-    devices,
     duration,
     isAuthenticated,
+    machines,
     newSlot,
     removeSlot,
-    selectedDeviceId,
-    selectDevice,
+    selectedProgramId,
+    selectProgram,
+    setCalculationMode,
     setDuration,
     setNewSlot,
     slots,
     suggestions,
-    alternativeSuggestion,
     syncStatus,
-    updateDevice,
+    updateProgram,
     updateSlot,
   } = useCycle();
   const recommended = suggestions[0];
-  const selectedDevice = devices.find((device) => device.id === selectedDeviceId);
-  const delayStep = selectedDevice?.delayStep || 30;
-  const selectedMode = selectedDevice?.mode || "soon";
+  const allPrograms = machines.flatMap((machine) => machine.programs);
+  const selectedProgram = allPrograms.find((program) => program.id === selectedProgramId);
+  const delayStep = selectedProgram?.delayStep || 30;
   const selectedDelayStepIndex = Math.max(0, delayStepOptions.indexOf(delayStep));
-  const exactStartAdvice = getExactStartAdvice(recommended, currentTime, delayStep);
-  const earlyStartWarning = getEarlyStartWarning(recommended, currentTime, delayStep);
   const endsOutsideSlot = recommended
     ? recommended.end > getSlotBoundsForSuggestion(recommended).slotEnd
     : false;
-  const alternativeEndsOutside = alternativeSuggestion
-    ? alternativeSuggestion.end > getSlotBoundsForSuggestion(alternativeSuggestion).slotEnd
-    : false;
-  const setSelectedMode = (mode: "soon" | "last") => {
-    if (selectedDevice) {
-      updateDevice(selectedDevice.id, { mode });
-    }
-  };
+  const isFinMode = selectedProgram?.delayMode === "fin";
+  const dialWait = recommended
+    ? isFinMode
+      ? recommended.end - timeToMinutes(currentTime)
+      : recommended.wait
+    : null;
   const isSynced = syncStatus === "saved" || syncStatus === "saving";
   const resultCard = (
-    <section className="rounded-[28px] bg-emerald-700 p-5 text-white shadow-xl shadow-emerald-300/30 md:p-7">
-      <div className="flex items-start justify-between gap-4">
+    <section className="rounded-[24px] bg-emerald-700 p-4 text-white shadow-xl shadow-emerald-300/30 sm:p-5 md:p-7">
+      <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/70">
-            Prochain lancement
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/70">
+            {isFinMode ? "A regler sur \"fin dans\"" : "Prochain lancement"}
           </p>
-          <h2 className="mt-3 text-5xl font-black tracking-normal sm:text-6xl md:text-7xl">
-            {recommended ? formatWait(recommended.wait) : "--"}
+          <h2 className="mt-2 text-4xl font-black tracking-normal sm:text-5xl md:text-7xl">
+            {dialWait !== null ? formatWait(dialWait) : "--"}
           </h2>
-          <p className="mt-3 break-words text-base font-bold leading-6 text-white/80">
+          <p className="mt-2 break-words text-sm font-bold leading-5 text-white/80">
             {recommended
-              ? `${recommended.slot.name} · depart ${minutesToTime(recommended.start)} · fin ${minutesToTime(
-                  recommended.end,
-                )}`
+              ? `${recommended.slot.name} · ${minutesToTime(recommended.start)} · fin ${minutesToTime(recommended.end)}`
               : "Ajoute un creneau pour obtenir une recommandation."}
           </p>
         </div>
-        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/15">
-          <ClockIcon className="size-6" />
+        <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white/15 sm:size-12">
+          <ClockIcon className="size-5 sm:size-6" />
         </span>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-3xl bg-white/12 p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">Appareil</p>
-          <p className="mt-2 text-lg font-black">{selectedDevice?.name || "Machine"}</p>
+      <div className="mt-4 grid gap-2 sm:gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl bg-white/12 p-3 sm:rounded-3xl sm:p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Programme</p>
+          <p className="mt-1 text-base font-black sm:mt-2 sm:text-lg">{selectedProgram?.name || "Programme"}</p>
         </div>
-        <div className="rounded-3xl bg-white/12 p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">Cycle</p>
-          <p className="mt-2 text-lg font-black">{formatDuration(duration)}</p>
+        <div className="rounded-2xl bg-white/12 p-3 sm:rounded-3xl sm:p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Cycle</p>
+          <p className="mt-1 text-base font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
         </div>
       </div>
 
-      {(exactStartAdvice || earlyStartWarning || endsOutsideSlot) && recommended && (
-        <div className="mt-4 rounded-3xl bg-white/12 p-4 text-sm font-semibold leading-6 text-white/85">
-          {exactStartAdvice && (
-            <p>
-              Pour demarrer pile a {minutesToTime(exactStartAdvice.slotStart)}, regle{" "}
-              {formatDuration(exactStartAdvice.exactDelay)} a{" "}
-              {minutesToTime(exactStartAdvice.setupAt)}.
-            </p>
-          )}
-          {!exactStartAdvice && earlyStartWarning && (
-            <p>
-              {formatDuration(earlyStartWarning.earlyDelay)} maintenant partirait a{" "}
-              {minutesToTime(earlyStartWarning.earlyStart)}, avant le creneau.
-            </p>
-          )}
-          {endsOutsideSlot && (
-            <p className={exactStartAdvice || earlyStartWarning ? "mt-1 text-white/75" : ""}>
-              Fin hors heures creuses, mais depart bien dans {recommended.slot.name}.
-            </p>
-          )}
-        </div>
-      )}
-
-      {alternativeSuggestion && (
-        <div className="mt-4 rounded-3xl border border-white/15 bg-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">
-            Autre creneau possible
+      {endsOutsideSlot && recommended && (
+        <div className="mt-3 rounded-2xl bg-white/12 p-3 text-xs font-semibold leading-5 text-white/85 sm:mt-4 sm:rounded-3xl sm:p-4 sm:text-sm">
+          <p>
+            Fin hors heures creuses, mais depart bien dans {recommended.slot.name}.
           </p>
-          <p className="mt-2 break-words text-sm font-semibold leading-6 text-white/90">
-            {alternativeSuggestion.slot.name} · depart {minutesToTime(alternativeSuggestion.start)} ·
-            fin {minutesToTime(alternativeSuggestion.end)}
-          </p>
-          {alternativeEndsOutside && (
-            <p className="mt-1 text-sm leading-6 text-white/75">
-              Le cycle depasse ce creneau, mais le depart reste bien dans les heures creuses.
-            </p>
-          )}
-          <button
-            className="mt-3 rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/25"
-            type="button"
-            onClick={() => setSelectedMode("soon")}
-          >
-            Utiliser ce creneau
-          </button>
         </div>
       )}
     </section>
   );
 
   const controlsCard = (
-    <section className="rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70 md:p-7">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-2xl font-bold text-slate-950 md:text-3xl">
+    <section className="rounded-[24px] bg-white p-4 shadow-xl shadow-slate-200/70 sm:p-5 md:p-7">
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xl font-bold text-slate-950 sm:text-2xl md:text-3xl">
             Calculateur de cycle
           </p>
-          <p className="mt-2 max-w-2xl leading-6 text-slate-600">
-            Choisis ton appareil, ajuste la duree si besoin, puis garde le delai de lancement sous
-            les yeux.
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-slate-600 sm:mt-2 sm:text-base sm:leading-6">
+            Choisis ton appareil, ajuste la duree si besoin.
           </p>
         </div>
         {isSynced && (
-            <span className="hidden rounded-full bg-green-50 px-3 py-2 text-xs font-bold text-emerald-700 sm:inline-flex">
+            <span className="hidden shrink-0 rounded-full bg-green-50 px-3 py-2 text-xs font-bold text-emerald-700 sm:inline-flex">
               Enregistre
           </span>
         )}
       </div>
 
-      <div className="mt-6 rounded-3xl bg-slate-50 p-4 sm:p-5">
-        <div className="flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700">
-            <DeviceIcon className="size-5" />
+      <div className="mt-4 rounded-2xl bg-slate-50 p-3 sm:mt-6 sm:rounded-3xl sm:p-4 sm:p-5">
+        <div className="flex items-center gap-2">
+          <span className="grid size-9 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700 sm:size-10">
+            <DeviceIcon className="size-4 sm:size-5" />
           </span>
-          <div>
-            <p className="font-bold text-slate-950">Machine</p>
-            <p className="text-sm leading-5 text-slate-500">
+          <div className="min-w-0">
+            <p className="font-bold text-slate-950 text-sm sm:text-base">Machine</p>
+            <p className="text-xs leading-4 text-slate-500 sm:text-sm sm:leading-5">
               {isAuthenticated
                 ? "Tes reglages sont gardes avec ton compte."
                 : "Choisis un appareil pour tester sans compte."}
@@ -306,45 +243,59 @@ export default function CalculerPage() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {devices.map((device) => {
-            const active = selectedDeviceId === device.id;
+        <div className="mt-3 space-y-3 sm:mt-4 sm:space-y-4">
+          {machines.map((machine) => (
+            <div key={machine.id}>
+              <p className="text-xs font-bold text-slate-700 sm:text-sm">{machine.name}</p>
+              <div className="mt-2 grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {machine.programs.map((program) => {
+                  const active = selectedProgramId === program.id;
 
-            return (
-              <button
-                className={`relative min-h-24 rounded-2xl border bg-white px-4 py-4 text-left text-slate-700 transition ${
-                  active
-                    ? "border-emerald-300 shadow-sm"
-                    : "border-transparent hover:border-emerald-100 hover:text-emerald-800"
-                }`}
-                key={device.id}
-                type="button"
-                onClick={() => selectDevice(device.id)}
-              >
-                {active && (
-                  <span className="absolute right-3 top-3 size-2 rounded-full bg-emerald-500" />
-                )}
-                <span className="block pr-4 text-lg font-bold leading-6">{device.name}</span>
-                <span className="mt-2 block text-sm text-slate-500">
-                  {formatDuration(device.defaultDuration)} · pas {formatDuration(device.delayStep)}
-                </span>
-              </button>
-            );
-          })}
+                  return (
+                    <button
+                      className={`relative min-h-20 rounded-2xl border bg-white px-3 py-3 text-left text-slate-700 transition sm:min-h-24 sm:px-4 sm:py-4 ${
+                        active
+                          ? "border-emerald-300 shadow-sm"
+                          : "border-transparent hover:border-emerald-100 hover:text-emerald-800"
+                      }`}
+                      key={program.id}
+                      type="button"
+                      onClick={() => selectProgram(program.id)}
+                    >
+                      {active && (
+                        <span className="absolute right-2 top-2 size-2 rounded-full bg-emerald-500 sm:right-3 sm:top-3" />
+                      )}
+                      <span className="block pr-6 text-base font-bold leading-5 sm:pr-4 sm:text-lg sm:leading-6">{program.name}</span>
+                      <span className="mt-1 block text-xs text-slate-500 sm:mt-2 sm:text-sm">
+                        {formatDuration(program.duration)} · pas {formatDuration(program.delayStep)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
+
+        <Link
+          className="mt-3 block rounded-2xl border border-emerald-100 bg-green-50 px-4 py-3 text-center text-xs font-bold text-emerald-800 sm:mt-4 sm:text-sm"
+          href="/machines"
+        >
+          Gérer les machines et programmes
+        </Link>
       </div>
 
-      <div className="mt-4 rounded-3xl bg-slate-50 p-4">
-        <p className="text-sm font-bold text-slate-700">Mode de calcul</p>
-        <div className="mt-3">
-          <ModeToggle mode={selectedMode} onChange={setSelectedMode} />
+      <div className="mt-4 rounded-2xl bg-slate-50 p-3 sm:mt-4 sm:rounded-3xl sm:p-4">
+        <p className="text-xs font-bold text-slate-700 sm:text-sm">Mode de calcul</p>
+        <div className="mt-2 sm:mt-3">
+          <ModeToggle mode={calculationMode} onChange={setCalculationMode} />
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-          <label className="text-sm font-bold text-slate-700" htmlFor="duration">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 sm:mt-5 sm:gap-3">
+          <label className="text-xs font-bold text-slate-700 sm:text-sm" htmlFor="duration">
             Duree du programme
           </label>
-          <span className="rounded-full bg-white px-4 py-2 text-base font-black text-emerald-700">
+          <span className="rounded-full bg-slate-50 px-3 py-2 text-sm font-black text-emerald-700 sm:px-4 sm:py-2 sm:text-base">
             {formatDuration(duration)}
           </span>
         </div>
@@ -359,6 +310,13 @@ export default function CalculerPage() {
           onChange={(event) => setDuration(Number(event.target.value))}
         />
         <DurationTicks />
+
+        <div className="mt-4 flex items-center justify-between gap-2 sm:mt-5">
+          <span className="text-xs font-bold text-slate-700 sm:text-sm">Mode depart differe</span>
+          <span className="rounded-full bg-slate-50 px-3 py-2 text-xs font-black text-emerald-700 sm:px-4 sm:py-2 sm:text-sm">
+            {selectedProgram?.delayMode === "fin" ? "Fin à" : "Départ dans"}
+          </span>
+        </div>
       </div>
     </section>
   );
@@ -493,7 +451,7 @@ export default function CalculerPage() {
           <div className="mt-4 rounded-2xl bg-slate-50 p-3">
             <p className="text-sm font-bold text-slate-700">Mode de calcul</p>
             <div className="mt-3">
-              <ModeToggle mode={selectedMode} onChange={setSelectedMode} />
+              <ModeToggle mode={calculationMode} onChange={setCalculationMode} />
             </div>
           </div>
 
@@ -525,26 +483,19 @@ export default function CalculerPage() {
               {formatDuration(delayStep)}
             </span>
           </div>
-          <input
-            id="guest-delay-step"
-            className="mt-4 w-full accent-emerald-700"
-            type="range"
-            min="0"
-            max={delayStepOptions.length - 1}
-            step="1"
-            value={selectedDelayStepIndex}
-            onChange={(event) => {
-              if (selectedDevice) {
-                updateDevice(selectedDevice.id, {
-                  delayStep: delayStepOptions[Number(event.target.value)],
-                });
-              }
-            }}
-          />
-          <div className="mt-2 flex justify-between text-xs font-semibold text-slate-400">
-            {delayStepOptions.map((step) => (
-              <span key={step}>{formatDuration(step)}</span>
-            ))}
+
+          <div className="mt-5">
+            <span className="text-sm font-bold text-slate-700">Mode depart differe</span>
+            <div className="mt-2">
+              <DelayModeToggle
+                mode={selectedProgram?.delayMode === "fin" ? "fin" : "depart"}
+                onChange={(delayMode) => {
+                  if (selectedProgram) {
+                    updateProgram(selectedProgram.id, { delayMode });
+                  }
+                }}
+              />
+            </div>
           </div>
         </section>
 

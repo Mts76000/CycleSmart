@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarIcon, ClockIcon, UserIcon } from "./icons";
+import { CalendarIcon, ClockIcon, DeviceIcon, UserIcon } from "./icons";
 import { CycleProvider } from "@/lib/cycle-store";
 
 const tabs = [
   { href: "/calculer", label: "Calculer", icon: ClockIcon },
   { href: "/creneaux", label: "Creneaux", icon: CalendarIcon },
+  { href: "/machines", label: "Machines", icon: DeviceIcon },
   { href: "/profil", label: "Profil", icon: UserIcon },
 ];
 
@@ -96,8 +97,8 @@ export function MainShell({
           </div>
 
           {isAuthenticated && (
-            <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full bg-white/95 px-5 py-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
-              <div className="mx-auto grid max-w-[430px] grid-cols-3 gap-2 rounded-[24px] bg-slate-100 p-1">
+            <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full bg-white/95 px-3 py-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
+              <div className="mx-auto grid max-w-[430px] grid-cols-4 gap-1 rounded-[24px] bg-slate-100 p-1">
                 {tabs.map((tab) => (
                   <NavItem
                     active={pathname === tab.href}

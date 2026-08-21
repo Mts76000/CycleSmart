@@ -281,7 +281,7 @@ export default function CalculerPage() {
           className="mt-3 block rounded-2xl border border-emerald-100 bg-green-50 px-4 py-3 text-center text-xs font-bold text-emerald-800 sm:mt-4 sm:text-sm"
           href="/machines"
         >
-          Gérer les machines et programmes
+          Gérer les programmes
         </Link>
       </div>
 

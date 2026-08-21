@@ -1,11 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-dvh bg-[linear-gradient(180deg,#dcfce7_0%,#f8faf9_34%)] px-5 py-8 text-slate-950">
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[430px] flex-col">
-        <Link className="mx-auto grid size-16 place-items-center rounded-3xl bg-emerald-500 text-3xl font-black text-white shadow-lg shadow-emerald-300/40" href="/calculer">
-          °°
+        <Link className="mx-auto grid size-16 place-items-center rounded-3xl bg-white shadow-lg shadow-emerald-300/40" href="/calculer">
+          <Image alt="CycleSmart" className="size-10" height={40} priority src="/logo-icon.png" width={40} />
         </Link>
         <div className="mt-6 text-center">
           <p className="text-3xl font-bold">CycleSmart</p>

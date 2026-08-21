@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarIcon, ClockIcon, DeviceIcon, UserIcon } from "./icons";
@@ -123,9 +124,7 @@ export function MainShell({
 function Brand() {
   return (
     <Link className="flex items-center gap-3" href="/calculer">
-      <span className="grid size-10 place-items-center rounded-2xl bg-emerald-500 text-lg font-black text-white">
-        CS
-      </span>
+      <Image alt="CycleSmart" className="size-10" height={40} priority src="/logo-icon.png" width={40} />
       <span className="text-2xl font-bold tracking-normal text-emerald-700">CycleSmart</span>
     </Link>
   );
@@ -146,13 +145,15 @@ function NavItem({
 }) {
   return (
     <Link
-      className={`flex items-center justify-center gap-2 rounded-[20px] font-bold transition ${
-        compact ? "h-12 text-xs" : "h-12 justify-start px-4 text-sm"
+      className={`flex rounded-[20px] font-bold transition ${
+        compact
+          ? "h-14 flex-col items-center justify-center gap-1 text-[11px]"
+          : "h-12 items-center justify-start gap-2 px-4 text-sm"
       } ${active ? "bg-emerald-500 text-white shadow-sm" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}
       href={href}
     >
-      <Icon className="size-5" />
-      <span>{label}</span>
+      <Icon className={compact ? "size-5 shrink-0" : "size-5"} />
+      <span className={compact ? "leading-none" : undefined}>{label}</span>
     </Link>
   );
 }

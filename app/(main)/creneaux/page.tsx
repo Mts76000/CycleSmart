@@ -201,7 +201,7 @@ export default function CreneauxPage() {
         className="block rounded-2xl border border-emerald-100 bg-green-50 px-4 py-3 text-center text-xs font-bold text-emerald-800 sm:text-sm"
         href="/machines"
       >
-        Gerer les machines et programmes
+        Gerer les programmes
       </Link>
     </div>
   );

@@ -29,7 +29,7 @@ export function PasswordInput({
         autoComplete={autoComplete}
       />
       <button
-        className="ml-3 grid size-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-white hover:text-emerald-700"
+        className="ml-3 grid size-9 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-white hover:text-emerald-700"
         type="button"
         onClick={() => setVisible((current) => !current)}
         aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}

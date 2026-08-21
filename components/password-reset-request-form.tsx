@@ -11,8 +11,8 @@ export function PasswordResetRequestForm() {
   );
 
   return (
-    <form className="mt-8 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-200/80" action={formAction}>
-      <h1 className="text-2xl font-black text-slate-950">Mot de passe oublie</h1>
+    <form className="mt-8 rounded-[32px] bg-white p-6 shadow-card" action={formAction}>
+      <h1 className="font-display text-2xl font-black tracking-tight text-slate-950">Mot de passe oublie</h1>
       <p className="mt-2 text-slate-600">
         Entre ton adresse e-mail. Si un compte existe, tu recevras un lien pour choisir un nouveau mot de passe.
       </p>
@@ -38,14 +38,14 @@ export function PasswordResetRequestForm() {
       )}
 
       <button
-        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-lg shadow-emerald-300/40 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >
         {pending ? "Envoi..." : "Recevoir le lien"}
       </button>
 
-      <Link className="mt-4 block text-center text-sm font-bold text-emerald-800" href="/connexion">
+      <Link className="mt-4 block text-center text-sm font-bold text-emerald-800 transition hover:text-emerald-950 hover:underline" href="/connexion">
         Retour a la connexion
       </Link>
     </form>

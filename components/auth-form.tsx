@@ -17,13 +17,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <form
-      className="mt-8 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-200/80"
+      className="mt-8 rounded-[32px] bg-white p-6 shadow-card"
       action={formAction}
     >
       <div className="grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
         {isSignup ? (
           <Link
-            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500"
+            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500 transition hover:text-slate-800"
             href="/connexion"
           >
             Connexion
@@ -39,7 +39,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           </span>
         ) : (
           <Link
-            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500"
+            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500 transition hover:text-slate-800"
             href="/inscription"
           >
             Inscription
@@ -113,7 +113,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               Rester connecte plus longtemps
             </label>
             <Link
-              className="text-sm font-bold text-emerald-800"
+              className="text-sm font-bold text-emerald-800 transition hover:text-emerald-950 hover:underline"
               href="/mot-de-passe-oublie"
             >
               Mot de passe oublie ?
@@ -129,7 +129,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <button
-        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-lg shadow-emerald-300/40 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >
@@ -139,10 +139,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             ? "Creer mon compte →"
             : "Me connecter →"}
       </button>
-
-      <p className="mt-5 rounded-full bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
-        Connexion securisee par cookie httpOnly et mot de passe chiffre en base.
-      </p>
     </form>
   );
 }

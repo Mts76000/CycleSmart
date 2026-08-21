@@ -145,3 +145,27 @@ export function PlusIcon(props: IconProps) {
     </SvgIcon>
   );
 }
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </SvgIcon>
+  );
+}
+
+export function ChevronRightIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="m9 6 6 6-6 6" />
+    </SvgIcon>
+  );
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </SvgIcon>
+  );
+}

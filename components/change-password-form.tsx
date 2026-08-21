@@ -11,13 +11,8 @@ export function ChangePasswordForm() {
   );
 
   return (
-    <form className="rounded-[28px] bg-white p-5 shadow-xl shadow-slate-200/70 md:p-6" action={formAction}>
-      <p className="text-xl font-bold text-slate-950">Changer le mot de passe</p>
-      <p className="mt-2 leading-6 text-slate-500">
-        Mets un nouveau mot de passe sans toucher a tes creneaux.
-      </p>
-
-      <label className="mt-5 block text-sm font-semibold text-slate-600" htmlFor="currentPassword">
+    <form action={formAction}>
+      <label className="block text-sm font-semibold text-slate-600" htmlFor="currentPassword">
         Mot de passe actuel
       </label>
       <PasswordInput id="currentPassword" name="currentPassword" autoComplete="current-password" />
@@ -40,7 +35,7 @@ export function ChangePasswordForm() {
         <p
           className={`mt-4 rounded-2xl px-4 py-3 text-sm font-semibold ${
             state.message === "Mot de passe modifie."
-              ? "bg-green-50 text-emerald-700"
+              ? "bg-emerald-50 text-emerald-700"
               : "bg-red-50 text-red-700"
           }`}
         >
@@ -49,7 +44,7 @@ export function ChangePasswordForm() {
       )}
 
       <button
-        className="mt-5 h-12 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-lg shadow-emerald-300/40 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-5 h-12 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >

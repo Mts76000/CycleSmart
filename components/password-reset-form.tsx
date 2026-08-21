@@ -13,10 +13,10 @@ export function PasswordResetForm({ token }: { token: string }) {
 
   if (!token) {
     return (
-      <div className="mt-8 rounded-[32px] bg-white p-6 text-center shadow-xl shadow-slate-200/80">
-        <h1 className="text-2xl font-black text-slate-950">Lien invalide</h1>
+      <div className="mt-8 rounded-[32px] bg-white p-6 text-center shadow-card">
+        <h1 className="font-display text-2xl font-black tracking-tight text-slate-950">Lien invalide</h1>
         <p className="mt-2 text-slate-600">Demande un nouveau lien pour modifier ton mot de passe.</p>
-        <Link className="mt-6 inline-flex rounded-2xl bg-emerald-500 px-5 py-4 font-bold text-white" href="/mot-de-passe-oublie">
+        <Link className="mt-6 inline-flex rounded-2xl bg-emerald-500 px-5 py-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99]" href="/mot-de-passe-oublie">
           Recevoir un nouveau lien
         </Link>
       </div>
@@ -24,9 +24,9 @@ export function PasswordResetForm({ token }: { token: string }) {
   }
 
   return (
-    <form className="mt-8 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-200/80" action={formAction}>
+    <form className="mt-8 rounded-[32px] bg-white p-6 shadow-card" action={formAction}>
       <input name="token" type="hidden" value={token} />
-      <h1 className="text-2xl font-black text-slate-950">Nouveau mot de passe</h1>
+      <h1 className="font-display text-2xl font-black tracking-tight text-slate-950">Nouveau mot de passe</h1>
       <p className="mt-2 text-slate-600">Choisis un mot de passe que tu n&apos;utilises pas ailleurs.</p>
 
       <label className="mt-6 block text-sm font-semibold text-slate-600" htmlFor="newPassword">
@@ -52,7 +52,7 @@ export function PasswordResetForm({ token }: { token: string }) {
       )}
 
       <button
-        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-lg shadow-emerald-300/40 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >

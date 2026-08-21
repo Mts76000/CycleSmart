@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ChangePasswordForm } from "@/components/change-password-form";
 import { DeviceIcon, SparkIcon } from "@/components/icons";
@@ -73,8 +74,8 @@ export default async function ProfilPage() {
     return (
       <div className="mx-auto max-w-2xl space-y-5 pt-6 md:pt-0">
         <section className="rounded-[28px] bg-white p-6 text-center shadow-xl shadow-slate-200/70">
-          <div className="mx-auto grid size-20 place-items-center rounded-full bg-green-100 text-3xl font-black text-emerald-700">
-            CS
+          <div className="mx-auto grid size-20 place-items-center rounded-full bg-green-100">
+            <Image alt="CycleSmart" className="size-11" height={44} src="/logo-icon.png" width={44} />
           </div>
           <p className="mt-5 text-3xl font-bold">Aucun compte connecte</p>
           <p className="mt-2 leading-6 text-slate-500">

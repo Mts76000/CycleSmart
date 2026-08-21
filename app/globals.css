@@ -31,3 +31,35 @@ button {
 input[type="range"] {
   min-height: 28px;
 }
+
+/* Neutralise le rendu natif iOS/Safari des champs date et heure
+   (cadre gris interne qui depasse du champ stylise). */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+  background: transparent;
+  padding: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-left: 8px;
+  opacity: 0.6;
+}

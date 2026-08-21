@@ -148,7 +148,7 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
     return sessionUnavailable({ name, email });
   }
 
-  redirect("/profil");
+  redirect("/calculer");
 }
 
 export async function login(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -199,7 +199,7 @@ export async function login(_state: AuthFormState, formData: FormData): Promise<
     return sessionUnavailable({ email });
   }
 
-  redirect("/profil");
+  redirect("/calculer");
 }
 
 export async function requestPasswordReset(
@@ -359,5 +359,5 @@ export async function resetPassword(
     return { message: "Mot de passe modifie. Connecte-toi avec ton nouveau mot de passe." };
   }
 
-  redirect("/profil");
+  redirect("/calculer");
 }

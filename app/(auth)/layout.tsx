@@ -9,7 +9,7 @@ const highlights = [
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-dvh bg-[#eef2f1] text-slate-950 md:p-5">
+    <main className="min-h-dvh bg-[#eef2f1] text-stone-950 md:p-5">
       <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col md:min-h-0 md:flex-row md:gap-5">
         <aside className="relative hidden shrink-0 basis-[42%] flex-col justify-between overflow-hidden rounded-[32px] bg-emerald-700 p-10 text-white md:flex">
           <div
@@ -54,7 +54,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <div className="mt-5 text-center md:hidden">
               <p className="font-display text-2xl font-bold tracking-tight">CycleSmart</p>
-              <p className="mt-1 text-sm text-slate-600">Optimise tes cycles au meilleur moment.</p>
+              <p className="mt-1 text-sm text-stone-600">Optimise tes cycles au meilleur moment.</p>
             </div>
             {children}
           </div>

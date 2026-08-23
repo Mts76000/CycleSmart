@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f8f7;
-  --foreground: #0e1613;
+  /* Warm, slightly green-tinted neutrals instead of cold slate/gray, so
+     content surfaces feel like they belong to the same material family as
+     the emerald hero surfaces (kept at the app's original emerald-700). */
+  --background: #f3f5f2;
+  --foreground: #12201a;
+
+  /* Named surface tokens. Everything that isn't a hero/brand surface should
+     be built from these three levels instead of ad hoc bg-white /
+     bg-stone-50 choices. */
+  --surface-0: #ffffff; /* base cards */
+  --surface-1: #f2f5f1; /* recessed sub-blocks inside a card */
+  --surface-2: #e8ede7; /* pressed/selected sub-blocks */
+  --surface-hero: #047857; /* emerald-700, the app's original hero green */
+  --surface-hero-strong: #065f46; /* emerald-800, for nested surfaces on the hero */
+
+  /* One radius scale, used everywhere instead of ad hoc rounded-[Npx]. */
+  --radius-xs: 12px;
+  --radius-sm: 16px;
+  --radius-md: 20px;
+  --radius-lg: 26px;
+  --radius-xl: 32px;
 }
 
 @theme {
@@ -15,6 +34,16 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-hero: var(--surface-hero);
+  --color-surface-hero-strong: var(--surface-hero-strong);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
 }
 
 body {
@@ -74,6 +103,23 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: 0.6;
 }
 
+/* Custom <select> chrome: native selects otherwise render with the
+   browser's own arrow/box and break the surface system above. */
+select.field-select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23146b52' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.5rem;
+}
+
+/* The visible slider (track/fill/thumb) is built from plain divs in
+   components/slider.tsx, positioned from the same percentage so they can
+   never visually disagree. The native <input type="range"> underneath is
+   kept fully transparent (see that component) purely for interaction,
+   keyboard access and accessibility. */
+
 @layer utilities {
   .font-display {
     font-family: var(--font-display);
@@ -92,5 +138,68 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
   .shadow-cta {
     box-shadow: 0 14px 26px -12px rgba(16, 185, 129, 0.55);
+  }
+
+  /* Deep Forest surfaces. Use these instead of bg-white/bg-stone-* + a
+     border/shadow combo, so every "card level" in the app reads as part of
+     the same material system as the hero surfaces. */
+  .surface-card {
+    background: var(--surface-0);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 1px 2px rgba(6, 78, 59, 0.05),
+      0 20px 40px -28px rgba(6, 78, 59, 0.25);
+  }
+
+  .surface-sub {
+    background: var(--surface-1);
+    border-radius: var(--radius-md);
+  }
+
+  .surface-sub-pressed {
+    background: var(--surface-2);
+    border-radius: var(--radius-md);
+  }
+
+  .surface-hero {
+    background: var(--surface-hero);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 24px 48px -20px rgba(6, 78, 59, 0.4);
+  }
+
+  /* Numeric values (durations, clocks) read as an "instrument" when they
+     share tabular figures instead of a proportional font. */
+  .font-numeric {
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Shimmer skeleton, shaped like the surfaces it replaces rather than a
+     generic spinner. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-1);
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+      animation: none;
+    }
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }

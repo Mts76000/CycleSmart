@@ -25,7 +25,7 @@ export function MainShell({
 
   return (
     <CycleProvider isAuthenticated={isAuthenticated}>
-      <main className="min-h-dvh bg-[#eef2f1] text-slate-950">
+      <main className="min-h-dvh bg-background text-stone-950">
         <div
           className={`mx-auto flex min-h-dvh w-full flex-col md:p-5 ${
             isAuthenticated ? "max-w-[1400px] md:grid md:grid-cols-[92px_minmax(0,1fr)] md:gap-5 lg:grid-cols-[240px_minmax(0,1fr)]" : "max-w-4xl"
@@ -38,7 +38,7 @@ export function MainShell({
 
             <section
               className={`mx-auto w-full flex-1 px-4 pt-4 sm:px-6 md:px-0 md:pt-0 ${
-                isAuthenticated ? "max-w-5xl pb-28 md:pb-10" : "max-w-3xl pb-8"
+                isAuthenticated ? "max-w-6xl pb-28 md:pb-10" : "max-w-3xl pb-8"
               }`}
             >
               {children}
@@ -111,7 +111,7 @@ function LiveClockChip() {
 function DesktopRail({ pathname }: { pathname: string }) {
   return (
     <aside className="sticky top-5 hidden h-[calc(100dvh-2.5rem)] flex-col md:flex">
-      <div className="flex flex-1 flex-col rounded-[28px] bg-white p-3 shadow-card lg:p-5">
+      <div className="surface-card flex flex-1 flex-col p-3 lg:p-5">
         <Link className="flex items-center gap-3 px-1 py-2 lg:px-2" href="/calculer">
           <Image alt="CycleSmart" className="size-10 shrink-0" height={40} priority src="/logo-icon.png" width={40} />
           <span className="hidden text-xl font-bold tracking-tight text-emerald-800 lg:inline">
@@ -119,7 +119,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
           </span>
         </Link>
 
-        <div className="mt-5 rounded-2xl bg-emerald-800 p-3 text-white lg:mt-6 lg:p-4">
+        <div className="rounded-[var(--radius-md)] bg-emerald-800 mt-5 p-3 text-white lg:mt-6 lg:p-4">
           <p className="hidden text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-100/70 lg:block">
             Il est
           </p>
@@ -171,7 +171,7 @@ function RailItem({
   return (
     <Link
       className={`group relative flex items-center gap-3 rounded-2xl px-2.5 py-2.5 transition lg:px-3.5 lg:py-3 ${
-        active ? "bg-emerald-50 text-emerald-800" : "text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+        active ? "bg-emerald-50 text-emerald-800" : "text-stone-400 hover:bg-stone-50 hover:text-stone-700"
       }`}
       href={href}
     >
@@ -190,7 +190,7 @@ function RailItem({
 function MobileDock({ pathname }: { pathname: string }) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 md:hidden">
-      <div className="mx-auto flex max-w-[420px] items-end justify-between rounded-[28px] bg-white px-3 pb-2 pt-3 shadow-card">
+      <div className="surface-card mx-auto flex max-w-[420px] items-end justify-between px-3 pb-2 pt-3">
         {tabs.map((tab) => (
           <DockItem active={pathname === tab.href} href={tab.href} icon={tab.icon} key={tab.href} label={tab.label} />
         ))}
@@ -213,17 +213,17 @@ function DockItem({
   return (
     <Link className="flex flex-1 flex-col items-center gap-1" href={href}>
       <span
-        className={`grid place-items-center rounded-full transition-all duration-200 ${
+        className={`grid place-items-center rounded-full transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
           active
             ? "size-12 -translate-y-4 bg-emerald-500 text-white shadow-cta"
-            : "size-9 translate-y-0 text-slate-400"
+            : "size-9 translate-y-0 text-stone-400"
         }`}
       >
-        <Icon className={active ? "size-5" : "size-5"} />
+        <Icon className="size-5" />
       </span>
       <span
         className={`text-[10px] font-bold transition-opacity ${
-          active ? "-mt-3 text-emerald-700 opacity-100" : "text-slate-400 opacity-80"
+          active ? "-mt-3 text-emerald-700 opacity-100" : "text-stone-400 opacity-80"
         }`}
       >
         {label}

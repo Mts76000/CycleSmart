@@ -19,7 +19,7 @@ export function PasswordInput({
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="mt-2 flex h-14 items-center rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus-within:ring-4">
+    <div className="mt-2 flex h-14 items-center rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-4 outline-none ring-emerald-300 focus-within:ring-4">
       <input
         id={id}
         name={name}
@@ -29,7 +29,7 @@ export function PasswordInput({
         autoComplete={autoComplete}
       />
       <button
-        className="ml-3 grid size-9 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-white hover:text-emerald-700"
+        className="ml-3 grid size-9 shrink-0 place-items-center rounded-xl text-stone-500 transition hover:bg-white hover:text-emerald-700"
         type="button"
         onClick={() => setVisible((current) => !current)}
         aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}

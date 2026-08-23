@@ -12,20 +12,20 @@ export function ChangePasswordForm() {
 
   return (
     <form action={formAction}>
-      <label className="block text-sm font-semibold text-slate-600" htmlFor="currentPassword">
+      <label className="block text-sm font-semibold text-stone-600" htmlFor="currentPassword">
         Mot de passe actuel
       </label>
       <PasswordInput id="currentPassword" name="currentPassword" autoComplete="current-password" />
       {state?.errors?.currentPassword && <FormError messages={state.errors.currentPassword} />}
       {state?.errors?.password && <FormError messages={state.errors.password} />}
 
-      <label className="mt-4 block text-sm font-semibold text-slate-600" htmlFor="newPassword">
+      <label className="mt-4 block text-sm font-semibold text-stone-600" htmlFor="newPassword">
         Nouveau mot de passe
       </label>
       <PasswordInput id="newPassword" name="newPassword" autoComplete="new-password" />
       {state?.errors?.newPassword && <FormError messages={state.errors.newPassword} />}
 
-      <label className="mt-4 block text-sm font-semibold text-slate-600" htmlFor="confirmPassword">
+      <label className="mt-4 block text-sm font-semibold text-stone-600" htmlFor="confirmPassword">
         Confirmer
       </label>
       <PasswordInput id="confirmPassword" name="confirmPassword" autoComplete="new-password" />

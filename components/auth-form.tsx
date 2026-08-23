@@ -17,29 +17,29 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <form
-      className="mt-8 rounded-[32px] bg-white p-6 shadow-card"
+      className="surface-card mt-8 p-6"
       action={formAction}
     >
-      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
+      <div className="grid grid-cols-2 gap-1 rounded-[var(--radius-sm)] bg-[var(--surface-1)] p-1">
         {isSignup ? (
           <Link
-            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500 transition hover:text-slate-800"
+            className="rounded-xl px-3 py-3 text-center font-semibold text-stone-500 transition hover:text-stone-800"
             href="/connexion"
           >
             Connexion
           </Link>
         ) : (
-          <span className="rounded-xl bg-white px-3 py-3 text-center font-semibold text-slate-950 shadow-sm">
+          <span className="rounded-xl bg-white px-3 py-3 text-center font-semibold text-stone-950 shadow-sm">
             Connexion
           </span>
         )}
         {isSignup ? (
-          <span className="rounded-xl bg-white px-3 py-3 text-center font-semibold text-slate-950 shadow-sm">
+          <span className="rounded-xl bg-white px-3 py-3 text-center font-semibold text-stone-950 shadow-sm">
             Inscription
           </span>
         ) : (
           <Link
-            className="rounded-xl px-3 py-3 text-center font-semibold text-slate-500 transition hover:text-slate-800"
+            className="rounded-xl px-3 py-3 text-center font-semibold text-stone-500 transition hover:text-stone-800"
             href="/inscription"
           >
             Inscription
@@ -50,7 +50,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       {isSignup && (
         <>
           <label
-            className="mt-6 block text-sm font-semibold text-slate-600"
+            className="mt-6 block text-sm font-semibold text-stone-600"
             htmlFor="name"
           >
             Nom
@@ -58,7 +58,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           <input
             id="name"
             name="name"
-            className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
+            className="mt-2 h-14 w-full rounded-2xl bg-[var(--surface-1)] px-4 outline-none ring-emerald-300 focus:ring-4"
             placeholder="Marc Dupont"
             type="text"
             autoComplete="name"
@@ -69,7 +69,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <label
-        className={`${isSignup ? "mt-4" : "mt-6"} block text-sm font-semibold text-slate-600`}
+        className={`${isSignup ? "mt-4" : "mt-6"} block text-sm font-semibold text-stone-600`}
         htmlFor="email"
       >
         Adresse e-mail
@@ -77,7 +77,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <input
         id="email"
         name="email"
-        className="mt-2 h-14 w-full rounded-2xl bg-slate-100 px-4 outline-none ring-emerald-300 focus:ring-4"
+        className="mt-2 h-14 w-full rounded-2xl bg-[var(--surface-1)] px-4 outline-none ring-emerald-300 focus:ring-4"
         placeholder="nom@exemple.com"
         type="email"
         autoComplete="email"
@@ -86,7 +86,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       {state?.errors?.email && <FormError messages={state.errors.email} />}
 
       <label
-        className="mt-4 block text-sm font-semibold text-slate-600"
+        className="mt-4 block text-sm font-semibold text-stone-600"
         htmlFor="password"
       >
         Mot de passe
@@ -103,7 +103,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       {!isSignup && (
         <>
           <div className="mt-4 flex items-center justify-between gap-3 flex-col">
-            <label className="flex flex-1 items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+            <label className="flex flex-1 items-center gap-3 rounded-2xl bg-[var(--surface-1)] px-4 py-3 text-sm font-semibold text-stone-600">
               <input
                 className="size-4 accent-emerald-600"
                 type="checkbox"

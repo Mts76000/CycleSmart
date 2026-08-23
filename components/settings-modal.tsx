@@ -23,7 +23,7 @@ export function SettingsModalRow({
   return (
     <>
       <button
-        className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-slate-50"
+        className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-stone-50"
         onClick={() => dialogRef.current?.showModal()}
         type="button"
       >
@@ -31,15 +31,15 @@ export function SettingsModalRow({
           {icon}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-bold text-slate-950">{label}</span>
-          <span className="block truncate text-xs text-slate-400">{description}</span>
+          <span className="block text-sm font-bold text-stone-950">{label}</span>
+          <span className="block truncate text-xs text-stone-400">{description}</span>
         </span>
-        <ChevronRightIcon className="size-4 shrink-0 text-slate-300" />
+        <ChevronRightIcon className="size-4 shrink-0 text-stone-300" />
       </button>
 
       <dialog
         ref={dialogRef}
-        className="m-auto w-full max-w-md rounded-[28px] bg-white p-0 shadow-2xl backdrop:bg-slate-950/50 backdrop:backdrop-blur-sm"
+        className="m-auto w-full max-w-md rounded-[var(--radius-lg)] bg-white p-0 shadow-2xl backdrop:bg-stone-950/50 backdrop:backdrop-blur-sm"
         onClick={(event) => {
           if (event.target === dialogRef.current) {
             dialogRef.current?.close();
@@ -49,12 +49,12 @@ export function SettingsModalRow({
         <div className="max-h-[85vh] overflow-y-auto p-5 sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-xl font-bold text-slate-950">{title}</p>
-              {modalDescription && <p className="mt-1 text-sm text-slate-500">{modalDescription}</p>}
+              <p className="text-xl font-bold text-stone-950">{title}</p>
+              {modalDescription && <p className="mt-1 text-sm text-stone-500">{modalDescription}</p>}
             </div>
             <button
               aria-label="Fermer"
-              className="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 active:scale-95"
+              className="grid size-9 shrink-0 place-items-center rounded-full bg-stone-100 text-stone-500 transition hover:bg-stone-200 active:scale-95"
               onClick={() => dialogRef.current?.close()}
               type="button"
             >

@@ -59,28 +59,6 @@ function InstallGuideContent() {
   );
 }
 
-function SettingsRow({
-  icon: Icon,
-  label,
-  description,
-}: {
-  icon: (props: { className?: string }) => React.ReactNode;
-  label: string;
-  description: string;
-}) {
-  return (
-    <div className="flex w-full items-center gap-3 px-5 py-4">
-      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700">
-        <Icon className="size-4" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-bold text-stone-950">{label}</span>
-        <span className="block truncate text-xs text-stone-400">{description}</span>
-      </span>
-    </div>
-  );
-}
-
 export default async function ProfilPage() {
   const user = await getCurrentUser();
 
@@ -131,83 +109,66 @@ export default async function ProfilPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:items-start">
-        <div className="space-y-5 lg:sticky lg:top-5">
-          <section className="surface-hero relative overflow-hidden p-5 text-white sm:p-6 lg:p-7">
-            <div
-              className="pointer-events-none absolute -right-14 -top-16 size-44 rounded-full border-[24px] border-white/10"
-              aria-hidden="true"
-            />
-            <div className="relative flex items-center gap-4">
-              <div className="grid size-16 shrink-0 place-items-center rounded-2xl bg-white/15 font-display text-xl font-black sm:size-18">
-                {user.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <p className="font-display truncate text-xl font-bold tracking-tight sm:text-2xl">{user.name}</p>
-                <p className="mt-1 truncate text-sm text-white/70">{user.email}</p>
-              </div>
-            </div>
-
-            <div className="relative mt-5">
-              <ProfileStats />
-            </div>
-          </section>
-
-          <section className="rounded-[var(--radius-lg)] border border-emerald-100 bg-emerald-50 p-5 text-sm leading-6 text-emerald-950">
-            <p className="font-bold text-emerald-900">Le savais-tu ?</p>
-            <p className="mt-1.5 text-emerald-800/80">
-              Ajoute plusieurs créneaux d&apos;heures creuses pour que CycleSmart trouve toujours le
-              meilleur moment, même le week-end.
-            </p>
-          </section>
+    <div className="mx-auto max-w-3xl space-y-5">
+      <section className="surface-hero relative overflow-hidden p-5 text-white sm:p-6">
+        <div
+          className="pointer-events-none absolute -right-14 -top-16 size-44 rounded-full border-[24px] border-white/10"
+          aria-hidden="true"
+        />
+        <div className="relative flex items-center gap-4">
+          <div className="grid size-16 shrink-0 place-items-center rounded-2xl bg-white/15 font-display text-xl font-black sm:size-18">
+            {user.name.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="font-display truncate text-xl font-bold tracking-tight sm:text-2xl">{user.name}</p>
+            <p className="mt-1 truncate text-sm text-white/70">{user.email}</p>
+          </div>
         </div>
 
-        <div className="mt-5 space-y-5 lg:mt-0">
-          <section className="surface-card divide-y divide-stone-100 overflow-hidden">
-            <SettingsRow
-              description="Sauvegarde automatique sur ton compte"
-              icon={SparkIcon}
-              label="Synchronisation"
-            />
-
-            <SettingsModalRow
-              description="Modifier ton mot de passe"
-              icon={<LockIcon className="size-4" />}
-              label="Mot de passe"
-              modalDescription="Change ton mot de passe sans toucher à tes créneaux"
-              title="Changer le mot de passe"
-            >
-              <ChangePasswordForm />
-            </SettingsModalRow>
-
-            <SettingsModalRow
-              description="Ajouter à l'écran d'accueil"
-              icon={<DownloadIcon className="size-4" />}
-              label="Installer l'application"
-              modalDescription="Ajoute CycleSmart à ton écran d'accueil"
-              title="Installer l'application"
-            >
-              <InstallGuideContent />
-            </SettingsModalRow>
-          </section>
-
-          <section className="surface-card overflow-hidden">
-            <div className="border-b border-stone-100 px-5 py-4">
-              <p className="text-sm font-bold text-stone-950">Compte</p>
-              <p className="text-xs text-stone-400">Gestion de ta session</p>
-            </div>
-            <div className="space-y-3 p-5">
-              <LogoutButton />
-              <DeleteAccountButton />
-              <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                <BuyMeACoffeeButton />
-                <LegalLinks />
-              </div>
-            </div>
-          </section>
+        <div className="relative mt-5">
+          <ProfileStats />
         </div>
-      </div>
+      </section>
+
+      <section className="surface-card divide-y divide-stone-100 overflow-hidden">
+        <SettingsModalRow
+          description="Modifier ton mot de passe"
+          icon={<LockIcon className="size-4" />}
+          label="Mot de passe"
+          modalDescription="Change ton mot de passe sans toucher à tes créneaux"
+          title="Changer le mot de passe"
+        >
+          <ChangePasswordForm />
+        </SettingsModalRow>
+
+        <SettingsModalRow
+          description="Ajouter à l'écran d'accueil"
+          icon={<DownloadIcon className="size-4" />}
+          label="Installer l'application"
+          modalDescription="Ajoute CycleSmart à ton écran d'accueil"
+          title="Installer l'application"
+        >
+          <InstallGuideContent />
+        </SettingsModalRow>
+      </section>
+
+      <section className="surface-card overflow-hidden">
+        <div className="border-b border-stone-100 px-5 py-4">
+          <p className="text-sm font-bold text-stone-950">Compte</p>
+          <p className="text-xs text-stone-400">Gestion de ta session</p>
+        </div>
+        <div className="grid gap-3 p-5 sm:grid-cols-2">
+          <LogoutButton />
+          <DeleteAccountButton />
+        </div>
+      </section>
+
+      <section className="surface-card p-5">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <BuyMeACoffeeButton />
+          <LegalLinks />
+        </div>
+      </section>
     </div>
   );
 }

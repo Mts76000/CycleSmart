@@ -249,7 +249,7 @@ function alignEventToDelayStep(
   return now + Math.max(0, wait);
 }
 
-function getSuggestions(
+export function getSuggestions(
   slots: Slot[],
   currentTime: string,
   duration: number,
@@ -316,7 +316,7 @@ function getSuggestions(
   });
 }
 
-function getDefaultSlotName(startTime: string) {
+export function getDefaultSlotName(startTime: string) {
   const start = timeToMinutes(startTime);
 
   if (start < 6 * 60) {

@@ -17,7 +17,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <form
-      className="surface-card mt-8 p-6"
+      className="surface-card mt-8 p-6 md:mt-0"
       action={formAction}
     >
       <div className="grid grid-cols-2 gap-1 rounded-[var(--radius-sm)] bg-[var(--surface-1)] p-1">

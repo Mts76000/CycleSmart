@@ -10,7 +10,7 @@ const highlights = [
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-dvh bg-[#eef2f1] text-stone-950 md:p-5">
-      <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col md:min-h-0 md:flex-row md:gap-5">
+      <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col md:min-h-[calc(100dvh-2.5rem)] md:flex-row md:gap-5">
         <aside className="relative hidden shrink-0 basis-[42%] flex-col justify-between overflow-hidden rounded-[32px] bg-emerald-700 p-10 text-white md:flex">
           <div
             className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full border-[36px] border-white/10"

@@ -1,8 +1,10 @@
 const CACHE = "cyclesmart-cache-v3";
 
 const APP_ROUTES = [
+  "/",
   "/calculer",
   "/creneaux",
+  "/machines",
   "/profil",
   "/connexion",
   "/inscription",
@@ -111,10 +113,24 @@ async function cacheFirst(request) {
   return response;
 }
 
-async function apiNetworkOnly(request) {
+async function apiNetworkFirst(request) {
+  const cache = await caches.open(CACHE);
+
   try {
-    return await fetch(request);
+    const response = await fetch(request);
+
+    if (response.ok) {
+      await cache.put(request, response.clone());
+    }
+
+    return response;
   } catch {
+    const cachedResponse = await caches.match(request);
+
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
     return Response.json(
       { ok: false, error: "Hors ligne. Les donnees distantes sont indisponibles." },
       { status: 503 },
@@ -136,7 +152,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (url.pathname.startsWith("/api/")) {
-    event.respondWith(apiNetworkOnly(request));
+    event.respondWith(apiNetworkFirst(request));
     return;
   }
 

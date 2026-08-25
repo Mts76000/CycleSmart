@@ -132,13 +132,13 @@ export default function MachinesPage() {
           </p>
           <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              className="h-12 rounded-2xl bg-emerald-500 px-6 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98]"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-500 px-6 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
               href="/inscription"
             >
               Créer un compte
             </Link>
             <Link
-              className="h-12 rounded-2xl border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
+              className="inline-flex h-10 items-center justify-center rounded-full border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
               href="/connexion"
             >
               Connexion
@@ -194,7 +194,7 @@ export default function MachinesPage() {
                   }
                 />
                 <button
-                  className="h-11 rounded-xl bg-emerald-500 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   type="button"
                   disabled={!newMachine.name.trim()}
                   onClick={() => {
@@ -352,7 +352,7 @@ export default function MachinesPage() {
 
                 {!isAddingProgram && (
                   <button
-                    className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-emerald-200 bg-emerald-50 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100 lg:col-span-2"
+                    className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] lg:col-span-2"
                     type="button"
                     onClick={() => setShowProgramForm(selectedMachine.id)}
                   >
@@ -423,7 +423,7 @@ export default function MachinesPage() {
                       </div>
                     </div>
                     <button
-                      className="mt-3 h-11 w-full rounded-[var(--radius-sm)] bg-emerald-500 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:text-base"
+                      className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                       type="button"
                       disabled={!newProgram.name.trim()}
                       onClick={() => {

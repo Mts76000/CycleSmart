@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
 import {
   ClockIcon,
-  DeviceIcon,
   MoonIcon,
   PlusIcon,
   SunIcon,
@@ -158,22 +157,7 @@ export default function CalculerPage() {
   );
 
   const machineSection = (
-    <div>
-      <div className="flex items-center gap-2">
-        <span className="grid size-9 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-emerald-700 sm:size-10">
-          <DeviceIcon className="size-4 sm:size-5" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-sm font-bold text-stone-950 sm:text-base">Machine</p>
-          <p className="text-xs leading-4 text-stone-500 sm:text-sm sm:leading-5">
-            {isAuthenticated
-              ? "Tes réglages sont gardés avec ton compte."
-              : "Choisis un appareil pour tester sans compte."}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-5 space-y-5">
+    <div className="space-y-5">
         {machines.map((machine) => (
           <div key={machine.id}>
             <p className="text-xs font-bold uppercase tracking-[0.1em] text-stone-400">{machine.name}</p>
@@ -211,7 +195,6 @@ export default function CalculerPage() {
             </div>
           </div>
         ))}
-      </div>
 
       {isAuthenticated && (
         <ActionLink className="mt-4" href="/machines" block>
@@ -338,7 +321,7 @@ export default function CalculerPage() {
             onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
           />
           <button
-            className="h-12 rounded-2xl bg-emerald-500 px-4 font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
+            className="inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
             type="button"
             onClick={() => {
               addSlot();

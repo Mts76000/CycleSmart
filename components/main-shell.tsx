@@ -8,6 +8,8 @@ import { Footer } from "./footer";
 import { CalendarIcon, ClockIcon, DeviceIcon, LogoutIcon, UserIcon } from "./icons";
 import { PwaInstallPrompt } from "./pwa-install-prompt";
 import { logout } from "@/lib/auth-actions";
+import { CycleLoading } from "./cycle-loading";
+import { SyncErrorBanner } from "./sync-error";
 import { CycleProvider, useCycle } from "@/lib/cycle-store";
 
 const tabs = [
@@ -16,6 +18,21 @@ const tabs = [
   { href: "/machines", label: "Machines", icon: DeviceIcon },
   { href: "/profil", label: "Profil", icon: UserIcon },
 ];
+
+function CycleGuard({ children }: { children: React.ReactNode }) {
+  const { hydrated } = useCycle();
+
+  if (!hydrated) {
+    return <CycleLoading />;
+  }
+
+  return (
+    <>
+      <SyncErrorBanner />
+      {children}
+    </>
+  );
+}
 
 export function MainShell({
   children,
@@ -46,7 +63,7 @@ export function MainShell({
                 isAuthenticated ? "pb-28 md:px-0" : "md:px-8"
               }`}
             >
-              {children}
+              <CycleGuard>{children}</CycleGuard>
             </section>
 
             {!isAuthenticated && (

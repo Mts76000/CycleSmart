@@ -85,6 +85,7 @@ type CycleContextValue = {
   alternativeSuggestion: Suggestion | null;
   best: Suggestion | undefined;
   syncStatus: "local" | "loading" | "saving" | "saved" | "error";
+  hydrated: boolean;
   setCurrentTime: (time: string) => void;
   setDuration: (duration: number) => void;
   selectProgram: (programId: string) => void;
@@ -937,6 +938,7 @@ export function CycleProvider({
       alternativeSuggestion,
       best: suggestions[0],
       syncStatus,
+      hydrated,
       setCurrentTime,
       setDuration: updateDuration,
       selectProgram,
@@ -977,6 +979,7 @@ export function CycleProvider({
       slots,
       suggestions,
       syncStatus,
+      hydrated,
       updateDuration,
       updateCalculationMode,
       todayLabel,

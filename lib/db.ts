@@ -38,14 +38,24 @@ function getDbConfig(): PoolConfig {
   const connectionString =
     process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
 
+  const base = {
+    // Fail fast if Postgres is unreachable so the UI can fall back to guest mode.
+    connectionTimeoutMillis: 3000,
+    query_timeout: 5000,
+    idleTimeoutMillis: 30000,
+    max: 10,
+  };
+
   if (connectionString) {
     return {
+      ...base,
       connectionString,
       ssl: getSslConfig(connectionString),
     };
   }
 
   return {
+    ...base,
     host: getRequiredEnv("POSTGRES_HOST"),
     port: Number(process.env.POSTGRES_PORT || 5432),
     database: getRequiredEnv("POSTGRES_DATABASE"),
@@ -58,6 +68,13 @@ function getDbConfig(): PoolConfig {
 export function getPool() {
   if (!pool) {
     pool = new Pool(getDbConfig());
+
+    // Reset the pool on unexpected client errors so the next call can
+    // attempt a fresh connection.
+    pool.on("error", (error) => {
+      console.error("Postgres pool error, resetting pool", error);
+      pool = undefined;
+    });
   }
 
   return pool;

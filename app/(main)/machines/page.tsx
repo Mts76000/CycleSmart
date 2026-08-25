@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   DeviceIcon,
@@ -77,7 +78,7 @@ function DurationFields({
 }) {
   return (
     <input
-      className="mt-1 h-12 w-full rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-2.5 text-sm font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 sm:px-3"
+      className="mt-1 h-12 w-full rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
       type="time"
       min="00:30"
       max="08:00"
@@ -93,6 +94,7 @@ export default function MachinesPage() {
   const [showProgramForm, setShowProgramForm] = useState<string | null>(null);
   const [expandedMachine, setExpandedMachine] = useState<string | null>(null);
   const {
+    isAuthenticated,
     machines,
     newMachine,
     newProgram,
@@ -109,6 +111,43 @@ export default function MachinesPage() {
   const allProgramsCount = machines.reduce((sum, machine) => sum + machine.programs.length, 0);
   const selectedMachine = machines.find((machine) => machine.id === expandedMachine) ?? null;
   const isAddingProgram = selectedMachine ? showProgramForm === selectedMachine.id : false;
+
+  if (!isAuthenticated) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-5">
+        <section className="surface-hero p-6 text-center text-white">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/65">Configuration</p>
+          <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:text-3xl">
+            Tes machines et programmes
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-white/80">
+            La gestion des appareils et programmes est réservée aux comptes connectés.
+            En mode invité, utilise les appareils par défaut sur la page Calculer.
+          </p>
+        </section>
+
+        <section className="surface-card p-6 text-center">
+          <p className="text-stone-600">
+            Connecte-toi pour ajouter tes propres machines et programmes.
+          </p>
+          <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              className="h-12 rounded-2xl bg-emerald-500 px-6 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98]"
+              href="/inscription"
+            >
+              Créer un compte
+            </Link>
+            <Link
+              className="h-12 rounded-2xl border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
+              href="/connexion"
+            >
+              Connexion
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-5">
@@ -219,7 +258,7 @@ export default function MachinesPage() {
                 </span>
                 <p className="mt-3 font-bold text-stone-700">Choisis une machine</p>
                 <p className="mt-1 text-sm text-stone-400">
-                  Selectionne une machine a gauche pour voir et modifier ses programmes.
+                  Selectionne une machine dans la liste pour voir et modifier ses programmes.
                 </p>
               </div>
             </div>
@@ -269,7 +308,7 @@ export default function MachinesPage() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-[120px_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+                    <div className="mt-3 space-y-2.5">
                       <div>
                         <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
                           Durée
@@ -284,26 +323,28 @@ export default function MachinesPage() {
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
-                          Pas
-                        </label>
-                        <StepSelect
-                          className="mt-1 w-full"
-                          value={program.delayStep}
-                          onChange={(delayStep) => updateProgram(program.id, { delayStep })}
-                        />
-                      </div>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
+                            Pas
+                          </label>
+                          <StepSelect
+                            className="mt-1 w-full"
+                            value={program.delayStep}
+                            onChange={(delayStep) => updateProgram(program.id, { delayStep })}
+                          />
+                        </div>
 
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
-                          Mode
-                        </label>
-                        <DelayModeSelect
-                          className="mt-1 w-full"
-                          value={program.delayMode}
-                          onChange={(delayMode) => updateProgram(program.id, { delayMode })}
-                        />
+                        <div>
+                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
+                            Mode
+                          </label>
+                          <DelayModeSelect
+                            className="mt-1 w-full"
+                            value={program.delayMode}
+                            onChange={(delayMode) => updateProgram(program.id, { delayMode })}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -332,7 +373,7 @@ export default function MachinesPage() {
                         Annuler
                       </button>
                     </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-[2fr_1fr] lg:grid-cols-[2fr_120px_1fr_1fr]">
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-400">
                           Nom

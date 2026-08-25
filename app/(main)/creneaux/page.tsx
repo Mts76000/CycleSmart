@@ -1,8 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
-import { GuestBanner } from "@/components/guest-banner";
 import {
   ClockIcon,
   MoonIcon,
@@ -47,6 +47,43 @@ export default function CreneauxPage() {
 
   const modeLabel = calculationMode === "last" ? "Fin dans le créneau" : "Départ dans le créneau";
 
+  if (!isAuthenticated) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-5">
+        <section className="surface-hero p-6 text-center text-white">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/65">Réglages</p>
+          <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:text-3xl">
+            Tes heures creuses
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-white/80">
+            La gestion détaillée est réservée aux comptes connectés. En mode invité,
+            ajoute tes créneaux directement depuis la page Calculer.
+          </p>
+        </section>
+
+        <section className="surface-card p-6 text-center">
+          <p className="text-stone-600">
+            Connecte-toi pour sauvegarder et gérer tous tes créneaux sur tous tes appareils.
+          </p>
+          <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              className="h-12 rounded-2xl bg-emerald-500 px-6 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98]"
+              href="/inscription"
+            >
+              Créer un compte
+            </Link>
+            <Link
+              className="h-12 rounded-2xl border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
+              href="/connexion"
+            >
+              Connexion
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <section className="surface-hero p-4 text-white sm:p-5 md:p-6 lg:p-8">
@@ -73,8 +110,6 @@ export default function CreneauxPage() {
           />
         </div>
       </section>
-
-      {!isAuthenticated && <GuestBanner />}
 
       <section className="surface-card p-5 md:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

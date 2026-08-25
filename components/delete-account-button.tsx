@@ -19,7 +19,7 @@ export function DeleteAccountButton() {
       }}
     >
       <button
-        className="h-14 w-full rounded-2xl border border-red-200 bg-red-50 px-4 font-bold text-red-600 transition hover:bg-red-100 active:scale-[0.99]"
+        className="inline-flex h-11 w-full items-center justify-center rounded-full border border-stone-200 bg-white px-4 text-sm font-bold text-stone-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-[0.98]"
         type="submit"
       >
         Supprimer mon compte

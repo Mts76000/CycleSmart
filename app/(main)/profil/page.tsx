@@ -130,17 +130,11 @@ export default async function ProfilPage() {
         </div>
       </section>
 
-      <section className="surface-card divide-y divide-stone-100 overflow-hidden">
-        <SettingsModalRow
-          description="Modifier ton mot de passe"
-          icon={<LockIcon className="size-4" />}
-          label="Mot de passe"
-          modalDescription="Change ton mot de passe sans toucher à tes créneaux"
-          title="Changer le mot de passe"
-        >
-          <ChangePasswordForm />
-        </SettingsModalRow>
-
+      <section className="surface-card overflow-hidden">
+        <div className="border-b border-stone-100 px-5 py-4">
+          <p className="text-sm font-bold text-stone-950">Application</p>
+          <p className="text-xs text-stone-400">Raccourci et installation</p>
+        </div>
         <SettingsModalRow
           description="Ajouter à l'écran d'accueil"
           icon={<DownloadIcon className="size-4" />}
@@ -154,20 +148,34 @@ export default async function ProfilPage() {
 
       <section className="surface-card overflow-hidden">
         <div className="border-b border-stone-100 px-5 py-4">
-          <p className="text-sm font-bold text-stone-950">Compte</p>
-          <p className="text-xs text-stone-400">Gestion de ta session</p>
+          <p className="text-sm font-bold text-stone-950">Gestion du compte</p>
+          <p className="text-xs text-stone-400">Mot de passe, session et suppression</p>
         </div>
-        <div className="grid gap-3 p-5 sm:grid-cols-2">
-          <LogoutButton />
-          <DeleteAccountButton />
+        <div className="divide-y divide-stone-100">
+          <SettingsModalRow
+            description="Modifier ton mot de passe"
+            icon={<LockIcon className="size-4" />}
+            label="Mot de passe"
+            modalDescription="Change ton mot de passe sans toucher à tes créneaux"
+            title="Changer le mot de passe"
+          >
+            <ChangePasswordForm />
+          </SettingsModalRow>
+
+          <div className="grid gap-3 p-5 sm:grid-cols-2">
+            <LogoutButton />
+            <DeleteAccountButton />
+          </div>
         </div>
       </section>
 
-      <section className="surface-card p-5">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+      <section className="surface-card p-5 text-center">
+        <p className="text-sm font-bold text-stone-950">Soutenir CycleSmart</p>
+        <p className="mt-1 text-xs text-stone-400">Un café, c&apos;est le meilleur moyen de nous remercier.</p>
+        <div className="mt-4">
           <BuyMeACoffeeButton />
-          <LegalLinks />
         </div>
+        <LegalLinks className="mt-4 justify-center" />
       </section>
     </div>
   );

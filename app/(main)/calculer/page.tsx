@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
-import { GuestBanner } from "@/components/guest-banner";
 import {
   ClockIcon,
   DeviceIcon,
@@ -96,7 +94,6 @@ export default function CalculerPage() {
   const recommended = suggestions[0];
   const allPrograms = machines.flatMap((machine) => machine.programs);
   const selectedProgram = allPrograms.find((program) => program.id === selectedProgramId);
-  const delayStep = selectedProgram?.delayStep || 30;
   const endsOutsideSlot = recommended
     ? recommended.end > getSlotBoundsForSuggestion(recommended).slotEnd
     : false;
@@ -140,64 +137,17 @@ export default function CalculerPage() {
       <div className="mt-6 grid grid-cols-2 gap-2 border-t border-white/15 pt-4 sm:gap-3 sm:pt-5 mx-auto max-w-md">
         <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Programme</p>
-          <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">{selectedProgram?.name || "Programme"}</p>
+          <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">
+            {isAuthenticated && selectedProgram && duration === selectedProgram.duration
+              ? selectedProgram.name
+              : "Personnalisé"}
+          </p>
         </div>
         <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Cycle</p>
           <p className="mt-1 font-numeric text-sm font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
         </div>
       </div>
-    </section>
-  );
-
-  const upcomingSlotsPreview = (
-    <section className="surface-card p-5">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-bold text-stone-950">Tes heures creuses</p>
-        <Link className="text-xs font-bold text-emerald-700 transition hover:text-emerald-800" href="/creneaux">
-          Voir tout
-        </Link>
-      </div>
-
-      {slots.length === 0 ? (
-        <div className="surface-sub mt-3 flex flex-col items-center gap-3 p-5 text-center">
-          <p className="text-sm font-semibold leading-6 text-stone-500">
-            Ajoute un créneau d&apos;heures creuses pour obtenir une recommandation.
-          </p>
-          <Link
-            className="rounded-xl bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100"
-            href="/creneaux"
-          >
-            Ajouter un créneau
-          </Link>
-        </div>
-      ) : (
-        <div className="mt-3 space-y-2">
-          {slots.slice(0, 3).map((slot) => {
-            const SlotIcon = getSlotIcon(slot.start);
-
-            return (
-              <div className="surface-sub flex items-center gap-3 px-3 py-2.5" key={slot.id}>
-                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white text-emerald-700">
-                  <SlotIcon className="size-4" />
-                </span>
-                <p className="min-w-0 flex-1 truncate text-sm font-bold text-stone-700">{slot.name}</p>
-                <p className="shrink-0 text-xs font-bold text-stone-400 font-numeric">
-                  {slot.start} - {slot.end}
-                </p>
-              </div>
-            );
-          })}
-          {slots.length < 3 && (
-            <Link
-              className="block rounded-xl border border-dashed border-emerald-200 bg-emerald-50/60 px-3 py-2.5 text-center text-xs font-bold text-emerald-700 transition hover:bg-emerald-100"
-              href="/creneaux"
-            >
-              + Ajouter un autre créneau
-            </Link>
-          )}
-        </div>
-      )}
     </section>
   );
 
@@ -223,7 +173,7 @@ export default function CalculerPage() {
             <p className="text-xs font-bold uppercase tracking-[0.1em] text-stone-400">{machine.name}</p>
             <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {machine.programs.map((program) => {
-                const active = selectedProgramId === program.id;
+                const active = selectedProgramId === program.id && duration === program.duration;
 
                 return (
                   <button
@@ -257,9 +207,11 @@ export default function CalculerPage() {
         ))}
       </div>
 
-      <ActionLink className="mt-4" href="/machines" block>
-        Gérer les programmes
-      </ActionLink>
+      {isAuthenticated && (
+        <ActionLink className="mt-4" href="/machines" block>
+          Gérer les programmes
+        </ActionLink>
+      )}
     </div>
   );
 
@@ -279,13 +231,6 @@ export default function CalculerPage() {
               columns={1}
             />
           </div>
-
-          <div className="mt-5 flex items-center justify-between gap-2 border-t border-stone-100 pt-4">
-            <span className="text-sm font-semibold text-stone-600">Mode départ différé</span>
-            <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700">
-              {selectedProgram?.delayMode === "fin" ? "Fin à" : "Départ dans"}
-            </span>
-          </div>
         </div>
 
         <div>
@@ -300,79 +245,60 @@ export default function CalculerPage() {
           </div>
           <DurationTicks />
         </div>
+
+        <div className="border-t border-stone-100 pt-4 sm:col-span-2">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <span className="text-sm font-semibold text-stone-600">Mode départ différé</span>
+              <div className="mt-2 w-full">
+                <SegmentedControl
+                  value={selectedProgram?.delayMode === "fin" ? "fin" : "depart"}
+                  onChange={(delayMode) => {
+                    if (selectedProgram) {
+                      updateProgram(selectedProgram.id, { delayMode });
+                    }
+                  }}
+                  options={[
+                    { value: "depart", label: "Départ dans" },
+                    { value: "fin", label: "Fin à" },
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div>
+              <span className="text-sm font-semibold text-stone-600">Pas</span>
+              <select
+                className="field-select mt-2 h-11 w-full rounded-full border-none bg-emerald-50 px-4 text-sm font-black text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                value={selectedProgram?.delayStep}
+                onChange={(event) => {
+                  if (selectedProgram) {
+                    updateProgram(selectedProgram.id, { delayStep: Number(event.target.value) });
+                  }
+                }}
+              >
+                {delayStepOptions.map((step) => (
+                  <option key={step} value={step}>
+                    {formatDuration(step)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const guestExtras = (
-    <>
-      <div className="surface-card flex items-center justify-between gap-4 p-4">
-        <label className="text-sm font-bold text-stone-700" htmlFor="guest-delay-step">
-          Pas du départ différé
-        </label>
-        <select
-          id="guest-delay-step"
-          className="field-select rounded-full border-none bg-emerald-50 px-4 py-2 text-base font-black text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
-          value={delayStep}
-          onChange={(event) => {
-            if (selectedProgram) {
-              updateProgram(selectedProgram.id, { delayStep: Number(event.target.value) });
-            }
-          }}
-          disabled={!selectedProgram}
-        >
-          {delayStepOptions.map((step) => (
-            <option key={step} value={step}>
-              {formatDuration(step)}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="surface-card p-4">
-        <span className="text-sm font-bold text-stone-700">Mode départ différé</span>
-        <div className="mt-3">
-          <SegmentedControl
-            value={selectedProgram?.delayMode === "fin" ? "fin" : "depart"}
-            onChange={(delayMode) => {
-              if (selectedProgram) {
-                updateProgram(selectedProgram.id, { delayMode });
-              }
-            }}
-            options={[
-              { value: "depart", label: "Départ dans" },
-              { value: "fin", label: "Fin à" },
-            ]}
-          />
-        </div>
-      </div>
-
-      <section className="flex flex-col flex-wrap items-start gap-3 rounded-[var(--radius-lg)] border border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm font-semibold leading-6 text-emerald-950">
-          Crée un compte pour garder tes heures creuses et tes appareils.
-        </p>
-        <div className="flex shrink-0 gap-2">
-          <Link
-            className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
-            href="/inscription"
-          >
-            Créer un compte
-          </Link>
-          <Link
-            className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100 active:scale-[0.98]"
-            href="/connexion"
-          >
-            Connexion
-          </Link>
-        </div>
-      </section>
-    </>
-  );
-
   const slotFormCard = (
     <section className="surface-card p-5">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-lg font-bold text-stone-950">Heures creuses</p>
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <div className="min-w-0">
+          <p className="text-lg font-bold text-stone-950">Heures creuses</p>
+          <p className="text-xs text-stone-400">
+            Mode invité : restent uniquement sur cet appareil.
+          </p>
+        </div>
         {!showSlotForm && (
           <button
             className="flex h-9 items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100 active:scale-[0.97]"
@@ -472,31 +398,18 @@ export default function CalculerPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-6xl space-y-5">
+      <div className="mx-auto max-w-4xl space-y-5">
         {resultCard}
-        <GuestBanner />
 
-        <div className="md:grid md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] md:items-start md:gap-6 md:space-y-0 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
-          <div className="space-y-5 md:sticky md:top-5">
-            {upcomingSlotsPreview}
-          </div>
+        <section className="surface-card p-4 sm:p-5 md:p-7">
+          <p className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur de cycle</p>
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
+            Règle la durée et le mode, CycleSmart trouve le bon moment.
+          </p>
+          <div className="mt-6">{renderModeAndDuration()}</div>
+        </section>
 
-          <div className="space-y-5">
-            <section className="surface-card p-4 sm:p-5 md:p-7">
-              <p className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur de cycle</p>
-              <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
-                Choisis ton appareil, ajuste la durée si besoin.
-              </p>
-              <div className="mt-6 divide-y divide-stone-100">
-                <div className="pb-6">{machineSection}</div>
-                <div className="pt-6">{renderModeAndDuration()}</div>
-              </div>
-            </section>
-
-            {slotFormCard}
-            <div className="grid gap-3">{guestExtras}</div>
-          </div>
-        </div>
+        {slotFormCard}
       </div>
     );
   }

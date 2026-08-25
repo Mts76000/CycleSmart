@@ -797,7 +797,7 @@ export function CycleProvider({
           const nextDelayMode =
             patch.delayMode === undefined ? program.delayMode : (patch.delayMode === "depart" || patch.delayMode === "fin" ? patch.delayMode : program.delayMode);
 
-          if (selectedProgramId === programId) {
+          if (selectedProgramId === programId && patch.duration !== undefined) {
             setDuration(nextDuration);
           }
 

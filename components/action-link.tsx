@@ -20,8 +20,8 @@ export function ActionLink({
 }) {
   return (
     <Link
-      className={`rounded-[var(--radius-sm)] border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100 active:scale-[0.98] ${
-        block ? "block text-center" : "inline-flex items-center justify-center"
+      className={`inline-flex h-10 items-center justify-center rounded-full border border-emerald-200 bg-white px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98] ${
+        block ? "w-full text-center" : ""
       } ${className}`}
       href={href}
     >

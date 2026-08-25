@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "Conditions générales d'utilisation de CycleSmart.",
 };
 
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@cyclesmart.app";
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@mathis-lamotte.fr";
 
 export default function ConditionsPage() {
   return (

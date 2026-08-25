@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "Information sur les cookies et le stockage local utilisés par CycleSmart.",
 };
 
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@cyclesmart.app";
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@mathis-lamotte.fr";
 
 export default function CookiesPage() {
   return (

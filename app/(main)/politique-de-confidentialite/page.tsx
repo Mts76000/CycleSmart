@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     "Politique de confidentialité et traitement des données personnelles de CycleSmart.",
 };
 
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@cyclesmart.app";
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@mathis-lamotte.fr";
 
 export default function PrivacyPage() {
   return (

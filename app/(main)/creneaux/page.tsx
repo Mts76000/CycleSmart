@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
+import { GuestBanner } from "@/components/guest-banner";
 import {
   ClockIcon,
   MoonIcon,
@@ -36,6 +37,7 @@ export default function CreneauxPage() {
     addSlot,
     calculationMode,
     currentTime,
+    isAuthenticated,
     newSlot,
     removeSlot,
     setNewSlot,
@@ -71,6 +73,8 @@ export default function CreneauxPage() {
           />
         </div>
       </section>
+
+      {!isAuthenticated && <GuestBanner />}
 
       <section className="surface-card p-5 md:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

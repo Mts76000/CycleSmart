@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
+import { GuestBanner } from "@/components/guest-banner";
 import {
   ClockIcon,
   DeviceIcon,
@@ -385,7 +386,7 @@ export default function CalculerPage() {
       </div>
 
       {showSlotForm && (
-        <div className="surface-sub mt-3 grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_120px_120px_auto]">
+        <div className="surface-sub mt-3 grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_120px_120px_auto] md:grid-cols-[minmax(0,1fr)_160px_160px_auto]">
           <input
             className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
             placeholder="Nom optionnel"
@@ -428,7 +429,7 @@ export default function CalculerPage() {
 
           return (
             <article
-              className="surface-sub grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_112px_112px_40px] sm:items-center"
+              className="surface-sub grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_112px_112px_40px] sm:items-center md:grid-cols-[minmax(0,1fr)_150px_150px_52px]"
               key={slot.id}
             >
               <div className="flex items-center gap-3">
@@ -471,26 +472,30 @@ export default function CalculerPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4 md:grid md:grid-cols-[minmax(0,380px)_minmax(0,1fr)] md:items-start md:gap-6 md:space-y-0">
-        <div className="space-y-4 md:sticky md:top-5">
-          {resultCard}
-          {upcomingSlotsPreview}
-        </div>
+      <div className="mx-auto max-w-6xl space-y-5">
+        {resultCard}
+        <GuestBanner />
 
-        <div className="space-y-4">
-          <section className="surface-card p-4 sm:p-5 md:p-7">
-            <p className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur de cycle</p>
-            <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
-              Choisis ton appareil, ajuste la durée si besoin.
-            </p>
-            <div className="mt-6 divide-y divide-stone-100">
-              <div className="pb-6">{machineSection}</div>
-              <div className="pt-6">{renderModeAndDuration()}</div>
-            </div>
-          </section>
+        <div className="md:grid md:grid-cols-[minmax(0,420px)_minmax(0,1fr)] md:items-start md:gap-6 md:space-y-0">
+          <div className="space-y-5 md:sticky md:top-5">
+            {upcomingSlotsPreview}
+          </div>
 
-          {slotFormCard}
-          <div className="grid gap-3">{guestExtras}</div>
+          <div className="space-y-5">
+            <section className="surface-card p-4 sm:p-5 md:p-7">
+              <p className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur de cycle</p>
+              <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
+                Choisis ton appareil, ajuste la durée si besoin.
+              </p>
+              <div className="mt-6 divide-y divide-stone-100">
+                <div className="pb-6">{machineSection}</div>
+                <div className="pt-6">{renderModeAndDuration()}</div>
+              </div>
+            </section>
+
+            {slotFormCard}
+            <div className="grid gap-3">{guestExtras}</div>
+          </div>
         </div>
       </div>
     );

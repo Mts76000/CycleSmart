@@ -6,12 +6,7 @@ Application PWA qui calcule le meilleur moment pour lancer tes machines (lave-li
 - Fonctionne en mode invité, avec une synchronisation optionnelle en ligne.
 - Design mobile-first, installable comme application native (PWA).
 
-## Démonstration
 
-Le site est déployé sur : `https://cyclesmart.app` *(à adapter si besoin)*.
-
-![Capture mobile](./public/screenshot-mobile.png)
-![Capture desktop](./public/screenshot-wide.png)
 
 ## Fonctionnalités
 
@@ -114,19 +109,7 @@ npm run lint
 npm run build
 ```
 
-## Déploiement
 
-L'application est conçue pour être déployée sur une plateforme Node.js (Vercel, Railway, etc.) avec un service PostgreSQL.
-
-Variables d'environnement en production :
-
-```env
-DATABASE_URL=postgres://...
-SESSION_SECRET=<secret>
-RESEND_API_KEY=...
-RESEND_FROM=noreply@cyclesmart.app
-NEXT_PUBLIC_APP_URL=https://cyclesmart.app
-```
 
 ## PWA et offline
 

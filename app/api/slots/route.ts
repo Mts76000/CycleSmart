@@ -81,7 +81,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   const user = await requireCurrentUser();
-  const rateLimit = await rateLimitByUser("slots:put", user.id, 30, 60 * 1000);
+  const rateLimit = await rateLimitByUser("slots:put", user.id, 120, 60 * 1000);
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfter);
   }

@@ -4,7 +4,7 @@ import { rateLimitByIp, rateLimitResponse } from "@/lib/rate-limit";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const rateLimit = await rateLimitByIp("health", 30, 60 * 1000);
+  const rateLimit = await rateLimitByIp("health", 120, 60 * 1000);
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfter);
   }

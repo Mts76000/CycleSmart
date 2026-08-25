@@ -113,7 +113,7 @@ async function getAppOrigin() {
 }
 
 export async function signup(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
-  const rateLimit = await rateLimitByIp("signup", 5, 60 * 60 * 1000);
+  const rateLimit = await rateLimitByIp("signup", 20, 60 * 60 * 1000);
   if (!rateLimit.allowed) {
     return {
       message: `Trop de tentatives de creation. Reessaie dans ${rateLimit.retryAfter}s.`,
@@ -170,7 +170,7 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
 }
 
 export async function login(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
-  const rateLimit = await rateLimitByIp("login", 10, 15 * 60 * 1000);
+  const rateLimit = await rateLimitByIp("login", 30, 15 * 60 * 1000);
   if (!rateLimit.allowed) {
     return {
       message: `Trop de tentatives de connexion. Reessaie dans ${rateLimit.retryAfter}s.`,
@@ -231,7 +231,7 @@ export async function requestPasswordReset(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const rateLimit = await rateLimitByIp("password-reset-request", 3, 15 * 60 * 1000);
+  const rateLimit = await rateLimitByIp("password-reset-request", 10, 15 * 60 * 1000);
   if (!rateLimit.allowed) {
     return {
       message: `Trop de demandes. Reessaie dans ${rateLimit.retryAfter}s.`,
@@ -292,7 +292,7 @@ export async function logout() {
 export async function deleteAccount() {
   const user = await requireCurrentUser();
 
-  const rateLimit = await rateLimitByUser("delete-account", user.id, 3, 60 * 60 * 1000);
+  const rateLimit = await rateLimitByUser("delete-account", user.id, 10, 60 * 60 * 1000);
   if (!rateLimit.allowed) {
     redirect("/profil?error=rate-limit");
   }
@@ -336,7 +336,7 @@ export async function changePassword(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const rateLimit = await rateLimitByIp("change-password", 10, 15 * 60 * 1000);
+  const rateLimit = await rateLimitByIp("change-password", 30, 15 * 60 * 1000);
   if (!rateLimit.allowed) {
     return {
       message: `Trop de tentatives. Reessaie dans ${rateLimit.retryAfter}s.`,
@@ -390,7 +390,7 @@ export async function resetPassword(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const rateLimit = await rateLimitByIp("reset-password", 5, 15 * 60 * 1000);
+  const rateLimit = await rateLimitByIp("reset-password", 20, 15 * 60 * 1000);
   if (!rateLimit.allowed) {
     return {
       message: `Trop de tentatives. Reessaie dans ${rateLimit.retryAfter}s.`,

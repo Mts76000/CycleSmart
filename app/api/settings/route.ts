@@ -174,7 +174,7 @@ const MAX_BODY_SIZE = 1024 * 1024;
 
 export async function PUT(request: Request) {
   const user = await requireCurrentUser();
-  const rateLimit = await rateLimitByUser("settings:put", user.id, 30, 60 * 1000);
+  const rateLimit = await rateLimitByUser("settings:put", user.id, 120, 60 * 1000);
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfter);
   }

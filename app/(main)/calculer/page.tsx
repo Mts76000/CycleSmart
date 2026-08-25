@@ -400,7 +400,7 @@ export default function CalculerPage() {
         {resultCard}
 
         <section className="surface-card p-4 sm:p-5 md:p-7">
-          <p className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur de cycle</p>
+          <h1 className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur d&apos;heures creuses</h1>
           <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
             Règle la durée et le mode, CycleSmart trouve le bon moment.
           </p>
@@ -419,7 +419,7 @@ export default function CalculerPage() {
       <section className="surface-card p-4 sm:p-5 md:p-7">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur de cycle</p>
+            <h1 className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur d&apos;heures creuses</h1>
             <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
               Choisis ton appareil, ajuste la durée si besoin.
             </p>

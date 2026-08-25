@@ -60,9 +60,12 @@ function isPageRequest(request) {
 
 async function networkFirst(request, fallbackUrl) {
   const cache = await caches.open(CACHE);
+  const isPage = isPageRequest(request);
 
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, {
+      cache: isPage ? "no-store" : "default",
+    });
 
     if (response.ok) {
       await cache.put(request, response.clone());

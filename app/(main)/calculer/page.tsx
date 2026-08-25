@@ -131,7 +131,7 @@ export default function CalculerPage() {
 
       {endsOutsideSlot && recommended && (
         <p className="mx-auto mt-4 max-w-md rounded-xl bg-white/12 px-3 py-2 text-center text-xs font-semibold leading-5 text-white/85">
-          Fin hors heures creuses, mais départ bien dans {recommended.slot.name}.
+          Fin hors heures creuses, mais départ bien dans le créneau : {recommended.slot.name}.
         </p>
       )}
 

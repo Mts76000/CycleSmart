@@ -16,7 +16,7 @@ export function GuestBanner() {
       </div>
       <div className="flex shrink-0 gap-2 sm:pl-4">
         <Link
-          className="h-11 rounded-2xl bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
+          className="h-11 rounded-2xl bg-emerald-700 px-4 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
           href="/inscription"
         >
           Créer un compte

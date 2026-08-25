@@ -49,10 +49,10 @@ export function SlotsTimeline({
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/55">Journée (24h)</p>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-50">Journée (24h)</p>
         <p
           className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-            isInSlot ? "bg-white text-emerald-800" : "bg-white/12 text-white/80"
+            isInSlot ? "bg-white text-emerald-800" : "bg-emerald-800 text-emerald-50"
           }`}
         >
           {isInSlot ? "Heure creuse en cours" : "Heure pleine en cours"}
@@ -69,7 +69,7 @@ export function SlotsTimeline({
           />
         ))}
 
-        <div className={`absolute top-0 w-full overflow-hidden rounded-full bg-white/12 ${compact ? "h-2.5" : "h-3"}`}>
+        <div className={`absolute top-0 w-full overflow-hidden rounded-full bg-emerald-800 ${compact ? "h-2.5" : "h-3"}`}>
           {segments.map((segment) => {
             const isHighlighted = highlightId !== null && highlightId === segment.slotId;
 
@@ -103,7 +103,7 @@ export function SlotsTimeline({
       </div>
 
       {!compact && (
-        <div className="relative mt-3 h-4 text-[10px] font-bold text-white/45">
+        <div className="relative mt-3 h-4 text-[10px] font-bold text-emerald-50">
           {hourMarks.map((hour, index) => {
             const isFirst = index === 0;
             const isLast = index === hourMarks.length - 1;

@@ -14,7 +14,7 @@ export default function CookiesPage() {
         <h1 className="font-display text-2xl font-black tracking-tight sm:text-3xl">
           Cookies et stockage local
         </h1>
-        <p className="mt-2 text-sm text-white/75">
+        <p className="mt-2 text-sm text-emerald-50">
           Dernière mise à jour : {new Date().toLocaleDateString("fr-FR")}
         </p>
       </section>

@@ -89,7 +89,7 @@ function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
           <BrandMark />
           <div className="flex w-full justify-center gap-2 sm:w-auto">
             <Link
-              className="flex h-10 flex-1 items-center justify-center rounded-full bg-emerald-500 px-5 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98] sm:flex-none"
+              className="flex h-10 flex-1 items-center justify-center rounded-full bg-emerald-700 px-5 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.98] sm:flex-none"
               href="/connexion"
             >
               Connexion
@@ -137,7 +137,7 @@ function LiveClockChip() {
 
   return (
     <div className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-sm font-bold text-emerald-800 shadow-sm">
-      <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+      <span className="size-1.5 rounded-full bg-emerald-700" aria-hidden="true" />
       {currentTime}
     </div>
   );
@@ -170,7 +170,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
 
         <div className="mt-auto hidden lg:block">
           <button
-            className="group flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-sm font-bold text-stone-400 transition hover:bg-stone-50 hover:text-stone-700 lg:px-3.5 lg:py-3"
+            className="group flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-sm font-bold text-stone-600 transition hover:bg-stone-50 hover:text-stone-700 lg:px-3.5 lg:py-3"
             type="button"
             onClick={() =>
               startTransition(() => {
@@ -214,12 +214,12 @@ function RailItem({
   return (
     <Link
       className={`group relative flex items-center gap-3 rounded-2xl px-2.5 py-2.5 transition lg:px-3.5 lg:py-3 ${
-        active ? "bg-emerald-50 text-emerald-800" : "text-stone-400 hover:bg-stone-50 hover:text-stone-700"
+        active ? "bg-emerald-50 text-emerald-800" : "text-stone-600 hover:bg-stone-50 hover:text-stone-700"
       }`}
       href={href}
     >
       <span
-        className={`absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-emerald-500 transition-transform ${
+        className={`absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-emerald-700 transition-transform ${
           active ? "scale-y-100" : "scale-y-0"
         }`}
         aria-hidden="true"
@@ -258,15 +258,15 @@ function DockItem({
       <span
         className={`grid place-items-center rounded-full transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
           active
-            ? "size-12 -translate-y-4 bg-emerald-500 text-white shadow-cta"
-            : "size-9 translate-y-0 text-stone-400"
+            ? "size-12 -translate-y-4 bg-emerald-700 text-white shadow-cta"
+            : "size-9 translate-y-0 text-stone-600"
         }`}
       >
         <Icon className="size-5" />
       </span>
       <span
         className={`text-[10px] font-bold transition-opacity ${
-          active ? "-mt-3 text-emerald-700 opacity-100" : "text-stone-400 opacity-80"
+          active ? "-mt-3 text-emerald-700 opacity-100" : "text-stone-600"
         }`}
       >
         {label}

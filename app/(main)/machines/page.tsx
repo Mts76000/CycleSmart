@@ -116,11 +116,11 @@ export default function MachinesPage() {
     return (
       <div className="mx-auto max-w-2xl space-y-5">
         <section className="surface-hero p-6 text-center text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/65">Configuration</p>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white">Configuration</p>
           <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:text-3xl">
             Tes machines et programmes
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-white/80">
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-emerald-50">
             La gestion des appareils et programmes est réservée aux comptes connectés.
             En mode invité, utilise les appareils par défaut sur la page Calculer.
           </p>
@@ -132,7 +132,7 @@ export default function MachinesPage() {
           </p>
           <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-500 px-6 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-6 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
               href="/inscription"
             >
               Créer un compte
@@ -154,14 +154,14 @@ export default function MachinesPage() {
       <section className="surface-hero p-4 text-white sm:p-5 md:p-6 lg:p-8">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/65 sm:text-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-white sm:text-sm">
               Configuration
             </p>
             <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:mt-3 sm:text-3xl md:text-4xl">
               Tes machines et programmes
             </h2>
           </div>
-          <p className="hidden shrink-0 text-right text-sm font-bold text-white/70 sm:block font-numeric">
+          <p className="hidden shrink-0 text-right text-sm font-bold text-emerald-50 sm:block font-numeric">
             {machines.length} machine{machines.length > 1 ? "s" : ""} · {allProgramsCount} prog.
           </p>
         </div>
@@ -171,7 +171,7 @@ export default function MachinesPage() {
         {/* Master list */}
         <div className="border-b border-stone-100 p-4 sm:p-5 md:border-b-0 md:border-r md:p-5">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-bold uppercase tracking-[0.1em] text-stone-400">Machines</p>
+            <p className="text-sm font-bold uppercase tracking-[0.1em] text-stone-600">Machines</p>
             <button
               className="grid size-8 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100 active:scale-[0.95]"
               type="button"
@@ -194,7 +194,7 @@ export default function MachinesPage() {
                   }
                 />
                 <button
-                  className="inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   type="button"
                   disabled={!newMachine.name.trim()}
                   onClick={() => {
@@ -231,14 +231,14 @@ export default function MachinesPage() {
                 >
                   <span
                     className={`grid size-9 shrink-0 place-items-center rounded-xl ${
-                      isSelected ? "bg-emerald-500 text-white" : "bg-stone-100 text-stone-500"
+                      isSelected ? "bg-emerald-700 text-white" : "bg-stone-100 text-stone-600"
                     }`}
                   >
                     <DeviceIcon className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold">{machine.name}</span>
-                    <span className="block text-xs text-stone-400">
+                    <span className="block text-xs text-stone-600">
                       {machine.programs.length} programme{machine.programs.length > 1 ? "s" : ""}
                     </span>
                   </span>
@@ -253,11 +253,11 @@ export default function MachinesPage() {
           {!selectedMachine ? (
             <div className="grid h-full min-h-[220px] place-items-center rounded-[var(--radius-md)] border border-dashed border-stone-200 p-6 text-center">
               <div>
-                <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-stone-50 text-stone-400">
+                <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-stone-50 text-stone-600">
                   <DeviceIcon className="size-5" />
                 </span>
                 <p className="mt-3 font-bold text-stone-700">Choisis une machine</p>
-                <p className="mt-1 text-sm text-stone-400">
+                <p className="mt-1 text-sm text-stone-600">
                   Selectionne une machine dans la liste pour voir et modifier ses programmes.
                 </p>
               </div>
@@ -272,7 +272,7 @@ export default function MachinesPage() {
                   onChange={(event) => updateMachine(selectedMachine.id, { name: event.target.value })}
                 />
                 <button
-                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-stone-50 text-stone-400 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30"
+                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-stone-50 text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30"
                   type="button"
                   disabled={machines.length <= 1}
                   onClick={() => {
@@ -298,7 +298,7 @@ export default function MachinesPage() {
                         onChange={(event) => updateProgram(program.id, { name: event.target.value })}
                       />
                       <button
-                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--surface-1)] text-stone-400 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
+                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--surface-1)] text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
                         type="button"
                         disabled={selectedMachine.programs.length <= 1}
                         onClick={() => removeProgram(program.id)}
@@ -310,7 +310,7 @@ export default function MachinesPage() {
 
                     <div className="mt-3 space-y-2.5">
                       <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
+                        <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
                           Durée
                         </label>
                         <DurationFields
@@ -325,7 +325,7 @@ export default function MachinesPage() {
 
                       <div className="grid grid-cols-2 gap-2.5">
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
+                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
                             Pas
                           </label>
                           <StepSelect
@@ -336,7 +336,7 @@ export default function MachinesPage() {
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
+                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
                             Mode
                           </label>
                           <DelayModeSelect
@@ -352,7 +352,7 @@ export default function MachinesPage() {
 
                 {!isAddingProgram && (
                   <button
-                    className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] lg:col-span-2"
+                    className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-4 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98] lg:col-span-2"
                     type="button"
                     onClick={() => setShowProgramForm(selectedMachine.id)}
                   >
@@ -366,7 +366,7 @@ export default function MachinesPage() {
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-bold text-emerald-800">Nouveau programme</p>
                       <button
-                        className="text-xs font-bold text-stone-400 transition hover:text-stone-600"
+                        className="text-xs font-bold text-stone-600 transition hover:text-stone-800"
                         type="button"
                         onClick={() => setShowProgramForm(null)}
                       >
@@ -375,7 +375,7 @@ export default function MachinesPage() {
                     </div>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-400">
+                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
                           Nom
                         </label>
                         <input
@@ -388,7 +388,7 @@ export default function MachinesPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-400">
+                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
                           Durée
                         </label>
                         <DurationFields
@@ -402,7 +402,7 @@ export default function MachinesPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-400">
+                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
                           Pas
                         </label>
                         <StepSelect
@@ -412,7 +412,7 @@ export default function MachinesPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-400">
+                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
                           Mode départ
                         </label>
                         <DelayModeSelect
@@ -423,7 +423,7 @@ export default function MachinesPage() {
                       </div>
                     </div>
                     <button
-                      className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                       type="button"
                       disabled={!newProgram.name.trim()}
                       onClick={() => {

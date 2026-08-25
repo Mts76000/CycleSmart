@@ -85,7 +85,7 @@ export function TimeDial({
           </p>
           <p
             className={`mt-1.5 font-bold uppercase leading-tight tracking-wide ${config.labelClass} ${
-              tone === "light" ? "text-white/60" : "text-emerald-700/70"
+              tone === "light" ? "text-emerald-50" : "text-emerald-700"
             }`}
           >
             {label}

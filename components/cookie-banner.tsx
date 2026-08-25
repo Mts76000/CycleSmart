@@ -60,7 +60,7 @@ export function CookieBanner() {
         </div>
         <div className="flex shrink-0 gap-2">
           <button
-            className="h-10 rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
+            className="h-10 rounded-xl bg-emerald-700 px-4 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
             type="button"
             onClick={accept}
           >

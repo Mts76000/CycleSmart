@@ -27,8 +27,8 @@ export function SegmentedControl<T extends string>({
         <button
           className={`rounded-[14px] px-3 py-2.5 text-sm font-bold leading-snug transition ${
             value === option.value
-              ? "bg-emerald-500 text-white shadow-cta"
-              : "text-stone-500 hover:text-stone-700"
+              ? "bg-emerald-700 text-white shadow-cta"
+              : "text-stone-600 hover:text-stone-700"
           }`}
           key={option.value}
           onClick={() => onChange(option.value)}

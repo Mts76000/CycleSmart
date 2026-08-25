@@ -32,7 +32,7 @@ export function SettingsModalRow({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-bold text-stone-950">{label}</span>
-          <span className="block truncate text-xs text-stone-400">{description}</span>
+          <span className="block truncate text-xs text-stone-600">{description}</span>
         </span>
         <ChevronRightIcon className="size-4 shrink-0 text-stone-300" />
       </button>
@@ -50,11 +50,11 @@ export function SettingsModalRow({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-xl font-bold text-stone-950">{title}</p>
-              {modalDescription && <p className="mt-1 text-sm text-stone-500">{modalDescription}</p>}
+              {modalDescription && <p className="mt-1 text-sm text-stone-600">{modalDescription}</p>}
             </div>
             <button
               aria-label="Fermer"
-              className="grid size-9 shrink-0 place-items-center rounded-full bg-stone-100 text-stone-500 transition hover:bg-stone-200 active:scale-95"
+              className="grid size-9 shrink-0 place-items-center rounded-full bg-stone-100 text-stone-600 transition hover:bg-stone-200 active:scale-95"
               onClick={() => dialogRef.current?.close()}
               type="button"
             >

@@ -16,7 +16,7 @@ export function PasswordResetForm({ token }: { token: string }) {
       <div className="mt-8 surface-card p-6 text-center">
         <h1 className="font-display text-2xl font-black tracking-tight text-stone-950">Lien invalide</h1>
         <p className="mt-2 text-stone-600">Demande un nouveau lien pour modifier ton mot de passe.</p>
-        <Link className="mt-6 inline-flex rounded-2xl bg-emerald-500 px-5 py-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99]" href="/mot-de-passe-oublie">
+        <Link className="mt-6 inline-flex rounded-2xl bg-emerald-700 px-5 py-4 font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.99]" href="/mot-de-passe-oublie">
           Recevoir un nouveau lien
         </Link>
       </div>
@@ -52,7 +52,7 @@ export function PasswordResetForm({ token }: { token: string }) {
       )}
 
       <button
-        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 h-14 w-full rounded-2xl bg-emerald-700 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >

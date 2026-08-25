@@ -31,7 +31,7 @@ export function Slider({
     <div className="relative flex h-7 items-center">
       <div className="absolute inset-x-0 h-2 rounded-full bg-[var(--surface-2)]" aria-hidden="true" />
       <div
-        className="absolute left-0 h-2 rounded-full bg-emerald-500"
+        className="absolute left-0 h-2 rounded-full bg-emerald-700"
         style={{ width: `${percent}%` }}
         aria-hidden="true"
       />

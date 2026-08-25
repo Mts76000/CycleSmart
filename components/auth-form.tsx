@@ -23,7 +23,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <div className="grid grid-cols-2 gap-1 rounded-[var(--radius-sm)] bg-[var(--surface-1)] p-1">
         {isSignup ? (
           <Link
-            className="rounded-xl px-3 py-3 text-center font-semibold text-stone-500 transition hover:text-stone-800"
+            className="rounded-xl px-3 py-3 text-center font-semibold text-stone-600 transition hover:text-stone-800"
             href="/connexion"
           >
             Connexion
@@ -39,7 +39,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           </span>
         ) : (
           <Link
-            className="rounded-xl px-3 py-3 text-center font-semibold text-stone-500 transition hover:text-stone-800"
+            className="rounded-xl px-3 py-3 text-center font-semibold text-stone-600 transition hover:text-stone-800"
             href="/inscription"
           >
             Inscription
@@ -129,7 +129,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <button
-        className="mt-6 h-14 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 h-14 w-full rounded-2xl bg-emerald-700 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >

@@ -70,7 +70,7 @@ export default async function ProfilPage() {
             <Image alt="CycleSmart" className="size-11" height={44} src="/logo-icon.png" width={44} />
           </div>
           <p className="mt-5 text-3xl font-bold">Aucun compte connecté</p>
-          <p className="mt-2 leading-6 text-stone-500">
+          <p className="mt-2 leading-6 text-stone-600">
             Connecte-toi pour sauvegarder tes heures creuses et les retrouver
             plus tard.
           </p>
@@ -78,7 +78,7 @@ export default async function ProfilPage() {
 
         <section className="grid gap-3">
           <Link
-            className="flex h-14 items-center justify-center rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99]"
+            className="flex h-14 items-center justify-center rounded-2xl bg-emerald-700 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.99]"
             href="/connexion"
           >
             Connexion
@@ -121,7 +121,7 @@ export default async function ProfilPage() {
           </div>
           <div className="min-w-0">
             <p className="font-display truncate text-xl font-bold tracking-tight sm:text-2xl">{user.name}</p>
-            <p className="mt-1 truncate text-sm text-white/70">{user.email}</p>
+            <p className="mt-1 truncate text-sm text-emerald-50">{user.email}</p>
           </div>
         </div>
 
@@ -133,7 +133,7 @@ export default async function ProfilPage() {
       <section className="surface-card overflow-hidden">
         <div className="border-b border-stone-100 px-5 py-4">
           <p className="text-sm font-bold text-stone-950">Application</p>
-          <p className="text-xs text-stone-400">Raccourci et installation</p>
+          <p className="text-xs text-stone-600">Raccourci et installation</p>
         </div>
         <SettingsModalRow
           description="Ajouter à l'écran d'accueil"
@@ -149,7 +149,7 @@ export default async function ProfilPage() {
       <section className="surface-card overflow-hidden">
         <div className="border-b border-stone-100 px-5 py-4">
           <p className="text-sm font-bold text-stone-950">Gestion du compte</p>
-          <p className="text-xs text-stone-400">Mot de passe, session et suppression</p>
+          <p className="text-xs text-stone-600">Mot de passe, session et suppression</p>
         </div>
         <div className="divide-y divide-stone-100">
           <SettingsModalRow
@@ -171,7 +171,7 @@ export default async function ProfilPage() {
 
       <section className="surface-card p-5 text-center">
         <p className="text-sm font-bold text-stone-950">Soutenir CycleSmart</p>
-        <p className="mt-1 text-xs text-stone-400">Un café, c&apos;est le meilleur moyen de nous remercier.</p>
+        <p className="mt-1 text-xs text-stone-600">Un café, c&apos;est le meilleur moyen de nous remercier.</p>
         <div className="mt-4">
           <BuyMeACoffeeButton />
         </div>

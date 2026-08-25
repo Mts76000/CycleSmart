@@ -32,7 +32,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <p className="font-display text-3xl font-bold leading-tight tracking-tight lg:text-4xl">
               Lance tes machines au meilleur moment.
             </p>
-            <ul className="mt-6 space-y-3 text-sm text-white/75">
+            <ul className="mt-6 space-y-3 text-sm text-emerald-50">
               {highlights.map((highlight) => (
                 <li className="flex items-start gap-2.5" key={highlight}>
                   <span className="mt-1 size-1.5 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
@@ -42,7 +42,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </ul>
           </div>
 
-          <p className="relative text-xs font-semibold text-white/50">
+          <p className="relative text-xs font-semibold text-emerald-100">
             Gratuit, sans pub, pense pour reduire ta facture d&apos;electricite.
           </p>
         </aside>

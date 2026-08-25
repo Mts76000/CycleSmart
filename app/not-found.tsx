@@ -14,7 +14,7 @@ export default function NotFound() {
             404
           </p>
           <h1 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Page introuvable</h1>
-          <p className="mt-2 text-sm leading-6 text-white/80">
+          <p className="mt-2 text-sm leading-6 text-emerald-50">
             Cette page n&apos;existe pas ou a été déplacée.
           </p>
         </section>
@@ -25,7 +25,7 @@ export default function NotFound() {
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
-              className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-emerald-500 px-6 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98] sm:w-auto"
+              className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-emerald-700 px-6 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.98] sm:w-auto"
               href="/calculer"
             >
               Calculer un cycle

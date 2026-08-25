@@ -44,7 +44,7 @@ export function ChangePasswordForm() {
       )}
 
       <button
-        className="mt-5 h-12 w-full rounded-2xl bg-emerald-500 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-5 h-12 w-full rounded-2xl bg-emerald-700 px-4 font-bold text-white shadow-cta transition hover:bg-emerald-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={pending}
       >

@@ -99,7 +99,7 @@ export function PwaInstallPrompt() {
         <Image alt="CycleSmart" className="size-11 shrink-0 rounded-xl" height={44} src="/logo-icon.png" width={44} />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-stone-950">Installer CycleSmart</p>
-          <p className="mt-1 text-xs leading-5 text-stone-500">
+          <p className="mt-1 text-xs leading-5 text-stone-600">
             {platform === "ios"
               ? "Touche le bouton de partage puis \u00ab Sur l'ecran d'accueil \u00bb."
               : "Ajoute l'app a ton ecran d'accueil pour l'ouvrir en un geste."}
@@ -107,7 +107,7 @@ export function PwaInstallPrompt() {
 
           {platform === "android" && (
             <button
-              className="mt-3 flex h-10 items-center gap-2 rounded-xl bg-emerald-500 px-3.5 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
+              className="mt-3 flex h-10 items-center gap-2 rounded-xl bg-emerald-700 px-3.5 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
               onClick={install}
               type="button"
             >
@@ -118,7 +118,7 @@ export function PwaInstallPrompt() {
         </div>
         <button
           aria-label="Fermer"
-          className="grid size-7 shrink-0 place-items-center rounded-full text-stone-400 transition hover:bg-stone-100"
+          className="grid size-7 shrink-0 place-items-center rounded-full text-stone-600 transition hover:bg-stone-100"
           onClick={dismiss}
           type="button"
         >

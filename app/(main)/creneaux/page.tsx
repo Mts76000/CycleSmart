@@ -35,7 +35,6 @@ export default function CreneauxPage() {
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const {
     addSlot,
-    calculationMode,
     currentTime,
     isAuthenticated,
     newSlot,
@@ -44,8 +43,6 @@ export default function CreneauxPage() {
     slots,
     updateSlot,
   } = useCycle();
-
-  const modeLabel = calculationMode === "last" ? "Fin dans le créneau" : "Départ dans le créneau";
 
   if (!isAuthenticated) {
     return (
@@ -67,13 +64,13 @@ export default function CreneauxPage() {
           </p>
           <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              className="h-12 rounded-2xl bg-emerald-500 px-6 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98]"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-500 px-6 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
               href="/inscription"
             >
               Créer un compte
             </Link>
             <Link
-              className="h-12 rounded-2xl border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
+              className="inline-flex h-10 items-center justify-center rounded-full border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
               href="/connexion"
             >
               Connexion
@@ -123,9 +120,6 @@ export default function CreneauxPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <p className="max-w-full rounded-full bg-emerald-50 px-4 py-2 text-sm font-bold leading-snug text-emerald-800">
-              {modeLabel}
-            </p>
             <button
               className="hidden h-10 shrink-0 items-center gap-1.5 rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] sm:inline-flex"
               type="button"
@@ -137,7 +131,7 @@ export default function CreneauxPage() {
         </div>
 
         <button
-          className="mt-4 h-12 w-full rounded-2xl border border-emerald-200 bg-emerald-50 font-bold text-emerald-800 transition hover:bg-emerald-100 active:scale-[0.99] sm:hidden"
+          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98] sm:hidden"
           type="button"
           onClick={() => setShowSlotForm((visible) => !visible)}
         >
@@ -166,7 +160,7 @@ export default function CreneauxPage() {
                 onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
               />
               <button
-                className="h-12 rounded-2xl bg-emerald-500 px-5 font-bold text-white transition active:scale-[0.99]"
+                className="inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-500 px-5 text-sm font-bold text-white transition hover:bg-emerald-600 active:scale-[0.98]"
                 type="button"
                 onClick={() => {
                   addSlot();

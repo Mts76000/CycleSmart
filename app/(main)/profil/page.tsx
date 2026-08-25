@@ -2,7 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { BuyMeACoffeeButton } from "@/components/buy-me-a-coffee-button";
 import { ChangePasswordForm } from "@/components/change-password-form";
+import { DeleteAccountButton } from "@/components/delete-account-button";
 import { DeviceIcon, DownloadIcon, LockIcon, SparkIcon } from "@/components/icons";
+import { LegalLinks } from "@/components/legal-links";
 import { LogoutButton } from "@/components/logout-button";
 import { ProfileStats } from "@/components/profile-stats";
 import { SettingsModalRow } from "@/components/settings-modal";
@@ -122,13 +124,15 @@ export default async function ProfilPage() {
             <InstallGuideContent />
           </SettingsModalRow>
         </section>
+
+        <LegalLinks className="justify-center" />
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)] lg:items-start">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:items-start">
         <div className="space-y-5 lg:sticky lg:top-5">
           <section className="surface-hero relative overflow-hidden p-5 text-white sm:p-6 lg:p-7">
             <div
@@ -157,14 +161,6 @@ export default async function ProfilPage() {
               meilleur moment, même le week-end.
             </p>
           </section>
-
-          <div className="hidden lg:block">
-            <LogoutButton />
-          </div>
-
-          <div className="hidden justify-center lg:flex">
-            <BuyMeACoffeeButton />
-          </div>
         </div>
 
         <div className="mt-5 space-y-5 lg:mt-0">
@@ -196,12 +192,20 @@ export default async function ProfilPage() {
             </SettingsModalRow>
           </section>
 
-          <div className="space-y-5 lg:hidden">
-            <LogoutButton />
-            <div className="flex justify-center">
-              <BuyMeACoffeeButton />
+          <section className="surface-card overflow-hidden">
+            <div className="border-b border-stone-100 px-5 py-4">
+              <p className="text-sm font-bold text-stone-950">Compte</p>
+              <p className="text-xs text-stone-400">Gestion de ta session</p>
             </div>
-          </div>
+            <div className="space-y-3 p-5">
+              <LogoutButton />
+              <DeleteAccountButton />
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                <BuyMeACoffeeButton />
+                <LegalLinks />
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>

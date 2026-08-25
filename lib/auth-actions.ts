@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireCurrentUser } from "./current-user";
-import { ensureDatabaseSchema, query } from "./db";
+import { ensureDatabaseSchema, getPool, query } from "./db";
 import { sendPasswordResetEmail } from "./email";
 import { createSession, deleteSession } from "./session";
 
@@ -253,6 +253,44 @@ export async function requestPasswordReset(
 }
 
 export async function logout() {
+  await deleteSession();
+  redirect("/connexion");
+}
+
+export async function deleteAccount() {
+  const user = await requireCurrentUser();
+
+  let client: import("pg").PoolClient | undefined;
+  let transactionStarted = false;
+
+  try {
+    await ensureDatabaseSchema();
+    client = await getPool().connect();
+    await client.query("begin");
+    transactionStarted = true;
+
+    await client.query("delete from off_peak_slots where user_id = $1", [user.id]);
+    await client.query("delete from cycle_devices where user_id = $1", [user.id]);
+    await client.query("delete from cycle_preferences where user_id = $1", [user.id]);
+    await client.query("delete from password_reset_tokens where user_id = $1", [user.id]);
+
+    const anonymousEmail = `deleted-${randomUUID()}@cyclesmart.anon`;
+    await client.query(
+      "update users set email = $1, name = $2, password_hash = $3, updated_at = now() where id = $4",
+      [anonymousEmail, "Utilisateur anonymise", "", user.id],
+    );
+
+    await client.query("commit");
+  } catch (error) {
+    if (client && transactionStarted) {
+      await client.query("rollback").catch(() => undefined);
+    }
+    console.error("Delete account failed", error);
+    redirect("/profil?error=compte");
+  } finally {
+    client?.release();
+  }
+
   await deleteSession();
   redirect("/connexion");
 }

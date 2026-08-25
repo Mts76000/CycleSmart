@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Footer } from "./footer";
 import { CalendarIcon, ClockIcon, DeviceIcon, UserIcon } from "./icons";
 import { PwaInstallPrompt } from "./pwa-install-prompt";
 import { CycleProvider, useCycle } from "@/lib/cycle-store";
@@ -43,6 +44,8 @@ export function MainShell({
             >
               {children}
             </section>
+
+            {!isAuthenticated && <Footer />}
           </div>
 
           {isAuthenticated && <MobileDock pathname={pathname} />}

@@ -13,7 +13,7 @@ export function LogoutButton() {
           window.localStorage.removeItem("cyclesmart-settings");
         }}
       >
-        Deconnexion
+        Déconnexion
       </button>
     </form>
   );

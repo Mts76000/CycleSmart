@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { startTransition } from "react";
 import { usePathname } from "next/navigation";
 import { Footer } from "./footer";
-import { CalendarIcon, ClockIcon, DeviceIcon, UserIcon } from "./icons";
+import { CalendarIcon, ClockIcon, DeviceIcon, LogoutIcon, UserIcon } from "./icons";
 import { PwaInstallPrompt } from "./pwa-install-prompt";
+import { logout } from "@/lib/auth-actions";
 import { CycleProvider, useCycle } from "@/lib/cycle-store";
 
 const tabs = [
@@ -29,7 +31,9 @@ export function MainShell({
       <main className="min-h-dvh bg-background text-stone-950">
         <div
           className={`mx-auto flex min-h-dvh w-full flex-col md:p-5 ${
-            isAuthenticated ? "max-w-[1400px] md:grid md:grid-cols-[92px_minmax(0,1fr)] md:gap-5 lg:grid-cols-[240px_minmax(0,1fr)]" : "max-w-4xl"
+            isAuthenticated
+              ? "max-w-[1400px] md:grid md:grid-cols-[92px_minmax(0,1fr)] md:gap-5 lg:grid-cols-[240px_minmax(0,1fr)]"
+              : "max-w-[1400px]"
           }`}
         >
           {isAuthenticated && <DesktopRail pathname={pathname} />}
@@ -38,14 +42,18 @@ export function MainShell({
             <TopBar isAuthenticated={isAuthenticated} />
 
             <section
-              className={`mx-auto w-full flex-1 px-4 pt-4 sm:px-6 md:px-0 md:pt-0 ${
-                isAuthenticated ? "max-w-6xl pb-28 md:pb-10" : "max-w-3xl pb-8"
+              className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-8 sm:px-6 md:pt-0 md:pb-10 ${
+                isAuthenticated ? "pb-28 md:px-0" : "md:px-8"
               }`}
             >
               {children}
             </section>
 
-            {!isAuthenticated && <Footer />}
+            {!isAuthenticated && (
+              <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
+                <Footer />
+              </div>
+            )}
           </div>
 
           {isAuthenticated && <MobileDock pathname={pathname} />}
@@ -59,21 +67,21 @@ export function MainShell({
 function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
   if (!isAuthenticated) {
     return (
-      <header className="px-5 pb-4 pt-6 sm:px-0">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="w-full px-4 pb-4 pt-5 sm:px-6 md:px-8">
+        <div className="flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:justify-between">
           <BrandMark />
-          <div className="flex gap-2">
+          <div className="flex w-full justify-center gap-2 sm:w-auto">
             <Link
-              className="flex-1 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98] sm:flex-none"
+              className="flex h-10 flex-1 items-center justify-center rounded-full bg-emerald-500 px-5 text-sm font-bold text-white shadow-cta transition hover:bg-emerald-600 active:scale-[0.98] sm:flex-none"
               href="/connexion"
             >
               Connexion
             </Link>
             <Link
-              className="flex-1 rounded-full bg-white px-4 py-2.5 text-center text-sm font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 active:scale-[0.98] sm:flex-none"
+              className="flex h-10 flex-1 items-center justify-center rounded-full bg-white px-5 text-sm font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 active:scale-[0.98] sm:flex-none"
               href="/inscription"
             >
-              Creer un compte
+              Créer un compte
             </Link>
           </div>
         </div>
@@ -92,7 +100,14 @@ function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
 function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <Link className="flex items-center gap-2.5" href="/calculer">
-      <Image alt="CycleSmart" className="size-9" height={36} priority src="/logo-icon.png" width={36} />
+      <Image
+        alt="CycleSmart"
+        className={compact ? "size-9" : "size-10"}
+        height={compact ? 36 : 40}
+        priority
+        src="/logo-icon.png"
+        width={compact ? 36 : 40}
+      />
       {!compact && (
         <span className="text-xl font-bold tracking-tight text-emerald-800">CycleSmart</span>
       )}
@@ -136,11 +151,19 @@ function DesktopRail({ pathname }: { pathname: string }) {
           ))}
         </nav>
 
-        <div className="hidden rounded-2xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-900 lg:block">
-          <p className="font-bold">Astuce</p>
-          <p className="mt-1 text-emerald-800/75">
-            Configure tes heures creuses une fois, puis laisse CycleSmart choisir le bon moment.
-          </p>
+        <div className="mt-auto hidden lg:block">
+          <button
+            className="group flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-sm font-bold text-stone-400 transition hover:bg-stone-50 hover:text-stone-700 lg:px-3.5 lg:py-3"
+            type="button"
+            onClick={() =>
+              startTransition(() => {
+                void logout();
+              })
+            }
+          >
+            <LogoutIcon className="size-5 shrink-0" />
+            <span className="hidden lg:inline">Déconnexion</span>
+          </button>
         </div>
       </div>
     </aside>

@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireCurrentUser } from "./current-user";
 import { ensureDatabaseSchema, getPool, query } from "./db";
+import { rateLimitByIp, rateLimitByUser } from "./rate-limit";
 import { sendPasswordResetEmail } from "./email";
 import { createSession, deleteSession } from "./session";
 
@@ -32,11 +33,21 @@ export type AuthFormState =
 type AuthFormValues = NonNullable<AuthFormState>["values"];
 
 const signupSchema = z.object({
-  name: z.string().min(2, "Le nom doit faire au moins 2 caracteres.").trim(),
-  email: z.email("Adresse e-mail invalide.").trim().toLowerCase(),
+  name: z
+    .string()
+    .min(2, "Le nom doit faire au moins 2 caracteres.")
+    .max(60, "Le nom ne peut pas depasser 60 caracteres.")
+    .regex(/^[^<>]*$/, "Le nom contient des caracteres non autorises.")
+    .trim(),
+  email: z
+    .email("Adresse e-mail invalide.")
+    .max(254, "Adresse e-mail trop longue.")
+    .trim()
+    .toLowerCase(),
   password: z
     .string()
     .min(8, "Le mot de passe doit faire au moins 8 caracteres.")
+    .max(128, "Le mot de passe ne peut pas depasser 128 caracteres.")
     .regex(/[a-zA-Z]/, "Ajoute au moins une lettre.")
     .regex(/[0-9]/, "Ajoute au moins un chiffre.")
     .trim(),
@@ -102,6 +113,13 @@ async function getAppOrigin() {
 }
 
 export async function signup(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const rateLimit = await rateLimitByIp("signup", 5, 60 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return {
+      message: `Trop de tentatives de creation. Reessaie dans ${rateLimit.retryAfter}s.`,
+    };
+  }
+
   const values = {
     name: String(formData.get("name") || ""),
     email: String(formData.get("email") || ""),
@@ -152,6 +170,13 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
 }
 
 export async function login(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const rateLimit = await rateLimitByIp("login", 10, 15 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return {
+      message: `Trop de tentatives de connexion. Reessaie dans ${rateLimit.retryAfter}s.`,
+    };
+  }
+
   const values = {
     email: String(formData.get("email") || ""),
   };
@@ -206,6 +231,13 @@ export async function requestPasswordReset(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const rateLimit = await rateLimitByIp("password-reset-request", 3, 15 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return {
+      message: `Trop de demandes. Reessaie dans ${rateLimit.retryAfter}s.`,
+    };
+  }
+
   const values = {
     email: String(formData.get("email") || ""),
   };
@@ -260,6 +292,11 @@ export async function logout() {
 export async function deleteAccount() {
   const user = await requireCurrentUser();
 
+  const rateLimit = await rateLimitByUser("delete-account", user.id, 3, 60 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    redirect("/profil?error=rate-limit");
+  }
+
   let client: import("pg").PoolClient | undefined;
   let transactionStarted = false;
 
@@ -299,6 +336,13 @@ export async function changePassword(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const rateLimit = await rateLimitByIp("change-password", 10, 15 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return {
+      message: `Trop de tentatives. Reessaie dans ${rateLimit.retryAfter}s.`,
+    };
+  }
+
   const validated = changePasswordSchema.safeParse({
     currentPassword: formData.get("currentPassword"),
     newPassword: formData.get("newPassword"),
@@ -346,6 +390,13 @@ export async function resetPassword(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const rateLimit = await rateLimitByIp("reset-password", 5, 15 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return {
+      message: `Trop de tentatives. Reessaie dans ${rateLimit.retryAfter}s.`,
+    };
+  }
+
   const validated = resetPasswordSchema.safeParse({
     token: formData.get("token"),
     newPassword: formData.get("newPassword"),

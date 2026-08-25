@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { getCurrentUser, requireCurrentUser } from "@/lib/current-user";
 import { ensureDatabaseSchema, getPool, query } from "@/lib/db";
+import { rateLimitByUser, rateLimitResponse } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -43,13 +44,28 @@ function normalizeDelayMode(value: unknown) {
   return value === "fin" ? "fin" : "depart";
 }
 
+const MAX_NAME_LENGTH = 60;
+const MAX_DESCRIPTION_LENGTH = 200;
+
+function isNonEmptyString(value: unknown, maxLength = MAX_NAME_LENGTH): value is string {
+  return typeof value === "string" && value.trim().length > 0 && value.trim().length <= maxLength;
+}
+
 function isProgram(value: unknown): value is ProgramPayload {
   if (!value || typeof value !== "object") {
     return false;
   }
 
   const program = value as ProgramPayload;
-  return Boolean(program.id && program.name && typeof program.duration === "number");
+  return (
+    typeof program.id === "string" &&
+    program.id.length > 0 &&
+    isNonEmptyString(program.name) &&
+    typeof program.duration === "number" &&
+    (!program.description || isNonEmptyString(program.description, MAX_DESCRIPTION_LENGTH)) &&
+    (!program.delayMode || typeof program.delayMode === "string") &&
+    (program.delayStep === undefined || typeof program.delayStep === "number")
+  );
 }
 
 function normalizePrograms(programs: unknown[]) {
@@ -69,7 +85,12 @@ function isMachine(value: unknown): value is MachinePayload {
   }
 
   const machine = value as MachinePayload;
-  return Boolean(machine.id && machine.name);
+  return (
+    typeof machine.id === "string" &&
+    machine.id.length > 0 &&
+    isNonEmptyString(machine.name) &&
+    (!machine.programs || Array.isArray(machine.programs))
+  );
 }
 
 function normalizeMachines(machines: unknown[]) {
@@ -149,12 +170,24 @@ export async function GET() {
   }
 }
 
+const MAX_BODY_SIZE = 1024 * 1024;
+
 export async function PUT(request: Request) {
+  const user = await requireCurrentUser();
+  const rateLimit = await rateLimitByUser("settings:put", user.id, 30, 60 * 1000);
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit.retryAfter);
+  }
+
+  const contentLength = Number(request.headers.get("content-length") || "0");
+  if (contentLength > MAX_BODY_SIZE) {
+    return Response.json({ ok: false, error: "Donnees trop volumineuses." }, { status: 413 });
+  }
+
   let client: PoolClient | undefined;
   let transactionStarted = false;
 
   try {
-    const user = await requireCurrentUser();
     const body = (await request.json()) as SettingsPayload;
     const machines = normalizeMachines(Array.isArray(body.machines) ? body.machines : []);
 

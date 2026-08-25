@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { getCurrentUser, requireCurrentUser } from "@/lib/current-user";
 import { ensureDatabaseSchema, getPool, query } from "@/lib/db";
+import { rateLimitByUser, rateLimitResponse } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -11,13 +12,30 @@ type SlotPayload = {
   end: string;
 };
 
+const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+const MAX_BODY_SIZE = 1024 * 1024;
+
+function isValidTime(value: unknown): value is string {
+  return typeof value === "string" && timePattern.test(value);
+}
+
+function isValidName(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0 && value.trim().length <= 60;
+}
+
 function isSlot(value: unknown): value is SlotPayload {
   if (!value || typeof value !== "object") {
     return false;
   }
 
   const slot = value as SlotPayload;
-  return Boolean(slot.id && slot.name && slot.start && slot.end);
+  return (
+    typeof slot.id === "string" &&
+    slot.id.length > 0 &&
+    isValidName(slot.name) &&
+    isValidTime(slot.start) &&
+    isValidTime(slot.end)
+  );
 }
 
 export async function GET() {
@@ -62,11 +80,21 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const user = await requireCurrentUser();
+  const rateLimit = await rateLimitByUser("slots:put", user.id, 30, 60 * 1000);
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit.retryAfter);
+  }
+
+  const contentLength = Number(request.headers.get("content-length") || "0");
+  if (contentLength > MAX_BODY_SIZE) {
+    return Response.json({ ok: false, error: "Donnees trop volumineuses." }, { status: 413 });
+  }
+
   let client: PoolClient | undefined;
   let transactionStarted = false;
 
   try {
-    const user = await requireCurrentUser();
     const body = (await request.json()) as { slots?: unknown[] };
     const slots = Array.isArray(body.slots) ? body.slots.filter(isSlot) : [];
 
@@ -82,7 +110,7 @@ export async function PUT(request: Request) {
           insert into off_peak_slots (id, user_id, name, start_time, end_time)
           values ($1, $2, $3, $4, $5)
         `,
-        [slot.id, user.id, slot.name, slot.start, slot.end],
+        [slot.id, user.id, slot.name.trim(), slot.start, slot.end],
       );
     }
 

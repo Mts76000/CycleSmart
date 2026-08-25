@@ -118,10 +118,10 @@ export default function CalculerPage() {
         )}
       </div>
 
-      <div className="mt-5 flex items-center gap-4 sm:mt-6 sm:gap-5 lg:mt-8 lg:justify-center lg:gap-10">
+      <div className="mt-5 flex flex-col items-center gap-4 sm:mt-6 sm:flex-row sm:gap-5 lg:mt-8 lg:justify-center lg:gap-10">
         <TimeDial minutes={dialWait} label={isFinMode ? "avant la fin" : "avant départ"} size="lg" />
-        <div className="min-w-0 flex-1 space-y-2 lg:max-w-sm lg:flex-none lg:text-center">
-          <p className="break-words text-base font-bold leading-6 text-white/90 lg:text-lg">
+        <div className="min-w-0 space-y-2 text-center sm:flex-1 sm:text-left lg:max-w-sm lg:flex-none">
+          <p className="text-base font-bold leading-6 text-white/90 lg:text-lg">
             {recommended
               ? `${recommended.slot.name} · ${minutesToTime(recommended.start)} → ${minutesToTime(recommended.end)}`
               : "Ajoute un créneau pour obtenir une recommandation."}

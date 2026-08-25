@@ -43,9 +43,14 @@ export function TimeDial({
   const circumference = 2 * Math.PI * config.radius;
   const offset = circumference * (1 - progress);
   const center = config.viewBox / 2;
+  const valueText = minutes !== null ? formatWait(minutes) : "Non disponible";
 
   return (
-    <div className={`relative grid shrink-0 place-items-center ${config.box}`}>
+    <div
+      className={`relative grid shrink-0 place-items-center ${config.box}`}
+      role="img"
+      aria-label={`${label}: ${valueText}`}
+    >
       <svg className="size-full -rotate-90" viewBox={`0 0 ${config.viewBox} ${config.viewBox}`} aria-hidden="true">
         <circle
           cx={center}

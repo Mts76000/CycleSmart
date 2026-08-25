@@ -218,6 +218,7 @@ export default function CalculerPage() {
                 { value: "last", label: "Plus tard possible" },
               ]}
               columns={1}
+              label="Mode de calcul"
             />
           </div>
         </div>
@@ -251,13 +252,17 @@ export default function CalculerPage() {
                     { value: "depart", label: "Départ dans" },
                     { value: "fin", label: "Fin à" },
                   ]}
+                  label="Mode départ différé"
                 />
               </div>
             </div>
 
             <div>
-              <span className="text-sm font-semibold text-stone-600">Pas</span>
+              <label className="text-sm font-semibold text-stone-600" htmlFor="delayStep">
+                Pas
+              </label>
               <select
+                id="delayStep"
                 className="field-select mt-2 h-11 w-full rounded-full border-none bg-emerald-50 px-4 text-sm font-black text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
                 value={selectedProgram?.delayStep}
                 onChange={(event) => {

@@ -8,15 +8,19 @@ export function SegmentedControl<T extends string>({
   onChange,
   options,
   columns,
+  label,
 }: {
   value: T;
   onChange: (value: T) => void;
   options: { value: T; label: string }[];
   columns?: number;
+  label?: string;
 }) {
   return (
     <div
       className="surface-sub grid gap-1 p-1"
+      role="group"
+      aria-label={label}
       style={{ gridTemplateColumns: `repeat(${columns ?? options.length}, minmax(0, 1fr))` }}
     >
       {options.map((option) => (
@@ -29,6 +33,7 @@ export function SegmentedControl<T extends string>({
           key={option.value}
           onClick={() => onChange(option.value)}
           type="button"
+          aria-pressed={value === option.value}
         >
           {option.label}
         </button>

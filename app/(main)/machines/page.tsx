@@ -77,7 +77,7 @@ function DurationFields({
 }) {
   return (
     <input
-      className="mt-1 h-12 w-full rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+      className="mt-1 h-12 w-full rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-2.5 text-sm font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 sm:px-3"
       type="time"
       min="00:30"
       max="08:00"
@@ -269,7 +269,7 @@ export default function MachinesPage() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-[120px_minmax(0,1fr)_minmax(0,1fr)] gap-2">
                       <div>
                         <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
                           Durée
@@ -332,7 +332,7 @@ export default function MachinesPage() {
                         Annuler
                       </button>
                     </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mt-3 grid gap-3 sm:grid-cols-[2fr_1fr] lg:grid-cols-[2fr_120px_1fr_1fr]">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-400">
                           Nom

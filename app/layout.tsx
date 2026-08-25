@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { CookieBanner } from "@/components/cookie-banner";
 import ServiceWorkerRegister from "@/components/service-worker-register";
 import "./globals.css";
+
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000";
 
 const bodyFont = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -18,9 +21,48 @@ const headingFont = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(appUrl),
   title: "CycleSmart - Heures creuses",
   description:
-    "Calculateur mobile-first pour lancer ses machines pendant les heures creuses.",
+    "Calcule le meilleur moment pour lancer ton lave-linge, lave-vaisselle ou autre appareil pendant les heures creuses. Gratuit, sans pub.",
+  keywords: [
+    "heures creuses",
+    "lave-linge",
+    "lave-vaisselle",
+    "économie d'énergie",
+    "calculateur",
+    "EDF",
+    "Linky",
+    "consommation électrique",
+  ],
+  authors: [{ name: "CycleSmart" }],
+  creator: "CycleSmart",
+  openGraph: {
+    title: "CycleSmart - Heures creuses",
+    description:
+      "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
+    url: "/",
+    siteName: "CycleSmart",
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CycleSmart - Heures creuses",
+    description:
+      "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +74,7 @@ export default function RootLayout({
     <html lang="fr" className={`h-full antialiased ${bodyFont.variable} ${headingFont.variable}`}>
       <body className="min-h-full flex flex-col">
         {children}
+        <CookieBanner />
         <ServiceWorkerRegister />
       </body>
     </html>

@@ -137,7 +137,7 @@ export default function CalculerPage() {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-2 border-t border-white/15 pt-4 sm:gap-3 sm:pt-5 lg:mx-auto lg:max-w-md">
+      <div className="mt-6 grid grid-cols-2 gap-2 border-t border-white/15 pt-4 sm:gap-3 sm:pt-5 mx-auto max-w-md">
         <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Programme</p>
           <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">{selectedProgram?.name || "Programme"}</p>
@@ -347,7 +347,7 @@ export default function CalculerPage() {
         </div>
       </div>
 
-      <section className="flex flex-col items-start gap-3 rounded-[var(--radius-lg)] border border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col flex-wrap items-start gap-3 rounded-[var(--radius-lg)] border border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm font-semibold leading-6 text-emerald-950">
           Crée un compte pour garder tes heures creuses et tes appareils.
         </p>
@@ -386,7 +386,7 @@ export default function CalculerPage() {
       </div>
 
       {showSlotForm && (
-        <div className="surface-sub mt-3 grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_120px_120px_auto] md:grid-cols-[minmax(0,1fr)_160px_160px_auto]">
+        <div className="surface-sub mt-3 grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_120px_120px_auto] lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]">
           <input
             className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
             placeholder="Nom optionnel"
@@ -429,7 +429,7 @@ export default function CalculerPage() {
 
           return (
             <article
-              className="surface-sub grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_112px_112px_40px] sm:items-center md:grid-cols-[minmax(0,1fr)_150px_150px_52px]"
+              className="surface-sub grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_112px_112px_40px] sm:items-center lg:grid-cols-[minmax(0,1fr)_150px_150px_52px]"
               key={slot.id}
             >
               <div className="flex items-center gap-3">
@@ -476,7 +476,7 @@ export default function CalculerPage() {
         {resultCard}
         <GuestBanner />
 
-        <div className="md:grid md:grid-cols-[minmax(0,420px)_minmax(0,1fr)] md:items-start md:gap-6 md:space-y-0">
+        <div className="md:grid md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] md:items-start md:gap-6 md:space-y-0 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
           <div className="space-y-5 md:sticky md:top-5">
             {upcomingSlotsPreview}
           </div>

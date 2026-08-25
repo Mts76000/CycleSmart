@@ -126,28 +126,34 @@ export default function CalculerPage() {
               ? `${recommended.slot.name} · ${minutesToTime(recommended.start)} → ${minutesToTime(recommended.end)}`
               : "Ajoute un créneau pour obtenir une recommandation."}
           </p>
-          {endsOutsideSlot && recommended && (
-            <p className="rounded-xl bg-white/12 px-3 py-2 text-xs font-semibold leading-5 text-white/85">
-              Fin hors heures creuses, mais départ bien dans {recommended.slot.name}.
-            </p>
-          )}
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-2 border-t border-white/15 pt-4 sm:gap-3 sm:pt-5 mx-auto max-w-md">
-        <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Programme</p>
-          <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">
-            {isAuthenticated && selectedProgram && duration === selectedProgram.duration
-              ? selectedProgram.name
-              : "Personnalisé"}
-          </p>
+      {endsOutsideSlot && recommended && (
+        <p className="mx-auto mt-4 max-w-md rounded-xl bg-white/12 px-3 py-2 text-center text-xs font-semibold leading-5 text-white/85">
+          Fin hors heures creuses, mais départ bien dans {recommended.slot.name}.
+        </p>
+      )}
+
+      {isAuthenticated && selectedProgram && duration === selectedProgram.duration ? (
+        <div className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-2 border-t border-white/15 pt-4 sm:gap-3 sm:pt-5">
+          <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Programme</p>
+            <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">{selectedProgram.name}</p>
+          </div>
+          <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Cycle</p>
+            <p className="mt-1 font-numeric text-sm font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
+          </div>
         </div>
-        <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Cycle</p>
-          <p className="mt-1 font-numeric text-sm font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
+      ) : (
+        <div className="mx-auto mt-6 max-w-md border-t border-white/15 pt-4 sm:pt-5">
+          <div className="rounded-2xl bg-white/10 px-3 py-2.5 sm:rounded-3xl sm:p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-xs">Personnalisé</p>
+            <p className="mt-1 font-numeric text-sm font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 

@@ -113,7 +113,7 @@ function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
   );
 }
 
-function BrandMark({ compact = false }: { compact?: boolean }) {
+export function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <Link className="flex items-center gap-2.5" href="/calculer">
       <Image

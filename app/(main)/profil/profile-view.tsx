@@ -216,9 +216,13 @@ export function ProfileView() {
               <p className="mt-1 truncate text-sm text-emerald-50">{session.user.email}</p>
             </div>
           </div>
-          <Button type="button" variant="secondary" onClick={handleSignOut} className="shrink-0">
+          <Button
+            type="button"
+            onClick={handleSignOut}
+            className="shrink-0 border border-white/25 bg-white/15 text-white hover:bg-white/25"
+          >
             <SignOut size={16} aria-hidden="true" />
-            <span className="hidden sm:inline">Se déconnecter</span>
+            Se déconnecter
           </Button>
         </div>
 
@@ -228,49 +232,53 @@ export function ProfileView() {
       </section>
 
       <SectionCard
-        icon={<DownloadIcon className="size-4.5" />}
-        title="Application"
-        description="Raccourci et installation"
-      >
-        <SettingsModalRow
-          description="Ajouter à l'écran d'accueil"
-          icon={<DownloadIcon className="size-4" />}
-          label="Installer l'application"
-          modalDescription="Ajoute CycleSmart à ton écran d'accueil"
-          title="Installer l'application"
-        >
-          <InstallGuideContent />
-        </SettingsModalRow>
-      </SectionCard>
-
-      <SectionCard
         icon={<Key size={18} aria-hidden="true" />}
-        title="Sécurité"
-        description="Changer votre mot de passe déconnecte vos autres sessions."
+        title="Gestion du compte"
+        description="Application et mot de passe"
       >
-        <form onSubmit={handleChangePassword} className="flex flex-col gap-4 sm:max-w-sm">
-          <Field
-            label="Mot de passe actuel"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-          />
-          <Field
-            label="Nouveau mot de passe"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            helperText="8 caractères minimum."
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          <Button type="submit" isLoading={isChangingPassword} className="self-start">
-            Mettre à jour le mot de passe
-          </Button>
-        </form>
+        <div className="divide-border -mx-6 -mb-6 divide-y">
+          <SettingsModalRow
+            description="Ajouter à l'écran d'accueil"
+            icon={<DownloadIcon className="size-4" />}
+            label="Installer l'application"
+            modalDescription="Ajoute CycleSmart à ton écran d'accueil"
+            title="Installer l'application"
+          >
+            <InstallGuideContent />
+          </SettingsModalRow>
+
+          <SettingsModalRow
+            description="Changer ton mot de passe"
+            icon={<Key size={16} aria-hidden="true" />}
+            label="Mot de passe"
+            modalDescription="Changer ton mot de passe déconnecte tes autres sessions."
+            title="Changer le mot de passe"
+          >
+            <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
+              <Field
+                label="Mot de passe actuel"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+              <Field
+                label="Nouveau mot de passe"
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                helperText="8 caractères minimum."
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <Button type="submit" isLoading={isChangingPassword} className="self-start">
+                Mettre à jour le mot de passe
+              </Button>
+            </form>
+          </SettingsModalRow>
+        </div>
       </SectionCard>
 
       <SectionCard

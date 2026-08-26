@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
-const umamiHost = "umami-587uoxmh6bswbfvi2ihyi2zz.72.61.109.246.sslip.io";
-const umamiOrigin = `https://${umamiHost} http://${umamiHost}`;
+const umamiOrigin = "https://stats.mathis-lamotte.fr";
 
 const cspDirectives = [
   "default-src 'self'",

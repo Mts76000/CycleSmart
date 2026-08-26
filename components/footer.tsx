@@ -4,7 +4,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto py-8 text-center">
+    <footer className="border-t border-emerald-900/10 py-8 text-center">
       <p className="text-xs font-semibold text-stone-600">
         © {currentYear} CycleSmart. Tous droits réservés.
       </p>

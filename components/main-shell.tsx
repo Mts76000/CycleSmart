@@ -64,16 +64,12 @@ export function MainShell({
             >
               <CycleGuard>{children}</CycleGuard>
             </section>
-
-            {!isAuthenticated && (
-              <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
-                <Footer />
-              </div>
-            )}
           </div>
 
           {isAuthenticated && <MobileDock pathname={pathname} />}
         </div>
+
+        {!isAuthenticated && <Footer />}
       </main>
       {isAuthenticated && <PwaInstallPrompt />}
     </CycleProvider>

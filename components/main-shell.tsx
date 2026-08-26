@@ -11,6 +11,11 @@ import { CycleLoading } from "./cycle-loading";
 import { SyncErrorBanner } from "./sync-error";
 import { CycleProvider, useCycle } from "@/lib/cycle-store";
 
+// Experiment: false tries a plain top-nav header (like the starter-nextjs template) instead
+// of the left rail on desktop. Flip back to true to restore the rail — nothing else to
+// change, every other layout branch below already reacts to this flag.
+const USE_SIDEBAR = false;
+
 const tabs = [
   { href: "/calculer", label: "Calculer", icon: ClockIcon },
   { href: "/creneaux", label: "Creneaux", icon: CalendarIcon },
@@ -41,21 +46,22 @@ export function MainShell({
   isAuthenticated: boolean;
 }) {
   const pathname = usePathname();
+  const showSidebar = isAuthenticated && USE_SIDEBAR;
 
   return (
     <CycleProvider isAuthenticated={isAuthenticated}>
       <main className="bg-cycle-background min-h-dvh text-stone-950">
         <div
           className={`mx-auto flex min-h-dvh w-full flex-col md:p-5 ${
-            isAuthenticated
+            showSidebar
               ? "max-w-[1400px] md:grid md:grid-cols-[92px_minmax(0,1fr)] md:gap-5 lg:grid-cols-[240px_minmax(0,1fr)]"
               : "max-w-[1400px]"
           }`}
         >
-          {isAuthenticated && <DesktopRail pathname={pathname} />}
+          {showSidebar && <DesktopRail pathname={pathname} />}
 
           <div className="flex min-h-dvh flex-col md:min-h-0">
-            <TopBar isAuthenticated={isAuthenticated} />
+            <TopBar isAuthenticated={isAuthenticated} pathname={pathname} />
 
             <section
               className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-8 sm:px-6 md:pt-0 md:pb-10 ${
@@ -65,14 +71,12 @@ export function MainShell({
               <CycleGuard>{children}</CycleGuard>
             </section>
 
-            {!isAuthenticated && (
-              <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
-                <Footer />
-              </div>
-            )}
+            <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
+              <Footer />
+            </div>
           </div>
 
-          {isAuthenticated && <MobileDock pathname={pathname} />}
+          {isAuthenticated && !USE_SIDEBAR && <MobileDock pathname={pathname} />}
         </div>
       </main>
       {isAuthenticated && <PwaInstallPrompt />}
@@ -80,7 +84,21 @@ export function MainShell({
   );
 }
 
-function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function TopBar({
+  isAuthenticated,
+  pathname,
+}: {
+  isAuthenticated: boolean;
+  pathname?: string;
+}) {
+  const router = useRouter();
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    router.push("/connexion");
+    router.refresh();
+  }
+
   if (!isAuthenticated) {
     return (
       <header className="w-full px-4 pt-5 pb-4 sm:px-6 md:px-8">
@@ -106,10 +124,48 @@ function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
   }
 
   return (
-    <header className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 sm:px-0 md:hidden">
-      <BrandMark compact />
-      <LiveClockChip />
-    </header>
+    <>
+      <header className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 sm:px-0 md:hidden">
+        <BrandMark compact />
+        <LiveClockChip />
+      </header>
+
+      {!USE_SIDEBAR && (
+        <header className="hidden w-full px-4 pt-5 pb-4 sm:px-6 md:flex md:px-8">
+          <div className="flex w-full items-center justify-between gap-6">
+            <div className="flex items-center gap-8">
+              <BrandMark />
+              <nav className="flex items-center gap-1">
+                {tabs.map((tab) => (
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    className={`rounded-full px-3.5 py-2 text-sm font-bold transition ${
+                      pathname === tab.href
+                        ? "bg-emerald-50 text-emerald-800"
+                        : "text-stone-600 hover:bg-stone-50 hover:text-stone-700"
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+            <div className="flex items-center gap-3">
+              <LiveClockChip />
+              <button
+                type="button"
+                onClick={() => void handleSignOut()}
+                className="flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-50 hover:text-stone-700"
+              >
+                <LogoutIcon className="size-4" />
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        </header>
+      )}
+    </>
   );
 }
 

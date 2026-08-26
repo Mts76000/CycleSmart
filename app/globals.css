@@ -10,13 +10,13 @@
   --color-muted: #e9eff8;
   --color-muted-foreground: #475569;
   --color-border: #e2e8f0;
-  --color-primary: #2563eb;
+  --color-primary: #047857;
   --color-on-primary: #ffffff;
   --color-accent: #ea580c;
   --color-on-accent: #ffffff;
   --color-destructive: #dc2626;
   --color-on-destructive: #ffffff;
-  --color-ring: #2563eb;
+  --color-ring: #047857;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -31,13 +31,13 @@
   --color-muted: #1c2740;
   --color-muted-foreground: #94a3b8;
   --color-border: #263250;
-  --color-primary: #3b82f6;
+  --color-primary: #10b981;
   --color-on-primary: #0b1120;
   --color-accent: #fb923c;
   --color-on-accent: #0b1120;
   --color-destructive: #f87171;
   --color-on-destructive: #0b1120;
-  --color-ring: #3b82f6;
+  --color-ring: #10b981;
 }
 
 @theme inline {

@@ -31,6 +31,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# curl: Coolify's own healthcheck probe (separate from the HEALTHCHECK instruction below)
+# tries curl first, falling back to busybox's wget — this image only has the latter by
+# default. Installing curl lets Coolify's probe (and ours) use whichever it prefers.
+RUN apk add --no-cache curl
+
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public

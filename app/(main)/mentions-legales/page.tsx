@@ -19,19 +19,13 @@ export default function LegalNoticePage() {
       </section>
 
       <section className="surface-card p-5 sm:p-6 md:p-7">
-        <p className="mb-5 text-xs text-stone-500">
-          Contenu générique à compléter — les valeurs entre crochets sont à remplacer par les
-          informations réelles.
-        </p>
-
         <div className="prose prose-stone max-w-none text-sm leading-7 text-stone-600">
           <h2 className="text-lg font-bold text-stone-950">1. Éditeur du site</h2>
           <p>Le site CycleSmart ({env.NEXT_PUBLIC_APP_URL}) est édité par :</p>
           <ul>
-            <li>[Nom / raison sociale de l&apos;éditeur]</li>
-            <li>[Forme juridique — ex. entreprise individuelle, SASU, SARL]</li>
-            <li>[Adresse du siège social]</li>
-            <li>[Numéro SIRET / RCS, si applicable]</li>
+            <li>Mathis Lamotte</li>
+            <li>Statut juridique en cours de formalisation (entreprise individuelle)</li>
+            <li>Numéro SIRET en cours d&apos;attribution</li>
             <li>
               Contact :{" "}
               <a className="font-bold text-emerald-700" href={`mailto:${env.CONTACT_EMAIL}`}>
@@ -41,15 +35,21 @@ export default function LegalNoticePage() {
           </ul>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">2. Directeur de la publication</h2>
-          <p>[Nom du directeur de la publication — généralement l&apos;éditeur lui-même].</p>
+          <p>Mathis Lamotte.</p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">3. Hébergement</h2>
-          <p>Le site est hébergé par :</p>
-          <ul>
-            <li>[Nom de l&apos;hébergeur]</li>
-            <li>[Adresse de l&apos;hébergeur]</li>
-            <li>[Site web / contact de l&apos;hébergeur]</li>
-          </ul>
+          <p>
+            Le site est hébergé par Hostinger (Hostinger International Ltd.) —{" "}
+            <a
+              className="font-bold text-emerald-700"
+              href="https://www.hostinger.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              hostinger.fr
+            </a>
+            .
+          </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">4. Propriété intellectuelle</h2>
           <p>

@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
-import {
-  ClockIcon,
-  MoonIcon,
-  PlusIcon,
-  SunIcon,
-  TrashIcon,
-} from "@/components/icons";
+import { ClockIcon, MoonIcon, PlusIcon, SunIcon, TrashIcon } from "@/components/icons";
 import { SegmentedControl } from "@/components/segmented-control";
 import { Slider } from "@/components/slider";
 import { TimeDial } from "@/components/time-dial";
@@ -31,7 +25,7 @@ function getTickPosition(value: number) {
 
 function DurationTicks() {
   return (
-    <div className="relative mt-2 h-5 text-xs font-semibold text-stone-600 font-numeric">
+    <div className="font-numeric relative mt-2 h-5 text-xs font-semibold text-stone-600">
       <span className="absolute left-0">30 min</span>
       <span className="absolute -translate-x-1/2" style={{ left: getTickPosition(240) }}>
         4 h
@@ -107,7 +101,7 @@ export default function CalculerPage() {
   const resultCard = (
     <section className="surface-hero p-4 text-white sm:p-6 md:p-8 lg:p-9">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-50">
+        <p className="text-xs font-bold tracking-[0.14em] text-emerald-50 uppercase">
           {isFinMode ? "À régler sur \u201cfin dans\u201d" : "Prochain lancement"}
         </p>
         {isSynced && (
@@ -118,9 +112,13 @@ export default function CalculerPage() {
       </div>
 
       <div className="mt-5 flex flex-col items-center gap-4 sm:mt-6 sm:flex-row sm:gap-5 lg:mt-8 lg:justify-center lg:gap-10">
-        <TimeDial minutes={dialWait} label={isFinMode ? "avant la fin" : "avant départ"} size="lg" />
+        <TimeDial
+          minutes={dialWait}
+          label={isFinMode ? "avant la fin" : "avant départ"}
+          size="lg"
+        />
         <div className="min-w-0 space-y-2 text-center sm:flex-1 sm:text-left lg:max-w-sm lg:flex-none">
-          <p className="text-base font-bold leading-6 text-white lg:text-lg">
+          <p className="text-base leading-6 font-bold text-white lg:text-lg">
             {recommended
               ? `${recommended.slot.name} · ${minutesToTime(recommended.start)} → ${minutesToTime(recommended.end)}`
               : "Ajoute un créneau pour obtenir une recommandation."}
@@ -129,7 +127,7 @@ export default function CalculerPage() {
       </div>
 
       {endsOutsideSlot && recommended && (
-        <p className="mx-auto mt-4 max-w-md rounded-xl bg-emerald-800 px-3 py-2 text-center text-xs font-semibold leading-5 text-white">
+        <p className="mx-auto mt-4 max-w-md rounded-xl bg-emerald-800 px-3 py-2 text-center text-xs leading-5 font-semibold text-white">
           Fin hors heures creuses, mais départ bien dans le créneau : {recommended.slot.name}.
         </p>
       )}
@@ -137,19 +135,31 @@ export default function CalculerPage() {
       {isAuthenticated && selectedProgram && duration === selectedProgram.duration ? (
         <div className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-2 border-t border-white/15 pt-4 sm:gap-3 sm:pt-5">
           <div className="rounded-2xl bg-emerald-800 px-3 py-2.5 sm:rounded-3xl sm:p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-50 sm:text-xs">Programme</p>
-            <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">{selectedProgram.name}</p>
+            <p className="text-[10px] font-bold tracking-[0.12em] text-emerald-50 uppercase sm:text-xs">
+              Programme
+            </p>
+            <p className="mt-1 truncate text-sm font-black sm:mt-2 sm:text-lg">
+              {selectedProgram.name}
+            </p>
           </div>
           <div className="rounded-2xl bg-emerald-800 px-3 py-2.5 sm:rounded-3xl sm:p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-50 sm:text-xs">Cycle</p>
-            <p className="mt-1 font-numeric text-sm font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
+            <p className="text-[10px] font-bold tracking-[0.12em] text-emerald-50 uppercase sm:text-xs">
+              Cycle
+            </p>
+            <p className="font-numeric mt-1 text-sm font-black sm:mt-2 sm:text-lg">
+              {formatDuration(duration)}
+            </p>
           </div>
         </div>
       ) : (
         <div className="mx-auto mt-6 max-w-md border-t border-white/15 pt-4 sm:pt-5">
           <div className="rounded-2xl bg-emerald-800 px-3 py-2.5 sm:rounded-3xl sm:p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-50 sm:text-xs">Personnalisé</p>
-            <p className="mt-1 font-numeric text-sm font-black sm:mt-2 sm:text-lg">{formatDuration(duration)}</p>
+            <p className="text-[10px] font-bold tracking-[0.12em] text-emerald-50 uppercase sm:text-xs">
+              Personnalisé
+            </p>
+            <p className="font-numeric mt-1 text-sm font-black sm:mt-2 sm:text-lg">
+              {formatDuration(duration)}
+            </p>
           </div>
         </div>
       )}
@@ -158,43 +168,47 @@ export default function CalculerPage() {
 
   const machineSection = (
     <div className="space-y-5">
-        {machines.map((machine) => (
-          <div key={machine.id}>
-            <p className="text-xs font-bold uppercase tracking-[0.1em] text-stone-600">{machine.name}</p>
-            <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-              {machine.programs.map((program) => {
-                const active = selectedProgramId === program.id && duration === program.duration;
+      {machines.map((machine) => (
+        <div key={machine.id}>
+          <p className="text-xs font-bold tracking-[0.1em] text-stone-600 uppercase">
+            {machine.name}
+          </p>
+          <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {machine.programs.map((program) => {
+              const active = selectedProgramId === program.id && duration === program.duration;
 
-                return (
-                  <button
-                    className={`relative rounded-2xl px-4 py-3.5 text-left transition ${
-                      active
-                        ? "bg-emerald-700 text-white shadow-cta"
-                        : "bg-[var(--surface-1)] text-stone-700 hover:bg-emerald-50"
+              return (
+                <button
+                  className={`relative rounded-2xl px-4 py-3.5 text-left transition ${
+                    active
+                      ? "shadow-cta bg-emerald-700 text-white"
+                      : "bg-[var(--cycle-surface-1)] text-stone-700 hover:bg-emerald-50"
+                  }`}
+                  key={program.id}
+                  type="button"
+                  onClick={() => selectProgram(program.id)}
+                >
+                  <span
+                    className={`block text-[11px] font-bold tracking-[0.1em] uppercase ${
+                      active ? "text-emerald-50" : "text-stone-600"
                     }`}
-                    key={program.id}
-                    type="button"
-                    onClick={() => selectProgram(program.id)}
                   >
-                    <span
-                      className={`block text-[11px] font-bold uppercase tracking-[0.1em] ${
-                        active ? "text-emerald-50" : "text-stone-600"
-                      }`}
-                    >
-                      {program.name}
-                    </span>
-                    <span className="mt-1 block font-numeric text-2xl font-black leading-tight">
-                      {formatDuration(program.duration)}
-                    </span>
-                    <span className={`mt-1 block text-xs font-numeric ${active ? "text-emerald-50" : "text-stone-600"}`}>
-                      pas {formatDuration(program.delayStep)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                    {program.name}
+                  </span>
+                  <span className="font-numeric mt-1 block text-2xl leading-tight font-black">
+                    {formatDuration(program.duration)}
+                  </span>
+                  <span
+                    className={`font-numeric mt-1 block text-xs ${active ? "text-emerald-50" : "text-stone-600"}`}
+                  >
+                    pas {formatDuration(program.delayStep)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        ))}
+        </div>
+      ))}
 
       {isAuthenticated && (
         <ActionLink className="mt-4" href="/machines" block>
@@ -208,7 +222,9 @@ export default function CalculerPage() {
     return (
       <div className="grid gap-8 sm:grid-cols-2">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-stone-600">Mode de calcul</p>
+          <p className="text-xs font-bold tracking-[0.1em] text-stone-600 uppercase">
+            Mode de calcul
+          </p>
           <div className="mt-3">
             <SegmentedControl
               value={calculationMode}
@@ -224,14 +240,24 @@ export default function CalculerPage() {
         </div>
 
         <div>
-          <label className="text-xs font-bold uppercase tracking-[0.1em] text-stone-600" htmlFor="duration">
+          <label
+            className="text-xs font-bold tracking-[0.1em] text-stone-600 uppercase"
+            htmlFor="duration"
+          >
             Durée du programme
           </label>
-          <p className="mt-1 font-display font-numeric text-3xl font-black leading-none text-stone-950">
+          <p className="font-display font-numeric mt-1 text-3xl leading-none font-black text-stone-950">
             {formatDuration(duration)}
           </p>
           <div className="mt-6">
-            <Slider id="duration" min={durationMin} max={durationMax} step={5} value={duration} onChange={setDuration} />
+            <Slider
+              id="duration"
+              min={durationMin}
+              max={durationMax}
+              step={5}
+              value={duration}
+              onChange={setDuration}
+            />
           </div>
           <DurationTicks />
         </div>
@@ -263,7 +289,7 @@ export default function CalculerPage() {
               </label>
               <select
                 id="delayStep"
-                className="field-select mt-2 h-11 w-full rounded-full border-none bg-emerald-50 px-4 text-sm font-black text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                className="field-select mt-2 h-11 w-full rounded-full border-none bg-emerald-50 px-4 text-sm font-black text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                 value={selectedProgram?.delayStep}
                 onChange={(event) => {
                   if (selectedProgram) {
@@ -308,21 +334,21 @@ export default function CalculerPage() {
       {showSlotForm && (
         <div className="surface-sub mt-3 grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_120px_120px_auto] lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]">
           <input
-            className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
+            className="h-12 rounded-2xl bg-white px-4 ring-emerald-300 outline-none focus:ring-4"
             placeholder="Nom optionnel"
             value={newSlot.name}
             onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
           />
           <input
             aria-label="Début du créneau"
-            className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+            className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
             type="time"
             value={newSlot.start}
             onChange={(event) => setNewSlot((slot) => ({ ...slot, start: event.target.value }))}
           />
           <input
             aria-label="Fin du créneau"
-            className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+            className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
             type="time"
             value={newSlot.end}
             onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
@@ -367,14 +393,14 @@ export default function CalculerPage() {
               </div>
               <input
                 aria-label={`Début de ${slot.name || "créneau"} ${index + 1}`}
-                className="h-11 rounded-2xl bg-white px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                className="h-11 rounded-2xl bg-white px-3 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                 type="time"
                 value={slot.start}
                 onChange={(event) => updateSlot(slot.id, { start: event.target.value })}
               />
               <input
                 aria-label={`Fin de ${slot.name || "créneau"} ${index + 1}`}
-                className="h-11 rounded-2xl bg-white px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                className="h-11 rounded-2xl bg-white px-3 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                 type="time"
                 value={slot.end}
                 onChange={(event) => updateSlot(slot.id, { end: event.target.value })}
@@ -396,11 +422,13 @@ export default function CalculerPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-4xl space-y-5">
+      <div className="mx-auto max-w-6xl space-y-5">
         {resultCard}
 
         <section className="surface-card p-4 sm:p-5 md:p-7">
-          <h1 className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur d&apos;heures creuses</h1>
+          <h1 className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">
+            Calculateur d&apos;heures creuses
+          </h1>
           <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
             Règle la durée et le mode, CycleSmart trouve le bon moment.
           </p>
@@ -413,13 +441,15 @@ export default function CalculerPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto max-w-6xl space-y-5">
       {resultCard}
 
       <section className="surface-card p-4 sm:p-5 md:p-7">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">Calculateur d&apos;heures creuses</h1>
+            <h1 className="text-xl font-bold text-stone-950 sm:text-2xl md:text-3xl">
+              Calculateur d&apos;heures creuses
+            </h1>
             <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600 sm:mt-2 sm:text-base sm:leading-6">
               Choisis ton appareil, ajuste la durée si besoin.
             </p>

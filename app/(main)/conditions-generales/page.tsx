@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
+import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Conditions d'utilisation - CycleSmart",
   description: "Conditions générales d'utilisation de CycleSmart.",
 };
-
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@mathis-lamotte.fr";
 
 export default function ConditionsPage() {
   return (
@@ -34,10 +33,10 @@ export default function ConditionsPage() {
           </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">3. Responsabilités</h2>
-<p>
-            CycleSmart fournit une estimation basée sur les informations saisies par l&apos;utilisateur.
-            Il ne remplace pas les consignes du fabricant de l&apos;appareil ni la vérification des
-            horaires réels de l&apos;abonnement d&apos;électricité.
+          <p>
+            CycleSmart fournit une estimation basée sur les informations saisies par
+            l&apos;utilisateur. Il ne remplace pas les consignes du fabricant de l&apos;appareil ni
+            la vérification des horaires réels de l&apos;abonnement d&apos;électricité.
           </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">4. Propriété intellectuelle</h2>
@@ -48,15 +47,15 @@ export default function ConditionsPage() {
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">5. Modification des conditions</h2>
           <p>
-            Les conditions peuvent être mises à jour à tout moment. L&apos;utilisateur est invité à les
-            consulter régulièrement.
+            Les conditions peuvent être mises à jour à tout moment. L&apos;utilisateur est invité à
+            les consulter régulièrement.
           </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">6. Contact</h2>
           <p>
             Pour toute question, écris-nous à{" "}
-            <a className="font-bold text-emerald-700" href={`mailto:${contactEmail}`}>
-              {contactEmail}
+            <a className="font-bold text-emerald-700" href={`mailto:${env.CONTACT_EMAIL}`}>
+              {env.CONTACT_EMAIL}
             </a>
             .
           </p>

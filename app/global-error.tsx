@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
 
-export default function GlobalErrorPage({
+// Catches errors in the root layout itself, where app/error.tsx cannot help (it renders
+// inside the layout). Must render its own <html>/<body> since the root layout is bypassed.
+export default function GlobalError({
   error,
   reset,
 }: {
@@ -16,31 +17,18 @@ export default function GlobalErrorPage({
 
   return (
     <html lang="fr">
-      <body className="min-h-screen bg-[var(--background)] p-4 font-sans text-[var(--foreground)] antialiased">
-        <main className="grid min-h-screen place-items-center">
-          <div className="max-w-md text-center">
-            <p className="text-6xl font-black text-emerald-500">Oups</p>
-            <h1 className="mt-4 text-2xl font-bold text-stone-900">Erreur critique</h1>
-            <p className="mt-2 text-stone-600">
-              L&apos;application a rencontré un problème inattendu. Réessaie ou recharge la page.
-            </p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <button
-                className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-6 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
-                onClick={() => reset()}
-                type="button"
-              >
-                Réessayer
-              </button>
-              <Link
-                className="inline-flex h-10 items-center justify-center rounded-full border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
-                href="/"
-              >
-                Accueil
-              </Link>
-            </div>
-          </div>
-        </main>
+      <body className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-white px-4 text-center text-zinc-900">
+        <h1 className="text-2xl font-semibold tracking-tight">Une erreur critique est survenue</h1>
+        <p className="max-w-sm text-sm text-zinc-600">
+          L&apos;application n&apos;a pas pu se charger. Merci de réessayer.
+        </p>
+        <button
+          type="button"
+          onClick={reset}
+          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white"
+        >
+          Réessayer
+        </button>
       </body>
     </html>
   );

@@ -14,9 +14,30 @@ function formatWait(minutes: number) {
 }
 
 const sizeConfig = {
-  sm: { box: "size-16", viewBox: 96, radius: 40, stroke: 7, valueClass: "text-base", labelClass: "text-[8px]" },
-  md: { box: "size-32 sm:size-36 md:size-40", viewBox: 120, radius: 52, stroke: 9, valueClass: "text-xl sm:text-2xl md:text-3xl", labelClass: "text-[9px] sm:text-[10px] md:text-xs" },
-  lg: { box: "size-40 md:size-52 lg:size-60", viewBox: 140, radius: 60, stroke: 10, valueClass: "text-3xl md:text-4xl lg:text-5xl", labelClass: "text-[10px] md:text-xs" },
+  sm: {
+    box: "size-16",
+    viewBox: 96,
+    radius: 40,
+    stroke: 7,
+    valueClass: "text-base",
+    labelClass: "text-[8px]",
+  },
+  md: {
+    box: "size-32 sm:size-36 md:size-40",
+    viewBox: 120,
+    radius: 52,
+    stroke: 9,
+    valueClass: "text-xl sm:text-2xl md:text-3xl",
+    labelClass: "text-[9px] sm:text-[10px] md:text-xs",
+  },
+  lg: {
+    box: "size-40 md:size-52 lg:size-60",
+    viewBox: 140,
+    radius: 60,
+    stroke: 10,
+    valueClass: "text-3xl md:text-4xl lg:text-5xl",
+    labelClass: "text-[10px] md:text-xs",
+  },
 } as const;
 
 /**
@@ -51,7 +72,11 @@ export function TimeDial({
       role="img"
       aria-label={`${label}: ${valueText}`}
     >
-      <svg className="size-full -rotate-90" viewBox={`0 0 ${config.viewBox} ${config.viewBox}`} aria-hidden="true">
+      <svg
+        className="size-full -rotate-90"
+        viewBox={`0 0 ${config.viewBox} ${config.viewBox}`}
+        aria-hidden="true"
+      >
         <circle
           cx={center}
           cy={center}
@@ -77,14 +102,14 @@ export function TimeDial({
       <div className="absolute inset-0 grid place-items-center px-2 text-center">
         <div>
           <p
-            className={`font-display font-numeric font-black leading-none ${config.valueClass} ${
+            className={`font-display font-numeric leading-none font-black ${config.valueClass} ${
               tone === "light" ? "text-white" : "text-emerald-950"
             }`}
           >
             {minutes !== null ? formatWait(minutes) : "--"}
           </p>
           <p
-            className={`mt-1.5 font-bold uppercase leading-tight tracking-wide ${config.labelClass} ${
+            className={`mt-1.5 leading-tight font-bold tracking-wide uppercase ${config.labelClass} ${
               tone === "light" ? "text-emerald-50" : "text-emerald-700"
             }`}
           >

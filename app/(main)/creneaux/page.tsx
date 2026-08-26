@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ActionLink } from "@/components/action-link";
-import {
-  ClockIcon,
-  MoonIcon,
-  SunIcon,
-  TrashIcon,
-} from "@/components/icons";
+import { ClockIcon, MoonIcon, SunIcon, TrashIcon } from "@/components/icons";
 import { SlotsTimeline } from "@/components/slots-timeline";
 import { useCycle } from "@/lib/cycle-store";
 
@@ -48,13 +43,13 @@ export default function CreneauxPage() {
     return (
       <div className="mx-auto max-w-2xl space-y-5">
         <section className="surface-hero p-6 text-center text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white">Réglages</p>
-          <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:text-3xl">
+          <p className="text-xs font-bold tracking-[0.14em] text-white uppercase">Réglages</p>
+          <h2 className="font-display mt-2 text-2xl font-black tracking-tight sm:text-3xl">
             Tes heures creuses
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-emerald-50">
-            La gestion détaillée est réservée aux comptes connectés. En mode invité,
-            ajoute tes créneaux directement depuis la page Calculer.
+            La gestion détaillée est réservée aux comptes connectés. En mode invité, ajoute tes
+            créneaux directement depuis la page Calculer.
           </p>
         </section>
 
@@ -86,14 +81,14 @@ export default function CreneauxPage() {
       <section className="surface-hero p-4 text-white sm:p-5 md:p-6 lg:p-8">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-white sm:text-sm">
+            <p className="text-xs font-bold tracking-[0.14em] text-white uppercase sm:text-sm">
               Réglages
             </p>
-            <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:mt-3 sm:text-3xl md:text-4xl">
+            <h2 className="font-display mt-2 text-2xl font-black tracking-tight sm:mt-3 sm:text-3xl md:text-4xl">
               Tes heures creuses
             </h2>
           </div>
-          <p className="hidden shrink-0 text-right text-sm font-bold text-emerald-50 sm:block font-numeric">
+          <p className="font-numeric hidden shrink-0 text-right text-sm font-bold text-emerald-50 sm:block">
             {slotCountLabel(slots.length)}
           </p>
         </div>
@@ -139,22 +134,22 @@ export default function CreneauxPage() {
         </button>
 
         {showSlotForm && (
-          <div className="mt-4 rounded-[var(--radius-md)] border border-dashed border-emerald-200 bg-emerald-50/40 p-4">
+          <div className="mt-4 rounded-[var(--cycle-radius-md)] border border-dashed border-emerald-200 bg-emerald-50/40 p-4">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_140px_auto]">
               <input
-                className="h-12 rounded-2xl bg-white px-4 outline-none ring-emerald-300 focus:ring-4"
+                className="h-12 rounded-2xl bg-white px-4 ring-emerald-300 outline-none focus:ring-4"
                 placeholder="Nom automatique si vide"
                 value={newSlot.name}
                 onChange={(event) => setNewSlot((slot) => ({ ...slot, name: event.target.value }))}
               />
               <input
-                className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                 type="time"
                 value={newSlot.start}
                 onChange={(event) => setNewSlot((slot) => ({ ...slot, start: event.target.value }))}
               />
               <input
-                className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                className="h-12 rounded-2xl bg-white px-4 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                 type="time"
                 value={newSlot.end}
                 onChange={(event) => setNewSlot((slot) => ({ ...slot, end: event.target.value }))}
@@ -175,7 +170,7 @@ export default function CreneauxPage() {
 
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {slots.length === 0 && (
-            <div className="rounded-[var(--radius-md)] border border-dashed border-stone-200 p-5 text-sm leading-6 text-stone-600 md:col-span-2">
+            <div className="rounded-[var(--cycle-radius-md)] border border-dashed border-stone-200 p-5 text-sm leading-6 text-stone-600 md:col-span-2">
               Ajoute tes plages d&apos;heures creuses. Exemple : 01:06 - 07:06 et 14:36 - 16:36.
             </div>
           )}
@@ -186,7 +181,7 @@ export default function CreneauxPage() {
 
             return (
               <article
-                className={`space-y-3 rounded-[var(--radius-md)] border p-4 transition ${
+                className={`space-y-3 rounded-[var(--cycle-radius-md)] border p-4 transition ${
                   isHovered ? "border-emerald-300 bg-emerald-50/40" : "border-stone-100 bg-white"
                 }`}
                 key={slot.id}
@@ -199,11 +194,11 @@ export default function CreneauxPage() {
                       <SlotIcon className="size-5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
+                      <span className="block text-[11px] font-bold tracking-[0.12em] text-stone-600 uppercase">
                         Plage {index + 1}
                       </span>
                       <input
-                        className="min-w-0 w-full bg-transparent text-lg font-bold text-stone-950 outline-none"
+                        className="w-full min-w-0 bg-transparent text-lg font-bold text-stone-950 outline-none"
                         aria-label={`Nom du créneau ${index + 1}`}
                         value={slot.name}
                         onChange={(event) => updateSlot(slot.id, { name: event.target.value })}
@@ -211,7 +206,7 @@ export default function CreneauxPage() {
                     </span>
                   </label>
                   <button
-                    className="grid size-10 shrink-0 place-items-center rounded-2xl bg-[var(--surface-1)] text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.96]"
+                    className="grid size-10 shrink-0 place-items-center rounded-2xl bg-[var(--cycle-surface-1)] text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.96]"
                     type="button"
                     onClick={() => removeSlot(slot.id)}
                     aria-label={`Supprimer ${slot.name}`}
@@ -222,18 +217,22 @@ export default function CreneauxPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">Début</span>
+                    <span className="text-[11px] font-bold tracking-[0.12em] text-stone-600 uppercase">
+                      Début
+                    </span>
                     <input
-                      className="mt-1 h-12 w-full rounded-2xl bg-[var(--surface-1)] px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                      className="mt-1 h-12 w-full rounded-2xl bg-[var(--cycle-surface-1)] px-4 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                       type="time"
                       value={slot.start}
                       onChange={(event) => updateSlot(slot.id, { start: event.target.value })}
                     />
                   </label>
                   <label className="block">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">Fin</span>
+                    <span className="text-[11px] font-bold tracking-[0.12em] text-stone-600 uppercase">
+                      Fin
+                    </span>
                     <input
-                      className="mt-1 h-12 w-full rounded-2xl bg-[var(--surface-1)] px-4 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+                      className="mt-1 h-12 w-full rounded-2xl bg-[var(--cycle-surface-1)] px-4 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
                       type="time"
                       value={slot.end}
                       onChange={(event) => updateSlot(slot.id, { end: event.target.value })}

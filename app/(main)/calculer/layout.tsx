@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/json-ld";
+import { env } from "@/lib/env";
 import { faqs } from "./faq-data";
 import { FaqSection } from "./faq-section";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000";
+const appUrl = env.NEXT_PUBLIC_APP_URL;
 
 export const metadata: Metadata = {
   title: "Calculateur d'heures creuses | CycleSmart",
@@ -22,8 +23,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Calculateur d'heures creuses | CycleSmart",
-    description:
-      "Calcule le meilleur moment pour lancer tes appareils pendant tes heures creuses.",
+    description: "Calcule le meilleur moment pour lancer tes appareils pendant tes heures creuses.",
     url: "/calculer",
     siteName: "CycleSmart",
     locale: "fr_FR",
@@ -32,8 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Calculateur d'heures creuses | CycleSmart",
-    description:
-      "Calcule le meilleur moment pour lancer tes appareils pendant tes heures creuses.",
+    description: "Calcule le meilleur moment pour lancer tes appareils pendant tes heures creuses.",
   },
   alternates: {
     canonical: "/calculer",
@@ -97,11 +96,7 @@ const faqSchema = {
   })),
 };
 
-export default function CalculerLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function CalculerLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}

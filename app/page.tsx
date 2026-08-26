@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "CycleSmart",
-  description:
-    "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
+  description: "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
   robots: {
     index: false,
     follow: true,

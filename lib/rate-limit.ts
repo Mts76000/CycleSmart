@@ -1,99 +1,71 @@
-import { headers } from "next/headers";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { env } from "@/lib/env";
 
-type RateLimitBucket = {
+export interface RateLimitResult {
+  success: boolean;
+  remaining: number;
+  reset: number;
+}
+
+interface Bucket {
   count: number;
   resetAt: number;
-};
-
-const store = new Map<string, RateLimitBucket>();
-
-function getKey(prefix: string, identifier: string) {
-  return `${prefix}:${identifier}`;
 }
 
-function cleanExpired(now: number) {
-  for (const [key, bucket] of store.entries()) {
-    if (bucket.resetAt < now) {
-      store.delete(key);
+/** In-memory fallback limiter, used whenever Upstash Redis isn't configured (dev/test). */
+class MemoryRatelimit {
+  private readonly buckets = new Map<string, Bucket>();
+
+  constructor(
+    private readonly limit: number,
+    private readonly windowMs: number,
+  ) {}
+
+  async limitKey(key: string): Promise<RateLimitResult> {
+    const now = Date.now();
+    const bucket = this.buckets.get(key);
+
+    if (!bucket || bucket.resetAt <= now) {
+      this.buckets.set(key, { count: 1, resetAt: now + this.windowMs });
+      return { success: true, remaining: this.limit - 1, reset: now + this.windowMs };
     }
+
+    bucket.count += 1;
+    return {
+      success: bucket.count <= this.limit,
+      remaining: Math.max(0, this.limit - bucket.count),
+      reset: bucket.resetAt,
+    };
   }
 }
 
-export function checkRateLimit(
-  prefix: string,
-  identifier: string,
-  maxRequests: number,
-  windowMs: number,
-) {
-  const now = Date.now();
-  cleanExpired(now);
+const upstashConfigured = Boolean(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
 
-  const key = getKey(prefix, identifier);
-  const bucket = store.get(key);
+const redis = upstashConfigured
+  ? new Redis({ url: env.UPSTASH_REDIS_REST_URL!, token: env.UPSTASH_REDIS_REST_TOKEN! })
+  : null;
 
-  if (!bucket || bucket.resetAt < now) {
-    store.set(key, { count: 1, resetAt: now + windowMs });
-    return { allowed: true, retryAfter: 0 };
-  }
-
-  if (bucket.count >= maxRequests) {
+/**
+ * Creates a rate limiter for a given action (e.g. "login", "register"). Backed by
+ * Upstash Redis in production when UPSTASH_REDIS_REST_URL/TOKEN are set; falls back to
+ * an in-memory limiter otherwise (fine for dev/test/single-instance, not for multi-instance prod).
+ */
+export function createRateLimiter(name: string, limit: number, windowSeconds: number) {
+  if (redis) {
+    const ratelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(limit, `${windowSeconds} s`),
+      prefix: `ratelimit:${name}`,
+    });
     return {
-      allowed: false,
-      retryAfter: Math.ceil((bucket.resetAt - now) / 1000),
+      check: async (identifier: string): Promise<RateLimitResult> => {
+        const result = await ratelimit.limit(identifier);
+        return { success: result.success, remaining: result.remaining, reset: result.reset };
+      },
     };
   }
 
-  bucket.count += 1;
-  return { allowed: true, retryAfter: 0 };
-}
-
-export async function getClientIp() {
-  const headerStore = await headers();
-  const forwarded = headerStore.get("x-forwarded-for");
-
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() || "unknown";
-  }
-
-  const realIp = headerStore.get("x-real-ip");
-  if (realIp) {
-    return realIp.trim();
-  }
-
-  return "unknown";
-}
-
-export async function rateLimitByIp(
-  prefix: string,
-  maxRequests: number,
-  windowMs: number,
-) {
-  const ip = await getClientIp();
-
-  if (ip === "127.0.0.1" || ip === "::1" || ip === "unknown") {
-    return { allowed: true, retryAfter: 0 };
-  }
-
-  return checkRateLimit(prefix, ip, maxRequests, windowMs);
-}
-
-export async function rateLimitByUser(
-  prefix: string,
-  userId: string,
-  maxRequests: number,
-  windowMs: number,
-) {
-  const ip = await getClientIp();
-  const identifier = `${userId}:${ip}`;
-  return checkRateLimit(prefix, identifier, maxRequests, windowMs);
-}
-
-export function rateLimitResponse(retryAfter: number) {
-  return Response.json(
-    {
-      ok: false,
-      error: `Trop de requetes. Reessaie dans ${retryAfter} secondes.`,
-    },
-    { status: 429, headers: { "Retry-After": String(retryAfter) } },
-  );
+  const memory = new MemoryRatelimit(limit, windowSeconds * 1000);
+  return { check: (identifier: string) => memory.limitKey(`${name}:${identifier}`) };
 }

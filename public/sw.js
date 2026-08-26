@@ -132,7 +132,13 @@ async function apiNetworkFirst(request) {
     }
 
     return Response.json(
-      { ok: false, error: "Hors ligne. Les donnees distantes sont indisponibles." },
+      {
+        success: false,
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Hors ligne. Les donnees distantes sont indisponibles.",
+        },
+      },
       { status: 503 },
     );
   }

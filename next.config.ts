@@ -1,74 +1,61 @@
 import type { NextConfig } from "next";
 
-const umamiOrigin = "https://stats.mathis-lamotte.fr";
+// CSP whitelist rationale:
+// - 'self' + inline styles/scripts: Next.js/Tailwind require these for hydration + the
+//   theme-init script in app/layout.tsx.
+// - analytics.umami.is: self-hosted-compatible Umami analytics script (lib/umami.ts).
+// - challenges.cloudflare.com: Turnstile widget + its iframe challenge.
+// - accounts.google.com: Google OAuth (better-auth socialProviders.google).
+// - 'unsafe-eval' in script-src: non-production only. React dev mode (`next dev`, which
+//   also backs the "test" env used by Playwright's webServer — see playwright.config.ts)
+//   uses eval() to reconstruct callstacks across environments (Fast Refresh, component
+//   stacks); it never does in a production build, so this is left out of the prod CSP.
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  process.env.NODE_ENV !== "production" ? "'unsafe-eval'" : null,
+  "https://analytics.umami.is",
+  "https://challenges.cloudflare.com",
+]
+  .filter(Boolean)
+  .join(" ");
 
-const cspDirectives = [
+const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${umamiOrigin}`,
+  `script-src ${scriptSrc}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
-  "font-src 'self'",
-  `connect-src 'self' ${umamiOrigin}`,
-  "manifest-src 'self'",
-  "object-src 'none'",
+  "img-src 'self' data: https://lh3.googleusercontent.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://analytics.umami.is",
+  "frame-src https://challenges.cloudflare.com https://accounts.google.com",
+  "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
-];
+].join("; ");
 
 const securityHeaders = [
-  {
-    key: "Content-Security-Policy",
-    value: cspDirectives.join("; "),
-  },
-  {
-    key: "X-Frame-Options",
-    value: "DENY",
-  },
-  {
-    key: "X-Content-Type-Options",
-    value: "nosniff",
-  },
-  {
-    key: "Referrer-Policy",
-    value: "strict-origin-when-cross-origin",
-  },
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   {
     key: "Permissions-Policy",
-    value: "geolocation=(), microphone=(), camera=()",
-  },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
-  {
-    key: "X-XSS-Protection",
-    value: "0",
+    value: "camera=(), microphone=(), geolocation=()",
   },
 ];
 
 const nextConfig: NextConfig = {
+  // Lean production image for the multi-stage Dockerfile (see Dockerfile).
+  output: "standalone",
   async headers() {
-    return [
-      {
-        source: "/sw.js",
-        headers: [
-          {
-            key: "Content-Type",
-            value: "application/javascript; charset=utf-8",
-          },
-          {
-            key: "Cache-Control",
-            value: "no-cache, no-store, must-revalidate",
-          },
-        ],
-      },
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-    ];
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
+  images: {
+    remotePatterns: [
+      // Google account avatars (better-auth Google OAuth profile images)
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+    ],
   },
 };
 

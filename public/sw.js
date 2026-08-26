@@ -13,8 +13,8 @@ const APP_ROUTES = [
 const PRECACHE_URLS = [
   ...APP_ROUTES,
   "/manifest.webmanifest",
-  "/pwa-icon-192",
-  "/pwa-icon-512",
+  "/icon-192x192.png",
+  "/icon-512x512.png",
   "/screenshot-mobile.png",
   "/screenshot-wide.png",
 ];

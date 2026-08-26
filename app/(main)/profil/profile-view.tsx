@@ -199,26 +199,48 @@ export function ProfileView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="border-border bg-card flex items-center justify-between rounded-xl border p-6">
-        <div className="flex items-center gap-4">
-          <span className="bg-primary text-on-primary flex size-12 shrink-0 items-center justify-center rounded-full text-base font-semibold">
-            {initialsFrom(session.user.name || session.user.email)}
-          </span>
-          <div>
-            <h1 className="text-card-foreground text-lg font-semibold tracking-tight">
-              {session.user.name || "Mon compte"}
-            </h1>
-            <p className="text-muted-foreground text-sm">{session.user.email}</p>
+      <section className="surface-hero relative overflow-hidden p-5 text-white sm:p-6">
+        <div
+          className="pointer-events-none absolute -top-16 -right-14 size-44 rounded-full border-[24px] border-white/10"
+          aria-hidden="true"
+        />
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="font-display grid size-14 shrink-0 place-items-center rounded-2xl bg-white/15 text-xl font-black sm:size-16">
+              {initialsFrom(session.user.name || session.user.email)}
+            </span>
+            <div className="min-w-0">
+              <p className="font-display truncate text-xl font-bold tracking-tight sm:text-2xl">
+                {session.user.name || "Mon compte"}
+              </p>
+              <p className="mt-1 truncate text-sm text-emerald-50">{session.user.email}</p>
+            </div>
           </div>
+          <Button type="button" variant="secondary" onClick={handleSignOut} className="shrink-0">
+            <SignOut size={16} aria-hidden="true" />
+            <span className="hidden sm:inline">Se déconnecter</span>
+          </Button>
         </div>
-        <Button type="button" variant="secondary" onClick={handleSignOut}>
-          <SignOut size={16} aria-hidden="true" />
-          Se déconnecter
-        </Button>
-      </div>
 
-      <SectionCard icon={<Laptop size={18} aria-hidden="true" />} title="Ton activité">
-        <ProfileStats />
+        <div className="relative mt-5">
+          <ProfileStats />
+        </div>
+      </section>
+
+      <SectionCard
+        icon={<DownloadIcon className="size-4.5" />}
+        title="Application"
+        description="Raccourci et installation"
+      >
+        <SettingsModalRow
+          description="Ajouter à l'écran d'accueil"
+          icon={<DownloadIcon className="size-4" />}
+          label="Installer l'application"
+          modalDescription="Ajoute CycleSmart à ton écran d'accueil"
+          title="Installer l'application"
+        >
+          <InstallGuideContent />
+        </SettingsModalRow>
       </SectionCard>
 
       <SectionCard
@@ -303,22 +325,6 @@ export function ProfileView() {
             })}
           </ul>
         )}
-      </SectionCard>
-
-      <SectionCard
-        icon={<DownloadIcon className="size-4.5" />}
-        title="Application"
-        description="Raccourci et installation"
-      >
-        <SettingsModalRow
-          description="Ajouter à l'écran d'accueil"
-          icon={<DownloadIcon className="size-4" />}
-          label="Installer l'application"
-          modalDescription="Ajoute CycleSmart à ton écran d'accueil"
-          title="Installer l'application"
-        >
-          <InstallGuideContent />
-        </SettingsModalRow>
       </SectionCard>
 
       <SectionCard

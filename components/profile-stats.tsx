@@ -29,7 +29,9 @@ export function ProfileStats() {
           key={label}
         >
           <Icon className="mx-auto size-4 text-emerald-50 sm:size-5" />
-          <p className="font-display mt-1.5 text-xl font-black sm:mt-2 sm:text-2xl">{value}</p>
+          <p className="font-display mt-1.5 text-xl font-black text-white sm:mt-2 sm:text-2xl">
+            {value}
+          </p>
           <p className="mt-0.5 text-[10px] font-bold tracking-wide text-emerald-50 uppercase sm:text-xs">
             {label}
           </p>

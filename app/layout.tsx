@@ -74,12 +74,14 @@ export default function RootLayout({
         {children}
         <CookieBanner />
         <ServiceWorkerRegister />
-        <Script
-          strategy="beforeInteractive"
-          defer
-          src="https://stats.mathis-lamotte.fr/script.js"
-          data-website-id="0d9dace8-6c75-4189-aa13-0d3ffd5b0265"
-        />
+        {process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            strategy="beforeInteractive"
+            defer
+            src="https://stats.mathis-lamotte.fr/script.js"
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+          />
+        )}
       </body>
     </html>
   );

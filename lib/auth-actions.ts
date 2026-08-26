@@ -8,7 +8,7 @@ import { z } from "zod";
 import { requireCurrentUser } from "./current-user";
 import { ensureDatabaseSchema, getPool, query } from "./db";
 import { rateLimitByIp, rateLimitByUser } from "./rate-limit";
-import { sendPasswordResetEmail } from "./email";
+import { notifyAdminOfSignup, sendPasswordResetEmail } from "./email";
 import { createSession, deleteSession } from "./session";
 
 export type AuthFormState =
@@ -164,6 +164,16 @@ export async function signup(_state: AuthFormState, formData: FormData): Promise
   } catch (error) {
     console.error("Session creation failed", error);
     return sessionUnavailable({ name, email });
+  }
+
+  try {
+    await notifyAdminOfSignup({
+      userEmail: email,
+      userName: name,
+      signedUpAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Failed to send admin signup notification", error);
   }
 
   redirect("/calculer");

@@ -1,6 +1,9 @@
 import "server-only";
 
+import type React from "react";
 import { Resend } from "resend";
+import { render, toPlainText } from "react-email";
+import { NewSignupEmail } from "@/emails/new-signup";
 
 let resend: Resend | undefined;
 
@@ -16,6 +19,65 @@ function getResend() {
   }
 
   return resend;
+}
+
+export async function sendEmail({
+  to,
+  subject,
+  react,
+}: {
+  to: string;
+  subject: string;
+  react: React.ReactElement;
+}) {
+  const fromEmail = process.env.CONTACT_FROM_EMAIL?.trim();
+
+  if (!fromEmail) {
+    throw new Error("Missing CONTACT_FROM_EMAIL.");
+  }
+
+  const html = await render(react);
+  const text = toPlainText(html);
+
+  const { error } = await getResend().emails.send({
+    from: `CycleSmart <${fromEmail}>`,
+    to,
+    subject,
+    html,
+    text,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function notifyAdminOfSignup({
+  userEmail,
+  userName,
+  signedUpAt,
+}: {
+  userEmail: string;
+  userName?: string;
+  signedUpAt: string;
+}) {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim();
+
+  if (!adminEmail) {
+    console.warn("ADMIN_EMAIL not configured, skipping admin signup notification.");
+    return;
+  }
+
+  await sendEmail({
+    to: adminEmail,
+    subject: "Nouvelle inscription - CycleSmart",
+    react: NewSignupEmail({
+      userEmail,
+      userName,
+      signedUpAt,
+      projectName: "CycleSmart",
+    }),
+  });
 }
 
 export async function sendPasswordResetEmail({

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Footer } from "./footer";
+import { Button } from "@/components/ui/button";
 import { CalendarIcon, ClockIcon, DeviceIcon, LogoutIcon, UserIcon } from "./icons";
 import { PwaInstallPrompt } from "./pwa-install-prompt";
 import { authClient } from "@/lib/auth-client";
@@ -91,89 +92,47 @@ export function TopBar({
   isAuthenticated: boolean;
   pathname?: string;
 }) {
-  if (!isAuthenticated) {
-    return (
-      <header className="w-full px-4 pt-5 pb-4 sm:px-6 md:px-8">
-        <div className="flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:justify-between">
-          <BrandMark />
-          <div className="flex w-full justify-center gap-2 sm:w-auto">
-            <Link
-              className="shadow-cta flex h-10 flex-1 items-center justify-center rounded-full bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98] sm:flex-none"
-              href="/connexion"
-            >
-              Connexion
-            </Link>
-            <Link
-              className="flex h-10 flex-1 items-center justify-center rounded-full bg-white px-5 text-sm font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 active:scale-[0.98] sm:flex-none"
-              href="/inscription"
-            >
-              Créer un compte
-            </Link>
-          </div>
-        </div>
-      </header>
-    );
-  }
-
   return (
-    <>
-      <header className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 sm:px-0 md:hidden">
-        <BrandMark compact />
-        <LiveClockChip />
-      </header>
+    <header className="border-border bg-background border-b px-4 py-4 sm:px-6 md:px-8">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6">
+        <div className="flex items-center gap-8">
+          <Link href="/calculer" className="text-foreground text-sm font-semibold tracking-tight">
+            CycleSmart
+          </Link>
 
-      {!USE_SIDEBAR && (
-        <header className="hidden w-full px-4 pt-5 pb-4 sm:px-6 md:flex md:px-8">
-          <div className="flex w-full items-center justify-between gap-6">
-            <BrandMark />
-            <nav className="flex items-center gap-1">
+          {isAuthenticated && !USE_SIDEBAR && (
+            <nav className="hidden items-center gap-6 md:flex">
               {tabs.map((tab) => (
                 <Link
                   key={tab.href}
                   href={tab.href}
-                  className={`rounded-full px-3.5 py-2 text-sm font-bold transition ${
+                  className={`text-sm font-medium transition ${
                     pathname === tab.href
-                      ? "bg-emerald-50 text-emerald-800"
-                      : "text-stone-600 hover:bg-stone-50 hover:text-stone-700"
+                      ? "text-foreground font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.label}
                 </Link>
               ))}
             </nav>
+          )}
+        </div>
+
+        {!isAuthenticated && (
+          <div className="flex gap-3">
+            <Link href="/connexion">
+              <Button type="button" variant="secondary">
+                Se connecter
+              </Button>
+            </Link>
+            <Link href="/inscription">
+              <Button type="button">Créer un compte</Button>
+            </Link>
           </div>
-        </header>
-      )}
-    </>
-  );
-}
-
-export function BrandMark({ compact = false }: { compact?: boolean }) {
-  return (
-    <Link className="flex items-center gap-2.5" href="/calculer">
-      <Image
-        alt="CycleSmart"
-        className={compact ? "size-9" : "size-10"}
-        height={compact ? 36 : 40}
-        priority
-        src="/logo-icon.png"
-        width={compact ? 36 : 40}
-      />
-      {!compact && (
-        <span className="text-xl font-bold tracking-tight text-emerald-800">CycleSmart</span>
-      )}
-    </Link>
-  );
-}
-
-function LiveClockChip() {
-  const { currentTime } = useCycle();
-
-  return (
-    <div className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-sm font-bold text-emerald-800 shadow-sm">
-      <span className="size-1.5 rounded-full bg-emerald-700" aria-hidden="true" />
-      {currentTime}
-    </div>
+        )}
+      </div>
+    </header>
   );
 }
 

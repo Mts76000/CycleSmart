@@ -72,6 +72,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
+    console.error("GET /api/slots failed:", error);
     return Response.json(
       { ok: false, error: error instanceof Error ? error.message : "Erreur serveur." },
       { status: 500 },
@@ -126,6 +127,7 @@ export async function PUT(request: Request) {
       return Response.json({ ok: false, error: "Non connecte." }, { status: 401 });
     }
 
+    console.error("PUT /api/slots failed:", error);
     return Response.json(
       { ok: false, error: error instanceof Error ? error.message : "Erreur serveur." },
       { status: 500 },

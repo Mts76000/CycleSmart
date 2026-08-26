@@ -39,7 +39,7 @@ export async function sendEmail({
   const html = await render(react);
   const text = toPlainText(html);
 
-  const { error } = await getResend().emails.send({
+  const { data, error } = await getResend().emails.send({
     from: `CycleSmart <${fromEmail}>`,
     to,
     subject,
@@ -48,8 +48,11 @@ export async function sendEmail({
   });
 
   if (error) {
+    console.error("Resend send error:", JSON.stringify(error));
     throw new Error(error.message);
   }
+
+  return data;
 }
 
 export async function notifyAdminOfSignup({
@@ -113,6 +116,7 @@ export async function sendPasswordResetEmail({
   });
 
   if (error) {
+    console.error("Resend send error:", JSON.stringify(error));
     throw new Error(error.message);
   }
 }

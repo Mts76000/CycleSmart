@@ -26,7 +26,7 @@ export async function mockTurnstile(page: Page) {
 /**
  * The register page's TurnstileWidget loads the (mocked) script asynchronously and polls
  * for it, so a token isn't necessarily set the instant the form is filled in. Call this
- * after page.goto("/register") and before submitting, or the request fails client-side
+ * after page.goto("/inscription") and before submitting, or the request fails client-side
  * validation (turnstileToken required, min length 1).
  */
 export async function waitForTurnstileReady(page: Page) {

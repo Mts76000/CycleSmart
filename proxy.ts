@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-const PROTECTED_PREFIXES = ["/account"];
+const PROTECTED_PREFIXES = ["/profil"];
 
 export function proxy(request: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) =>
@@ -13,7 +13,7 @@ export function proxy(request: NextRequest) {
   // requireAuth()/requireRole() themselves for the authoritative check.
   const sessionCookie = getSessionCookie(request);
   if (!sessionCookie) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/connexion", request.url);
     loginUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -22,5 +22,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/account/:path*"],
+  matcher: ["/profil/:path*"],
 };

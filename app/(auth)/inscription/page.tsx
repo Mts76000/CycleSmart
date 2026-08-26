@@ -44,14 +44,14 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      router.push(`/verification-email?email=${encodeURIComponent(email)}`);
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleGoogleSignIn() {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/account" });
+    await authClient.signIn.social({ provider: "google", callbackURL: "/profil" });
   }
 
   return (
@@ -60,7 +60,7 @@ export default function RegisterPage() {
         <h1 className="text-foreground text-2xl font-semibold tracking-tight">Créer un compte</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Déjà inscrit ?{" "}
-          <Link href="/login" className="text-primary font-medium hover:underline">
+          <Link href="/connexion" className="text-primary font-medium hover:underline">
             Se connecter
           </Link>
         </p>

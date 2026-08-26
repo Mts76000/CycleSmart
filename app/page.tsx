@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <div className="bg-background flex min-h-[100dvh] flex-col">
       <header className="flex items-center justify-between px-6 py-4">
-        <span className="text-foreground text-sm font-semibold tracking-tight">Starter</span>
+        <span className="text-foreground text-sm font-semibold tracking-tight">CycleSmart</span>
         <ThemeToggle />
       </header>
       <main
@@ -17,22 +17,21 @@ export default async function Home() {
         className="flex flex-1 flex-col items-center justify-center gap-6 px-4 text-center"
       >
         <h1 className="text-foreground text-3xl font-semibold tracking-tight sm:text-4xl">
-          Starter Next.js générique
+          CycleSmart
         </h1>
         <p className="text-muted-foreground max-w-md text-sm">
-          Auth, email, analytics, sécurité et tests déjà en place. Décrivez vos fonctionnalités
-          métier, le reste est prêt.
+          Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.
         </p>
         {session ? (
-          <Link href="/account">
+          <Link href="/profil">
             <Button type="button">Mon compte</Button>
           </Link>
         ) : (
           <div className="flex gap-3">
-            <Link href="/register">
+            <Link href="/inscription">
               <Button type="button">Créer un compte</Button>
             </Link>
-            <Link href="/login">
+            <Link href="/connexion">
               <Button type="button" variant="secondary">
                 Se connecter
               </Button>

@@ -17,7 +17,7 @@ export default function VerifyEmailPage() {
     if (!email) return;
     setIsLoading(true);
     try {
-      await authClient.sendVerificationEmail({ email, callbackURL: "/account" });
+      await authClient.sendVerificationEmail({ email, callbackURL: "/profil" });
       toast("Email de vérification renvoyé.", "success");
     } finally {
       setIsLoading(false);

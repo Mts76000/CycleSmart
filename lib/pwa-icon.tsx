@@ -13,7 +13,7 @@ export function generateIconResponse(px: number, padding = 0) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#2563eb",
+        background: "#047857",
       }}
     >
       <span
@@ -28,7 +28,7 @@ export function generateIconResponse(px: number, padding = 0) {
           fontWeight: 700,
         }}
       >
-        S
+        C
       </span>
     </div>,
     { width: px, height: px },

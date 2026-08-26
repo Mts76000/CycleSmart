@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
         </ul>
         <p>
           Conformément au RGPD, vous pouvez exporter ou supprimer vos données depuis la page{" "}
-          <a href="/account" className="text-primary font-medium hover:underline">
+          <a href="/profil" className="text-primary font-medium hover:underline">
             Paramètres du compte
           </a>
           .

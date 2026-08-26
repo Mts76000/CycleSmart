@@ -68,7 +68,7 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
-          await sendSignupAdminNotification(user.email);
+          await sendSignupAdminNotification(user.email, user.name);
         },
       },
     },

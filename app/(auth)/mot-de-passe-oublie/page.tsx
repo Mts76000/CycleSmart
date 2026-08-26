@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
           Si un compte existe avec l&apos;adresse {email}, un lien de réinitialisation vient
           d&apos;être envoyé. Le lien est valable 1 heure.
         </p>
-        <Link href="/login" className="text-primary text-sm font-medium hover:underline">
+        <Link href="/connexion" className="text-primary text-sm font-medium hover:underline">
           Retour à la connexion
         </Link>
       </div>
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
         </Button>
       </form>
 
-      <Link href="/login" className="text-primary text-sm font-medium hover:underline">
+      <Link href="/connexion" className="text-primary text-sm font-medium hover:underline">
         Retour à la connexion
       </Link>
     </div>

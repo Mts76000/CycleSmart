@@ -1,21 +1,20 @@
-# Starter Next.js
+# CycleSmart
 
-Socle générique pour tous les side-projects : authentification, format API standardisé,
-transactions, audit log, storage abstrait, RGPD, analytics, email transactionnel, anti-bot,
-sécurité HTTP, SEO/PWA, tests, CI/CD, qualité/DX. Voir [AGENTS.md](./AGENTS.md) pour les
-principes de conception détaillés (lu automatiquement par les agents IA).
+Calcule le meilleur moment pour lancer tes machines (lave-linge, lave-vaisselle...) pendant
+les heures creuses. Bâti sur le socle [starter-nextjs](https://github.com/Mts76000/starter-nextjs) :
+authentification, format API standardisé, transactions, audit log, RGPD, analytics, email
+transactionnel, anti-bot, sécurité HTTP, SEO/PWA, tests, CI/CD, qualité/DX. Voir
+[AGENTS.md](./AGENTS.md) pour les principes de conception détaillés du socle (lu
+automatiquement par les agents IA).
 
-## Utiliser ce repo comme template
+## Démarrage
 
-1. Sur GitHub : **Use this template** → créer un nouveau dépôt.
-2. Cloner le nouveau dépôt, puis `npm install`.
-3. Copier les fichiers d'environnement et les remplir (voir ci-dessous) :
+1. `npm install`.
+2. Copier les fichiers d'environnement et les remplir (voir ci-dessous) :
    ```bash
    cp .env.example .env.local
    cp .env.test.example .env.test
    ```
-4. Décrire uniquement les fonctionnalités métier du nouveau projet — tout le reste (auth,
-   sécurité, tests, CI...) est déjà en place.
 
 ## Variables d'environnement
 

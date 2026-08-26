@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function AccountLoading() {
+export default function ProfileLoading() {
   return (
     <div className="flex flex-col gap-10">
       <Skeleton className="h-8 w-48" />

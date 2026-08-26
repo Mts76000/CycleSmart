@@ -13,15 +13,15 @@ export default function OpengraphImage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#0b1120",
-        color: "#e2e8f0",
+        backgroundColor: "#f5f7f7",
+        color: "#047857",
         fontSize: 64,
         fontWeight: 700,
       }}
     >
-      Starter
-      <div style={{ fontSize: 28, fontWeight: 400, color: "#94a3b8", marginTop: 16 }}>
-        Socle Next.js générique
+      CycleSmart
+      <div style={{ fontSize: 28, fontWeight: 400, color: "#3f6c60", marginTop: 16 }}>
+        Le meilleur moment pour lancer tes machines
       </div>
     </div>,
     { ...size },

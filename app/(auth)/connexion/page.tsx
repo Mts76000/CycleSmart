@@ -34,7 +34,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push(searchParams.get("redirectTo") ?? "/account");
+      router.push(searchParams.get("redirectTo") ?? "/profil");
       router.refresh();
     } finally {
       setIsLoading(false);
@@ -42,7 +42,7 @@ export default function LoginPage() {
   }
 
   async function handleGoogleSignIn() {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/account" });
+    await authClient.signIn.social({ provider: "google", callbackURL: "/profil" });
   }
 
   return (
@@ -51,7 +51,7 @@ export default function LoginPage() {
         <h1 className="text-foreground text-2xl font-semibold tracking-tight">Connexion</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Pas encore de compte ?{" "}
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          <Link href="/inscription" className="text-primary font-medium hover:underline">
             Créer un compte
           </Link>
         </p>
@@ -93,7 +93,7 @@ export default function LoginPage() {
             />
             Se souvenir de moi
           </label>
-          <Link href="/forgot-password" className="text-primary font-medium hover:underline">
+          <Link href="/mot-de-passe-oublie" className="text-primary font-medium hover:underline">
             Mot de passe oublié ?
           </Link>
         </div>

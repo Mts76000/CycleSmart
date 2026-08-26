@@ -61,7 +61,7 @@ function SectionCard({
   );
 }
 
-export function AccountView() {
+export function ProfileView() {
   const router = useRouter();
   const { toast } = useToast();
   const { data: session, isPending } = useSession();
@@ -109,7 +109,7 @@ export function AccountView() {
 
   async function handleSignOut() {
     await authClient.signOut();
-    router.push("/login");
+    router.push("/connexion");
     router.refresh();
   }
 

@@ -20,7 +20,9 @@ export const POST = withApiErrorHandling(async (request: Request) => {
   // Always return success regardless of whether the email exists, to avoid leaking
   // which addresses are registered.
   await auth.api
-    .requestPasswordReset({ body: { email: validation.data.email, redirectTo: "/reset-password" } })
+    .requestPasswordReset({
+      body: { email: validation.data.email, redirectTo: "/mot-de-passe-oublie/nouveau" },
+    })
     .catch(() => {});
 
   return apiSuccess(null, "Si un compte existe avec cet email, un lien a été envoyé.");

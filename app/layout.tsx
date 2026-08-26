@@ -14,31 +14,31 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 const description =
-  "Socle Next.js générique : auth, email, analytics, sécurité, tests, prêt à l'emploi.";
+  "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: {
-    default: "Starter",
-    template: "%s | Starter",
+    default: "CycleSmart",
+    template: "%s | CycleSmart",
   },
   description,
   alternates: { canonical: canonicalUrl("/") },
   openGraph: {
-    title: "Starter",
+    title: "CycleSmart",
     description,
     url: canonicalUrl("/"),
-    siteName: "Starter",
+    siteName: "CycleSmart",
     locale: "fr_FR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Starter",
+    title: "CycleSmart",
     description,
   },
   appleWebApp: {
-    title: "Starter",
+    title: "CycleSmart",
     statusBarStyle: "default",
   },
   formatDetection: {
@@ -50,7 +50,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f7f7" },
     { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
   ],
 };

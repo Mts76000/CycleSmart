@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
         return;
       }
       toast("Mot de passe mis à jour.", "success");
-      router.push("/login");
+      router.push("/connexion");
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +41,10 @@ export default function ResetPasswordPage() {
         <p className="text-muted-foreground text-sm">
           Ce lien de réinitialisation est invalide ou a expiré.
         </p>
-        <Link href="/forgot-password" className="text-primary text-sm font-medium hover:underline">
+        <Link
+          href="/mot-de-passe-oublie"
+          className="text-primary text-sm font-medium hover:underline"
+        >
           Demander un nouveau lien
         </Link>
       </div>

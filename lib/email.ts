@@ -73,11 +73,11 @@ export async function sendChangeEmailVerification(oldEmail: string, newEmail: st
   });
 }
 
-export async function sendSignupAdminNotification(userEmail: string) {
+export async function sendSignupAdminNotification(userEmail: string, userName: string) {
   await sendTransactionalEmail({
     to: env.CONTACT_EMAIL,
     subject: "Nouvelle inscription",
     heading: "Nouvelle inscription",
-    body: `Un nouvel utilisateur vient de s'inscrire : ${userEmail}.`,
+    body: `${userName} vient de s'inscrire avec l'adresse ${userEmail}.`,
   });
 }

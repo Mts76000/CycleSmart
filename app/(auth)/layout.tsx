@@ -6,7 +6,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="bg-background flex min-h-[100dvh] flex-col">
       <header className="flex items-center justify-between px-6 py-4">
         <Link href="/" className="text-foreground text-sm font-semibold tracking-tight">
-          Starter
+          CycleSmart
         </Link>
         <ThemeToggle />
       </header>

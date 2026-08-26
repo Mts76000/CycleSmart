@@ -3,7 +3,7 @@ import { faqs } from "./faq-data";
 export function FaqSection() {
   return (
     <section
-      className="surface-card mx-auto mt-5 max-w-4xl p-4 sm:p-5 md:p-7"
+      className="surface-card mx-auto mt-5 max-w-6xl p-4 sm:p-5 md:p-7"
       aria-labelledby="faq-title"
     >
       <h2 id="faq-title" className="text-xl font-bold text-stone-950 sm:text-2xl">

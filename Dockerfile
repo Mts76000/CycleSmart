@@ -6,7 +6,10 @@ FROM node:26-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# --include=dev overrides an ambient NODE_ENV=production (e.g. Coolify's build-time env
+# vars) that would otherwise make npm silently skip devDependencies — breaking both the
+# "prepare" script (husky) and `next build` itself (needs typescript, eslint, etc.).
+RUN npm ci --include=dev
 
 # --- Build ---
 FROM base AS builder

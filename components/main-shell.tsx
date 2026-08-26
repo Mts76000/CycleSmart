@@ -4,18 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Footer } from "./footer";
-import { Button } from "@/components/ui/button";
 import { CalendarIcon, ClockIcon, DeviceIcon, LogoutIcon, UserIcon } from "./icons";
 import { PwaInstallPrompt } from "./pwa-install-prompt";
 import { authClient } from "@/lib/auth-client";
 import { CycleLoading } from "./cycle-loading";
 import { SyncErrorBanner } from "./sync-error";
 import { CycleProvider, useCycle } from "@/lib/cycle-store";
-
-// Experiment: false tries a plain top-nav header (like the starter-nextjs template) instead
-// of the left rail on desktop. Flip back to true to restore the rail — nothing else to
-// change, every other layout branch below already reacts to this flag.
-const USE_SIDEBAR = false;
 
 const tabs = [
   { href: "/calculer", label: "Calculer", icon: ClockIcon },
@@ -47,22 +41,21 @@ export function MainShell({
   isAuthenticated: boolean;
 }) {
   const pathname = usePathname();
-  const showSidebar = isAuthenticated && USE_SIDEBAR;
 
   return (
     <CycleProvider isAuthenticated={isAuthenticated}>
       <main className="bg-cycle-background min-h-dvh text-stone-950">
         <div
           className={`mx-auto flex min-h-dvh w-full flex-col md:p-5 ${
-            showSidebar
+            isAuthenticated
               ? "max-w-[1400px] md:grid md:grid-cols-[92px_minmax(0,1fr)] md:gap-5 lg:grid-cols-[240px_minmax(0,1fr)]"
               : "max-w-[1400px]"
           }`}
         >
-          {showSidebar && <DesktopRail pathname={pathname} />}
+          {isAuthenticated && <DesktopRail pathname={pathname} />}
 
           <div className="flex min-h-dvh flex-col md:min-h-0">
-            <TopBar isAuthenticated={isAuthenticated} pathname={pathname} />
+            <TopBar isAuthenticated={isAuthenticated} />
 
             <section
               className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-8 sm:px-6 md:pt-0 md:pb-10 ${
@@ -72,12 +65,14 @@ export function MainShell({
               <CycleGuard>{children}</CycleGuard>
             </section>
 
-            <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
-              <Footer />
-            </div>
+            {!isAuthenticated && (
+              <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
+                <Footer />
+              </div>
+            )}
           </div>
 
-          {isAuthenticated && !USE_SIDEBAR && <MobileDock pathname={pathname} />}
+          {isAuthenticated && <MobileDock pathname={pathname} />}
         </div>
       </main>
       {isAuthenticated && <PwaInstallPrompt />}
@@ -85,54 +80,65 @@ export function MainShell({
   );
 }
 
-export function TopBar({
-  isAuthenticated,
-  pathname,
-}: {
-  isAuthenticated: boolean;
-  pathname?: string;
-}) {
-  return (
-    <header className="border-border bg-background border-b px-4 py-4 sm:px-6 md:px-8">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6">
-        <div className="flex items-center gap-8">
-          <Link href="/calculer" className="text-foreground text-sm font-semibold tracking-tight">
-            CycleSmart
-          </Link>
-
-          {isAuthenticated && !USE_SIDEBAR && (
-            <nav className="hidden items-center gap-6 md:flex">
-              {tabs.map((tab) => (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className={`text-sm font-medium transition ${
-                    pathname === tab.href
-                      ? "text-foreground font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
-            </nav>
-          )}
-        </div>
-
-        {!isAuthenticated && (
-          <div className="flex gap-3">
-            <Link href="/connexion">
-              <Button type="button" variant="secondary">
-                Se connecter
-              </Button>
+export function TopBar({ isAuthenticated }: { isAuthenticated: boolean }) {
+  if (!isAuthenticated) {
+    return (
+      <header className="w-full px-4 pt-5 pb-4 sm:px-6 md:px-8">
+        <div className="flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:justify-between">
+          <BrandMark />
+          <div className="flex w-full justify-center gap-2 sm:w-auto">
+            <Link
+              className="shadow-cta flex h-10 flex-1 items-center justify-center rounded-full bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98] sm:flex-none"
+              href="/connexion"
+            >
+              Connexion
             </Link>
-            <Link href="/inscription">
-              <Button type="button">Créer un compte</Button>
+            <Link
+              className="flex h-10 flex-1 items-center justify-center rounded-full bg-white px-5 text-sm font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 active:scale-[0.98] sm:flex-none"
+              href="/inscription"
+            >
+              Créer un compte
             </Link>
           </div>
-        )}
-      </div>
+        </div>
+      </header>
+    );
+  }
+
+  return (
+    <header className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 sm:px-0 md:hidden">
+      <BrandMark compact />
+      <LiveClockChip />
     </header>
+  );
+}
+
+export function BrandMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <Link className="flex items-center gap-2.5" href="/calculer">
+      <Image
+        alt="CycleSmart"
+        className={compact ? "size-9" : "size-10"}
+        height={compact ? 36 : 40}
+        priority
+        src="/logo-icon.png"
+        width={compact ? 36 : 40}
+      />
+      {!compact && (
+        <span className="text-xl font-bold tracking-tight text-emerald-800">CycleSmart</span>
+      )}
+    </Link>
+  );
+}
+
+function LiveClockChip() {
+  const { currentTime } = useCycle();
+
+  return (
+    <div className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-sm font-bold text-emerald-800 shadow-sm">
+      <span className="size-1.5 rounded-full bg-emerald-700" aria-hidden="true" />
+      {currentTime}
+    </div>
   );
 }
 

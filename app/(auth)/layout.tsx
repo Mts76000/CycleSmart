@@ -1,5 +1,4 @@
 import { TopBar } from "@/components/main-shell";
-import { Footer } from "@/components/footer";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,9 +12,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           >
             <div className="w-full max-w-sm">{children}</div>
           </section>
-          <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 md:px-8">
-            <Footer />
-          </div>
         </div>
       </div>
     </main>

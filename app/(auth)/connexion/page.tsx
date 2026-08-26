@@ -20,8 +20,16 @@ export default function LoginPage() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const turnstileRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (turnstileRequired && !turnstileToken) {
+      toast("Merci de valider le champ de sécurité avant de continuer.", "error");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch("/api/login", {
@@ -107,7 +115,12 @@ export default function LoginPage() {
           />
         ) : null}
 
-        <Button type="submit" isLoading={isLoading} className="w-full">
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          disabled={turnstileRequired && !turnstileToken}
+          className="w-full"
+        >
           Se connecter
         </Button>
       </form>

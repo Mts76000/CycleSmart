@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 // CSP whitelist rationale:
 // - 'self' + inline styles/scripts: Next.js/Tailwind require these for hydration + the
 //   theme-init script in app/layout.tsx.
-// - analytics.umami.is: self-hosted-compatible Umami analytics script (lib/umami.ts).
+// - cloud.umami.is: Umami Cloud analytics script (lib/umami.ts).
 // - challenges.cloudflare.com: Turnstile widget + its iframe challenge.
 // - accounts.google.com: Google OAuth (better-auth socialProviders.google).
 // - 'unsafe-eval' in script-src: non-production only. React dev mode (`next dev`, which
@@ -14,7 +14,7 @@ const scriptSrc = [
   "'self'",
   "'unsafe-inline'",
   process.env.NODE_ENV !== "production" ? "'unsafe-eval'" : null,
-  "https://analytics.umami.is",
+  "https://cloud.umami.is",
   "https://challenges.cloudflare.com",
 ]
   .filter(Boolean)
@@ -26,7 +26,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://lh3.googleusercontent.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://analytics.umami.is",
+  "connect-src 'self' https://cloud.umami.is",
   "frame-src https://challenges.cloudflare.com https://accounts.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",

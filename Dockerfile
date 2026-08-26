@@ -43,6 +43,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+# drizzle-orm isn't traced into the Next.js standalone bundle (it's webpacked into the app's
+# own server chunks, not kept as a real node_modules package) — the migration script run at
+# container startup needs it as an actual importable package. Zero runtime deps of its own.
+COPY --from=deps /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
 
 USER nextjs
 
@@ -53,4 +57,8 @@ ENV HOSTNAME=0.0.0.0
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
 
-CMD ["node", "server.js"]
+# Runs drizzle migrations against DATABASE_URL before starting the server, so every deploy
+# converges the prod schema automatically instead of relying on a manual `db:migrate` run.
+# Plain JS (drizzle/migrate-prod.mjs), not the tsx-based db:migrate script, since this image
+# has no devDependencies.
+CMD ["sh", "-c", "node drizzle/migrate-prod.mjs && node server.js"]

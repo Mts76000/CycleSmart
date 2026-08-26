@@ -21,12 +21,19 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const turnstileRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrors({});
 
     if (!tosAccepted) {
       setErrors({ tosAccepted: "Vous devez accepter les CGU pour continuer." });
+      return;
+    }
+
+    if (turnstileRequired && !turnstileToken) {
+      toast("Merci de valider le champ de sécurité avant de continuer.", "error");
       return;
     }
 
@@ -134,7 +141,12 @@ export default function RegisterPage() {
           />
         ) : null}
 
-        <Button type="submit" isLoading={isLoading} className="w-full">
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          disabled={turnstileRequired && !turnstileToken}
+          className="w-full"
+        >
           Créer mon compte
         </Button>
       </form>

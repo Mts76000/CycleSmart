@@ -14,8 +14,16 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
+  const turnstileRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (turnstileRequired && !turnstileToken) {
+      toast("Merci de valider le champ de sécurité avant de continuer.", "error");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch("/api/forgot-password", {
@@ -78,7 +86,12 @@ export default function ForgotPasswordPage() {
           />
         ) : null}
 
-        <Button type="submit" isLoading={isLoading} className="w-full">
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          disabled={turnstileRequired && !turnstileToken}
+          className="w-full"
+        >
           Envoyer le lien
         </Button>
       </form>

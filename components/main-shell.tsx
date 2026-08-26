@@ -91,14 +91,6 @@ export function TopBar({
   isAuthenticated: boolean;
   pathname?: string;
 }) {
-  const router = useRouter();
-
-  async function handleSignOut() {
-    await authClient.signOut();
-    router.push("/connexion");
-    router.refresh();
-  }
-
   if (!isAuthenticated) {
     return (
       <header className="w-full px-4 pt-5 pb-4 sm:px-6 md:px-8">
@@ -133,35 +125,22 @@ export function TopBar({
       {!USE_SIDEBAR && (
         <header className="hidden w-full px-4 pt-5 pb-4 sm:px-6 md:flex md:px-8">
           <div className="flex w-full items-center justify-between gap-6">
-            <div className="flex items-center gap-8">
-              <BrandMark />
-              <nav className="flex items-center gap-1">
-                {tabs.map((tab) => (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    className={`rounded-full px-3.5 py-2 text-sm font-bold transition ${
-                      pathname === tab.href
-                        ? "bg-emerald-50 text-emerald-800"
-                        : "text-stone-600 hover:bg-stone-50 hover:text-stone-700"
-                    }`}
-                  >
-                    {tab.label}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-            <div className="flex items-center gap-3">
-              <LiveClockChip />
-              <button
-                type="button"
-                onClick={() => void handleSignOut()}
-                className="flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-50 hover:text-stone-700"
-              >
-                <LogoutIcon className="size-4" />
-                Déconnexion
-              </button>
-            </div>
+            <BrandMark />
+            <nav className="flex items-center gap-1">
+              {tabs.map((tab) => (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={`rounded-full px-3.5 py-2 text-sm font-bold transition ${
+                    pathname === tab.href
+                      ? "bg-emerald-50 text-emerald-800"
+                      : "text-stone-600 hover:bg-stone-50 hover:text-stone-700"
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </nav>
           </div>
         </header>
       )}

@@ -422,7 +422,7 @@ export default function CalculerPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-4xl space-y-5">
+      <div className="mx-auto max-w-6xl space-y-5">
         {resultCard}
 
         <section className="surface-card p-4 sm:p-5 md:p-7">
@@ -441,7 +441,7 @@ export default function CalculerPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto max-w-6xl space-y-5">
       {resultCard}
 
       <section className="surface-card p-4 sm:p-5 md:p-7">

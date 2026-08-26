@@ -339,9 +339,15 @@ export function ProfileView() {
         )}
       </section>
 
-      <div className="flex justify-center">
-        <BuyMeACoffeeButton />
-      </div>
+      <section className="surface-card p-5 text-center">
+        <p className="text-sm font-bold text-stone-950">Soutenir CycleSmart</p>
+        <p className="mt-1 text-xs text-stone-600">
+          Un café, c&apos;est le meilleur moyen de nous remercier.
+        </p>
+        <div className="mt-4 flex justify-center">
+          <BuyMeACoffeeButton />
+        </div>
+      </section>
     </div>
   );
 }

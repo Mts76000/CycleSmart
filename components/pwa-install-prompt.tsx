@@ -94,9 +94,15 @@ export function PwaInstallPrompt() {
   }
 
   return (
-    <div className="fixed inset-x-4 bottom-24 z-40 mx-auto max-w-sm rounded-[24px] bg-white p-4 shadow-card md:inset-x-auto md:bottom-6 md:left-6 md:right-auto">
+    <div className="shadow-card fixed inset-x-4 bottom-24 z-40 mx-auto max-w-sm rounded-[24px] bg-white p-4 md:inset-x-auto md:right-auto md:bottom-6 md:left-6">
       <div className="flex items-start gap-3">
-        <Image alt="CycleSmart" className="size-11 shrink-0 rounded-xl" height={44} src="/logo-icon.png" width={44} />
+        <Image
+          alt="CycleSmart"
+          className="size-11 shrink-0 rounded-xl"
+          height={44}
+          src="/logo-icon.png"
+          width={44}
+        />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-stone-950">Installer CycleSmart</p>
           <p className="mt-1 text-xs leading-5 text-stone-600">

@@ -25,9 +25,9 @@ export function SegmentedControl<T extends string>({
     >
       {options.map((option) => (
         <button
-          className={`rounded-[14px] px-3 py-2.5 text-sm font-bold leading-snug transition ${
+          className={`rounded-[14px] px-3 py-2.5 text-sm leading-snug font-bold transition ${
             value === option.value
-              ? "bg-emerald-700 text-white shadow-cta"
+              ? "shadow-cta bg-emerald-700 text-white"
               : "text-stone-600 hover:text-stone-700"
           }`}
           key={option.value}

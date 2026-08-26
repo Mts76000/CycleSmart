@@ -93,10 +93,7 @@ type CycleContextValue = {
   setNewMachine: (machine: NewMachine | ((machine: NewMachine) => NewMachine)) => void;
   addMachine: () => string | null;
   addProgram: (machineId: string) => void;
-  updateMachine: (
-    machineId: string,
-    patch: Partial<Pick<Machine, "name">>,
-  ) => void;
+  updateMachine: (machineId: string, patch: Partial<Pick<Machine, "name">>) => void;
   updateProgram: (
     programId: string,
     patch: Partial<Pick<Program, "name" | "duration" | "delayStep" | "delayMode">>,
@@ -182,7 +179,12 @@ export const defaultMachines: Machine[] = [
 
 export const favoriteDurations = [30, 75, 150, 180];
 export const delayStepOptions = [30, 60, 120];
-const defaultNewProgram: NewProgram = { name: "", duration: 120, delayStep: 60, delayMode: "depart" };
+const defaultNewProgram: NewProgram = {
+  name: "",
+  duration: 120,
+  delayStep: 60,
+  delayMode: "depart",
+};
 const defaultNewMachine: NewMachine = { name: "" };
 
 function getAllPrograms(machines: Machine[]): Program[] {
@@ -198,7 +200,9 @@ export function timeToMinutes(time: string) {
 
 export function minutesToTime(totalMinutes: number) {
   const normalized = ((Math.round(totalMinutes) % dayMinutes) + dayMinutes) % dayMinutes;
-  const hours = Math.floor(normalized / 60).toString().padStart(2, "0");
+  const hours = Math.floor(normalized / 60)
+    .toString()
+    .padStart(2, "0");
   const minutes = (normalized % 60).toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
@@ -376,11 +380,15 @@ function mergeStoredMachines(storedMachines: Machine[] | undefined) {
         return {
           ...defaultProgram,
           name: typeof storedProgram?.name === "string" ? storedProgram.name : defaultProgram.name,
-          duration: typeof storedProgram?.duration === "number"
-            ? normalizeDuration(storedProgram.duration)
-            : defaultProgram.duration,
+          duration:
+            typeof storedProgram?.duration === "number"
+              ? normalizeDuration(storedProgram.duration)
+              : defaultProgram.duration,
           delayStep: normalizeDelayStep(storedProgram?.delayStep),
-          delayMode: (storedProgram?.delayMode === "depart" || storedProgram?.delayMode === "fin") ? storedProgram.delayMode : defaultProgram.delayMode,
+          delayMode:
+            storedProgram?.delayMode === "depart" || storedProgram?.delayMode === "fin"
+              ? storedProgram.delayMode
+              : defaultProgram.delayMode,
         };
       }),
     };
@@ -404,7 +412,10 @@ function mergeStoredMachines(storedMachines: Machine[] | undefined) {
         ...program,
         duration: normalizeDuration(program.duration),
         delayStep: normalizeDelayStep(program.delayStep),
-        delayMode: (program.delayMode === "depart" || program.delayMode === "fin") ? program.delayMode : "depart",
+        delayMode:
+          program.delayMode === "depart" || program.delayMode === "fin"
+            ? program.delayMode
+            : "depart",
       })),
     })),
   ];
@@ -473,12 +484,15 @@ export function CycleProvider({
       }
       if (
         storedSettings?.selectedProgramId &&
-        getAllPrograms(nextMachines).some((program) => program.id === storedSettings.selectedProgramId)
+        getAllPrograms(nextMachines).some(
+          (program) => program.id === storedSettings.selectedProgramId,
+        )
       ) {
         setSelectedProgramId(storedSettings.selectedProgramId);
       }
       if (
-        storedSettings?.calculationMode === "soon" || storedSettings?.calculationMode === "last"
+        storedSettings?.calculationMode === "soon" ||
+        storedSettings?.calculationMode === "last"
       ) {
         setCalculationMode(storedSettings.calculationMode);
       }
@@ -501,31 +515,29 @@ export function CycleProvider({
           let hasError = false;
 
           if (settingsResult.status === "fulfilled") {
-            const data = settingsResult.value as { ok?: boolean; settings?: StoredSettings | null };
+            const json = settingsResult.value as
+              { success: true; data: { settings: StoredSettings | null } } | { success: false };
 
-            if (data.ok && data.settings) {
-              const remoteMachines = mergeStoredMachines(data.settings.machines);
+            if (json.success && json.data.settings) {
+              const settings = json.data.settings;
+              const remoteMachines = mergeStoredMachines(settings.machines);
               setMachines(remoteMachines);
 
-              if (
-                data.settings.duration &&
-                data.settings.duration >= 30 &&
-                data.settings.duration <= 480
-              ) {
-                setDuration(data.settings.duration);
+              if (settings.duration && settings.duration >= 30 && settings.duration <= 480) {
+                setDuration(settings.duration);
               }
               if (
-                data.settings.selectedProgramId &&
-                getAllPrograms(remoteMachines).some((program) => program.id === data.settings?.selectedProgramId)
+                settings.selectedProgramId &&
+                getAllPrograms(remoteMachines).some(
+                  (program) => program.id === settings.selectedProgramId,
+                )
               ) {
-                setSelectedProgramId(data.settings.selectedProgramId);
+                setSelectedProgramId(settings.selectedProgramId);
               }
-              if (
-                data.settings.calculationMode === "soon" || data.settings.calculationMode === "last"
-              ) {
-                setCalculationMode(data.settings.calculationMode);
+              if (settings.calculationMode === "soon" || settings.calculationMode === "last") {
+                setCalculationMode(settings.calculationMode);
               }
-            } else if (!data.ok) {
+            } else if (!json.success) {
               hasError = true;
             }
           } else {
@@ -533,13 +545,14 @@ export function CycleProvider({
           }
 
           if (slotsResult.status === "fulfilled") {
-            const data = slotsResult.value as { ok?: boolean; slots?: Slot[]; error?: string };
+            const json = slotsResult.value as
+              { success: true; data: { slots: Slot[] } } | { success: false };
 
-            if (data.ok && Array.isArray(data.slots)) {
-              if (data.slots.length > 0 || storedSlots.length === 0) {
-                setSlots(data.slots);
+            if (json.success && Array.isArray(json.data.slots)) {
+              if (json.data.slots.length > 0 || storedSlots.length === 0) {
+                setSlots(json.data.slots);
               }
-            } else if (!("error" in data)) {
+            } else if (!json.success) {
               hasError = true;
             }
           } else {
@@ -590,13 +603,13 @@ export function CycleProvider({
     })
       .then((response) => {
         if (response.status === 401) {
-          return { ok: false, local: true };
+          return { local: true };
         }
 
         return response.json();
       })
-      .then((data: { ok?: boolean; local?: boolean }) => {
-        setSyncStatus(data.local ? "local" : data.ok ? "saved" : "error");
+      .then((json: { success?: boolean; local?: boolean }) => {
+        setSyncStatus(json.local ? "local" : json.success ? "saved" : "error");
       })
       .catch((error) => {
         if ((error as Error).name !== "AbortError") {
@@ -635,13 +648,13 @@ export function CycleProvider({
     })
       .then((response) => {
         if (response.status === 401) {
-          return { ok: false, local: true };
+          return { local: true };
         }
 
         return response.json();
       })
-      .then((data: { ok?: boolean; local?: boolean }) => {
-        setSyncStatus(data.local ? "local" : data.ok ? "saved" : "error");
+      .then((json: { success?: boolean; local?: boolean }) => {
+        setSyncStatus(json.local ? "local" : json.success ? "saved" : "error");
       })
       .catch((error) => {
         if ((error as Error).name !== "AbortError") {
@@ -655,11 +668,21 @@ export function CycleProvider({
     };
   }, [hydrated, isAuthenticated, remoteHydrated, slots]);
 
-  const selectedProgram = getAllPrograms(machines).find((program) => program.id === selectedProgramId);
+  const selectedProgram = getAllPrograms(machines).find(
+    (program) => program.id === selectedProgramId,
+  );
   const selectedDelayStep = selectedProgram?.delayStep || 30;
   const selectedDelayMode = selectedProgram?.delayMode || "depart";
   const suggestions = useMemo(
-    () => getSuggestions(slots, currentTime, duration, calculationMode, selectedDelayStep, selectedDelayMode),
+    () =>
+      getSuggestions(
+        slots,
+        currentTime,
+        duration,
+        calculationMode,
+        selectedDelayStep,
+        selectedDelayMode,
+      ),
     [currentTime, duration, calculationMode, selectedDelayStep, selectedDelayMode, slots],
   );
   const alternativeSuggestion = useMemo(() => {
@@ -684,11 +707,18 @@ export function CycleProvider({
 
     return (
       soonSuggestions.find(
-        (suggestion) =>
-          suggestion.slot.id !== primary.slot.id && suggestion.start < primary.start,
+        (suggestion) => suggestion.slot.id !== primary.slot.id && suggestion.start < primary.start,
       ) ?? null
     );
-  }, [currentTime, duration, selectedDelayStep, calculationMode, selectedDelayMode, slots, suggestions]);
+  }, [
+    currentTime,
+    duration,
+    selectedDelayStep,
+    calculationMode,
+    selectedDelayMode,
+    slots,
+    suggestions,
+  ]);
 
   const updateDuration = useCallback((nextDuration: number) => {
     setDuration(nextDuration);
@@ -698,16 +728,19 @@ export function CycleProvider({
     setCalculationMode(mode);
   }, []);
 
-  const selectProgram = useCallback((programId: string) => {
-    const program = getAllPrograms(machines).find((item) => item.id === programId);
+  const selectProgram = useCallback(
+    (programId: string) => {
+      const program = getAllPrograms(machines).find((item) => item.id === programId);
 
-    if (!program) {
-      return;
-    }
+      if (!program) {
+        return;
+      }
 
-    setSelectedProgramId(program.id);
-    setDuration(program.duration);
-  }, [machines]);
+      setSelectedProgramId(program.id);
+      setDuration(program.duration);
+    },
+    [machines],
+  );
 
   const addMachine = useCallback(() => {
     const name = newMachine.name.trim();
@@ -727,40 +760,46 @@ export function CycleProvider({
     return machine.id;
   }, [newMachine]);
 
-  const addProgram = useCallback((machineId: string) => {
-    const name = newProgram.name.trim();
-    const duration = normalizeDuration(newProgram.duration);
-    const delayStep = normalizeDelayStep(newProgram.delayStep);
-    const delayMode = (newProgram.delayMode === "depart" || newProgram.delayMode === "fin") ? newProgram.delayMode : "depart";
+  const addProgram = useCallback(
+    (machineId: string) => {
+      const name = newProgram.name.trim();
+      const duration = normalizeDuration(newProgram.duration);
+      const delayStep = normalizeDelayStep(newProgram.delayStep);
+      const delayMode =
+        newProgram.delayMode === "depart" || newProgram.delayMode === "fin"
+          ? newProgram.delayMode
+          : "depart";
 
-    if (!name) {
-      return;
-    }
+      if (!name) {
+        return;
+      }
 
-    const program: Program = {
-      id: crypto.randomUUID(),
-      name,
-      description: "Programme personnalise",
-      duration,
-      delayStep,
-      delayMode,
-    };
+      const program: Program = {
+        id: crypto.randomUUID(),
+        name,
+        description: "Programme personnalise",
+        duration,
+        delayStep,
+        delayMode,
+      };
 
-    setMachines((current) =>
-      current.map((machine) => {
-        if (machine.id !== machineId) {
-          return machine;
-        }
-        return {
-          ...machine,
-          programs: [...machine.programs, program],
-        };
-      }),
-    );
-    setSelectedProgramId(program.id);
-    setDuration(program.duration);
-    setNewProgram(defaultNewProgram);
-  }, [newProgram]);
+      setMachines((current) =>
+        current.map((machine) => {
+          if (machine.id !== machineId) {
+            return machine;
+          }
+          return {
+            ...machine,
+            programs: [...machine.programs, program],
+          };
+        }),
+      );
+      setSelectedProgramId(program.id);
+      setDuration(program.duration);
+      setNewProgram(defaultNewProgram);
+    },
+    [newProgram],
+  );
 
   const updateMachine = useCallback((machineId: string, patch: Partial<Pick<Machine, "name">>) => {
     setMachines((current) =>
@@ -782,96 +821,108 @@ export function CycleProvider({
       programId: string,
       patch: Partial<Pick<Program, "name" | "duration" | "delayStep" | "delayMode">>,
     ) => {
-    setMachines((current) =>
-      current.map((machine) => {
-        const updatedPrograms = machine.programs.map((program) => {
-          if (program.id !== programId) {
-            return program;
-          }
+      setMachines((current) =>
+        current.map((machine) => {
+          const updatedPrograms = machine.programs.map((program) => {
+            if (program.id !== programId) {
+              return program;
+            }
 
-          const nextDuration =
-            patch.duration === undefined
-              ? program.duration
-              : normalizeDuration(patch.duration);
-          const nextDelayStep =
-            patch.delayStep === undefined ? program.delayStep : normalizeDelayStep(patch.delayStep);
-          const nextDelayMode =
-            patch.delayMode === undefined ? program.delayMode : (patch.delayMode === "depart" || patch.delayMode === "fin" ? patch.delayMode : program.delayMode);
+            const nextDuration =
+              patch.duration === undefined ? program.duration : normalizeDuration(patch.duration);
+            const nextDelayStep =
+              patch.delayStep === undefined
+                ? program.delayStep
+                : normalizeDelayStep(patch.delayStep);
+            const nextDelayMode =
+              patch.delayMode === undefined
+                ? program.delayMode
+                : patch.delayMode === "depart" || patch.delayMode === "fin"
+                  ? patch.delayMode
+                  : program.delayMode;
 
-          if (selectedProgramId === programId && patch.duration !== undefined) {
-            setDuration(nextDuration);
-          }
+            if (selectedProgramId === programId && patch.duration !== undefined) {
+              setDuration(nextDuration);
+            }
 
-          return {
-            ...program,
-            name: patch.name === undefined ? program.name : patch.name,
-            duration: nextDuration,
-            delayStep: nextDelayStep,
-            delayMode: nextDelayMode,
-          };
-        });
+            return {
+              ...program,
+              name: patch.name === undefined ? program.name : patch.name,
+              duration: nextDuration,
+              delayStep: nextDelayStep,
+              delayMode: nextDelayMode,
+            };
+          });
 
-        return {
-          ...machine,
-          programs: updatedPrograms,
-        };
-      }),
-    );
-  }, [selectedProgramId]);
-
-  const removeMachine = useCallback((machineId: string) => {
-    setMachines((current) => {
-      const machine = current.find((item) => item.id === machineId);
-
-      if (!machine || current.length <= 1) {
-        return current;
-      }
-
-      const nextMachines = current.filter((item) => item.id !== machineId);
-      const allPrograms = getAllPrograms(nextMachines);
-
-      if (selectedProgramId && !allPrograms.find((p) => p.id === selectedProgramId)) {
-        const nextProgram = allPrograms[0];
-        if (nextProgram) {
-          setSelectedProgramId(nextProgram.id);
-          setDuration(nextProgram.duration);
-        }
-      }
-
-      return nextMachines;
-    });
-  }, [selectedProgramId]);
-
-  const removeProgram = useCallback((programId: string) => {
-    setMachines((current) => {
-      let found = false;
-      const nextMachines = current.map((machine) => {
-        const hasProgram = machine.programs.some((p) => p.id === programId);
-        if (hasProgram) {
-          found = true;
-          if (machine.programs.length <= 1) {
-            return machine;
-          }
           return {
             ...machine,
-            programs: machine.programs.filter((p) => p.id !== programId),
+            programs: updatedPrograms,
           };
-        }
-        return machine;
-      });
+        }),
+      );
+    },
+    [selectedProgramId],
+  );
 
-      if (selectedProgramId === programId && found) {
+  const removeMachine = useCallback(
+    (machineId: string) => {
+      setMachines((current) => {
+        const machine = current.find((item) => item.id === machineId);
+
+        if (!machine || current.length <= 1) {
+          return current;
+        }
+
+        const nextMachines = current.filter((item) => item.id !== machineId);
         const allPrograms = getAllPrograms(nextMachines);
-        const nextProgram = allPrograms[0];
-        if (nextProgram) {
-          setSelectedProgramId(nextProgram.id);
-          setDuration(nextProgram.duration);
-        }
-      }
 
-      return nextMachines;
-    });
-  }, [selectedProgramId]);
+        if (selectedProgramId && !allPrograms.find((p) => p.id === selectedProgramId)) {
+          const nextProgram = allPrograms[0];
+          if (nextProgram) {
+            setSelectedProgramId(nextProgram.id);
+            setDuration(nextProgram.duration);
+          }
+        }
+
+        return nextMachines;
+      });
+    },
+    [selectedProgramId],
+  );
+
+  const removeProgram = useCallback(
+    (programId: string) => {
+      setMachines((current) => {
+        let found = false;
+        const nextMachines = current.map((machine) => {
+          const hasProgram = machine.programs.some((p) => p.id === programId);
+          if (hasProgram) {
+            found = true;
+            if (machine.programs.length <= 1) {
+              return machine;
+            }
+            return {
+              ...machine,
+              programs: machine.programs.filter((p) => p.id !== programId),
+            };
+          }
+          return machine;
+        });
+
+        if (selectedProgramId === programId && found) {
+          const allPrograms = getAllPrograms(nextMachines);
+          const nextProgram = allPrograms[0];
+          if (nextProgram) {
+            setSelectedProgramId(nextProgram.id);
+            setDuration(nextProgram.duration);
+          }
+        }
+
+        return nextMachines;
+      });
+    },
+    [selectedProgramId],
+  );
 
   const addSlot = useCallback(() => {
     setSlots((current) => [
@@ -898,7 +949,7 @@ export function CycleProvider({
           const nextName =
             patch.name !== undefined && patch.name.trim() === ""
               ? getDefaultSlotName(nextStart)
-              : patch.name ?? slot.name;
+              : (patch.name ?? slot.name);
 
           return {
             ...slot,

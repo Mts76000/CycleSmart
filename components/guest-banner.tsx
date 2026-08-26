@@ -9,9 +9,8 @@ export function GuestBanner() {
           <InfoIcon className="size-4" />
         </span>
         <p className="text-sm leading-6 text-stone-600">
-          <span className="font-bold text-stone-950">Mode invité.</span>{" "}
-          Les créneaux et réglages restent uniquement sur cet appareil.
-          Connecte-toi pour les synchroniser partout.
+          <span className="font-bold text-stone-950">Mode invité.</span> Les créneaux et réglages
+          restent uniquement sur cet appareil. Connecte-toi pour les synchroniser partout.
         </p>
       </div>
       <div className="flex shrink-0 gap-2 sm:pl-4">

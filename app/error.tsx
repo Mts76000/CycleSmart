@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
-export default function ErrorPage({
+// Client error boundary for this route segment. Server errors already never leak stack
+// traces (lib/api-response.ts); this only ever shows a generic message to the user.
+export default function Error({
   error,
   reset,
 }: {
@@ -11,33 +13,25 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Swap this for an external monitoring provider (e.g. Sentry) without touching
+    // anything else in the error-handling path — this is the single integration point.
     console.error(error);
   }, [error]);
 
   return (
-    <main className="grid min-h-screen place-items-center p-4">
-      <div className="max-w-md text-center">
-        <p className="text-6xl font-black text-emerald-500">Oups</p>
-        <h1 className="mt-4 text-2xl font-bold text-stone-900">Un problème est survenu</h1>
-        <p className="mt-2 text-stone-600">
-          Quelque chose s&apos;est mal passé. Réessaie ou recharge la page.
-        </p>
-        <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <button
-            className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-6 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
-            onClick={() => reset()}
-            type="button"
-          >
-            Réessayer
-          </button>
-          <Link
-            className="inline-flex h-10 items-center justify-center rounded-full border border-emerald-200 bg-white px-6 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
-            href="/"
-          >
-            Accueil
-          </Link>
-        </div>
-      </div>
+    <main
+      id="main-content"
+      className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4 text-center"
+    >
+      <h1 className="text-foreground text-2xl font-semibold tracking-tight">
+        Une erreur est survenue
+      </h1>
+      <p className="text-muted-foreground max-w-sm text-sm">
+        Désolé, quelque chose s&apos;est mal passé. Réessayez ou revenez à l&apos;accueil.
+      </p>
+      <Button type="button" onClick={reset}>
+        Réessayer
+      </Button>
     </main>
   );
 }

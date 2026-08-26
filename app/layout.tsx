@@ -1,87 +1,92 @@
-import type { Metadata } from "next";
-import Script from "next/script";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
-import { CookieBanner } from "@/components/cookie-banner";
+import { ToastProvider } from "@/components/ui/toast";
+import { UmamiScript } from "@/components/umami-script";
+import { canonicalUrl, organizationJsonLd } from "@/lib/seo";
+import { env } from "@/lib/env";
 import ServiceWorkerRegister from "@/components/service-worker-register";
 import "./globals.css";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000";
-
-const bodyFont = Plus_Jakarta_Sans({
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-body",
   display: "swap",
 });
 
-const headingFont = Outfit({
+// CycleSmart's original display font for headings/big numbers (TimeDial, stats,
+// page titles) — see .font-display in globals.css. Lighter letterforms than
+// Plus Jakarta Sans, which is what made those elements read as "blacker"/denser
+// when this was missing during the migration.
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-heading",
   display: "swap",
 });
+
+const appName = env.NEXT_PUBLIC_APP_NAME;
+const description =
+  "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(appUrl),
-  title: "CycleSmart - Heures creuses",
-  description:
-    "Calcule le meilleur moment pour lancer ton lave-linge, lave-vaisselle ou autre appareil pendant les heures creuses. Gratuit, sans pub.",
-  keywords: [
-    "heures creuses",
-    "lave-linge",
-    "lave-vaisselle",
-    "économie d'énergie",
-    "calculateur",
-    "EDF",
-    "Linky",
-    "consommation électrique",
-  ],
-  authors: [{ name: "CycleSmart" }],
-  creator: "CycleSmart",
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+  title: {
+    default: appName,
+    template: `%s | ${appName}`,
+  },
+  description,
+  alternates: { canonical: canonicalUrl("/") },
   openGraph: {
-    title: "CycleSmart - Heures creuses",
-    description:
-      "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
-    url: "/",
-    siteName: "CycleSmart",
+    title: appName,
+    description,
+    url: canonicalUrl("/"),
+    siteName: appName,
     locale: "fr_FR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CycleSmart - Heures creuses",
-    description:
-      "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
+    title: appName,
+    description,
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
+  appleWebApp: {
+    title: appName,
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#f5f7f7",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`h-full antialiased ${bodyFont.variable} ${headingFont.variable}`}>
-      <body className="min-h-full flex flex-col">
-        {children}
-        <CookieBanner />
+    <html lang="fr" className={`${plusJakarta.variable} ${outfit.variable} h-full antialiased`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+        />
+      </head>
+      {/* suppressHydrationWarning: browser extensions (ColorZilla, Grammarly, etc.) inject
+          attributes like cz-shortcut-listen into <body> before React hydrates. Harmless. */}
+      <body
+        className="bg-background text-foreground flex min-h-full flex-col"
+        suppressHydrationWarning
+      >
+        <a
+          href="#main-content"
+          className="focus:bg-primary focus:text-on-primary sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:px-4 focus:py-2"
+        >
+          Aller au contenu principal
+        </a>
+        <ToastProvider>{children}</ToastProvider>
+        <UmamiScript />
         <ServiceWorkerRegister />
-        {process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
-          <Script
-            strategy="beforeInteractive"
-            defer
-            src="https://stats.mathis-lamotte.fr/script.js"
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-          />
-        )}
       </body>
     </html>
   );

@@ -2,19 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  DeviceIcon,
-  TrashIcon,
-  PlusIcon,
-} from "@/components/icons";
-import {
-  delayStepOptions,
-  formatDuration,
-  useCycle,
-} from "@/lib/cycle-store";
+import { DeviceIcon, TrashIcon, PlusIcon } from "@/components/icons";
+import { delayStepOptions, formatDuration, useCycle } from "@/lib/cycle-store";
 
 function durationToTime(minutes: number) {
-  const hours = Math.floor(minutes / 60).toString().padStart(2, "0");
+  const hours = Math.floor(minutes / 60)
+    .toString()
+    .padStart(2, "0");
   const rest = (minutes % 60).toString().padStart(2, "0");
   return `${hours}:${rest}`;
 }
@@ -35,7 +29,7 @@ function StepSelect({
 }) {
   return (
     <select
-      className={`field-select h-12 min-w-0 rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 ${className}`}
+      className={`field-select h-12 min-w-0 rounded-[var(--cycle-radius-sm)] bg-[var(--cycle-surface-1)] px-3 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4 ${className}`}
       value={value}
       onChange={(event) => onChange(Number(event.target.value))}
     >
@@ -59,7 +53,7 @@ function DelayModeSelect({
 }) {
   return (
     <select
-      className={`field-select h-12 min-w-0 rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4 ${className}`}
+      className={`field-select h-12 min-w-0 rounded-[var(--cycle-radius-sm)] bg-[var(--cycle-surface-1)] px-3 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4 ${className}`}
       value={value}
       onChange={(event) => onChange(event.target.value as "depart" | "fin")}
     >
@@ -69,16 +63,10 @@ function DelayModeSelect({
   );
 }
 
-function DurationFields({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-}) {
+function DurationFields({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   return (
     <input
-      className="mt-1 h-12 w-full rounded-[var(--radius-sm)] bg-[var(--surface-1)] px-3 font-bold text-emerald-700 outline-none ring-emerald-300 focus:ring-4"
+      className="mt-1 h-12 w-full rounded-[var(--cycle-radius-sm)] bg-[var(--cycle-surface-1)] px-3 font-bold text-emerald-700 ring-emerald-300 outline-none focus:ring-4"
       type="time"
       min="00:30"
       max="08:00"
@@ -116,13 +104,13 @@ export default function MachinesPage() {
     return (
       <div className="mx-auto max-w-2xl space-y-5">
         <section className="surface-hero p-6 text-center text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white">Configuration</p>
-          <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:text-3xl">
+          <p className="text-xs font-bold tracking-[0.14em] text-white uppercase">Configuration</p>
+          <h2 className="font-display mt-2 text-2xl font-black tracking-tight sm:text-3xl">
             Tes machines et programmes
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-emerald-50">
-            La gestion des appareils et programmes est réservée aux comptes connectés.
-            En mode invité, utilise les appareils par défaut sur la page Calculer.
+            La gestion des appareils et programmes est réservée aux comptes connectés. En mode
+            invité, utilise les appareils par défaut sur la page Calculer.
           </p>
         </section>
 
@@ -154,14 +142,14 @@ export default function MachinesPage() {
       <section className="surface-hero p-4 text-white sm:p-5 md:p-6 lg:p-8">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-white sm:text-sm">
+            <p className="text-xs font-bold tracking-[0.14em] text-white uppercase sm:text-sm">
               Configuration
             </p>
-            <h2 className="mt-2 text-2xl font-display font-black tracking-tight sm:mt-3 sm:text-3xl md:text-4xl">
+            <h2 className="font-display mt-2 text-2xl font-black tracking-tight sm:mt-3 sm:text-3xl md:text-4xl">
               Tes machines et programmes
             </h2>
           </div>
-          <p className="hidden shrink-0 text-right text-sm font-bold text-emerald-50 sm:block font-numeric">
+          <p className="font-numeric hidden shrink-0 text-right text-sm font-bold text-emerald-50 sm:block">
             {machines.length} machine{machines.length > 1 ? "s" : ""} · {allProgramsCount} prog.
           </p>
         </div>
@@ -169,16 +157,18 @@ export default function MachinesPage() {
 
       <section className="surface-card overflow-hidden md:grid md:grid-cols-[300px_minmax(0,1fr)]">
         {/* Master list */}
-        <div className="border-b border-stone-100 p-4 sm:p-5 md:border-b-0 md:border-r md:p-5">
+        <div className="border-b border-stone-100 p-4 sm:p-5 md:border-r md:border-b-0 md:p-5">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-bold uppercase tracking-[0.1em] text-stone-600">Machines</p>
+            <p className="text-sm font-bold tracking-[0.1em] text-stone-600 uppercase">Machines</p>
             <button
               className="grid size-8 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100 active:scale-[0.95]"
               type="button"
               onClick={() => setShowMachineForm((visible) => !visible)}
               aria-label={showMachineForm ? "Fermer le formulaire" : "Ajouter une machine"}
             >
-              <PlusIcon className={`size-4 transition-transform ${showMachineForm ? "rotate-45" : ""}`} />
+              <PlusIcon
+                className={`size-4 transition-transform ${showMachineForm ? "rotate-45" : ""}`}
+              />
             </button>
           </div>
 
@@ -186,7 +176,7 @@ export default function MachinesPage() {
             <div className="mt-3 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/50 p-3">
               <div className="grid gap-2">
                 <input
-                  className="h-11 min-w-0 rounded-xl border border-stone-200 bg-white px-3 text-sm outline-none ring-emerald-300 focus:ring-4"
+                  className="h-11 min-w-0 rounded-xl border border-stone-200 bg-white px-3 text-sm ring-emerald-300 outline-none focus:ring-4"
                   placeholder="Ex: Seche-linge"
                   value={newMachine.name}
                   onChange={(event) =>
@@ -222,7 +212,9 @@ export default function MachinesPage() {
                 <button
                   key={machine.id}
                   className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition ${
-                    isSelected ? "bg-emerald-50 text-emerald-900" : "text-stone-600 hover:bg-stone-50"
+                    isSelected
+                      ? "bg-emerald-50 text-emerald-900"
+                      : "text-stone-600 hover:bg-stone-50"
                   }`}
                   type="button"
                   onClick={() =>
@@ -251,7 +243,7 @@ export default function MachinesPage() {
         {/* Detail pane */}
         <div className="p-4 sm:p-5 md:p-6">
           {!selectedMachine ? (
-            <div className="grid h-full min-h-[220px] place-items-center rounded-[var(--radius-md)] border border-dashed border-stone-200 p-6 text-center">
+            <div className="grid h-full min-h-[220px] place-items-center rounded-[var(--cycle-radius-md)] border border-dashed border-stone-200 p-6 text-center">
               <div>
                 <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-stone-50 text-stone-600">
                   <DeviceIcon className="size-5" />
@@ -269,7 +261,9 @@ export default function MachinesPage() {
                   className="min-w-0 flex-1 bg-transparent text-xl font-bold text-stone-950 outline-none sm:text-2xl"
                   aria-label={`Nom de ${selectedMachine.name}`}
                   value={selectedMachine.name}
-                  onChange={(event) => updateMachine(selectedMachine.id, { name: event.target.value })}
+                  onChange={(event) =>
+                    updateMachine(selectedMachine.id, { name: event.target.value })
+                  }
                 />
                 <button
                   className="grid size-9 shrink-0 place-items-center rounded-xl bg-stone-50 text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30"
@@ -289,16 +283,18 @@ export default function MachinesPage() {
                 {selectedMachine.programs.map((program) => (
                   <div
                     key={program.id}
-                    className="space-y-3 rounded-[var(--radius-md)] border border-stone-100 bg-white p-3 sm:p-4"
+                    className="space-y-3 rounded-[var(--cycle-radius-md)] border border-stone-100 bg-white p-3 sm:p-4"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <input
                         className="min-w-0 flex-1 bg-transparent text-lg font-bold text-stone-950 outline-none"
                         value={program.name}
-                        onChange={(event) => updateProgram(program.id, { name: event.target.value })}
+                        onChange={(event) =>
+                          updateProgram(program.id, { name: event.target.value })
+                        }
                       />
                       <button
-                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--surface-1)] text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
+                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--cycle-surface-1)] text-stone-600 transition hover:bg-red-50 hover:text-red-600 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
                         type="button"
                         disabled={selectedMachine.programs.length <= 1}
                         onClick={() => removeProgram(program.id)}
@@ -310,7 +306,7 @@ export default function MachinesPage() {
 
                     <div className="mt-3 space-y-2.5">
                       <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
+                        <label className="block text-[11px] font-bold tracking-[0.12em] text-stone-600 uppercase">
                           Durée
                         </label>
                         <DurationFields
@@ -325,7 +321,7 @@ export default function MachinesPage() {
 
                       <div className="grid grid-cols-2 gap-2.5">
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
+                          <label className="block text-[11px] font-bold tracking-[0.12em] text-stone-600 uppercase">
                             Pas
                           </label>
                           <StepSelect
@@ -336,7 +332,7 @@ export default function MachinesPage() {
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-600">
+                          <label className="block text-[11px] font-bold tracking-[0.12em] text-stone-600 uppercase">
                             Mode
                           </label>
                           <DelayModeSelect
@@ -362,7 +358,7 @@ export default function MachinesPage() {
                 )}
 
                 {isAddingProgram && (
-                  <div className="rounded-[var(--radius-md)] border border-dashed border-emerald-200 bg-emerald-50/40 p-3 sm:p-4 lg:col-span-2">
+                  <div className="rounded-[var(--cycle-radius-md)] border border-dashed border-emerald-200 bg-emerald-50/40 p-3 sm:p-4 lg:col-span-2">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-bold text-emerald-800">Nouveau programme</p>
                       <button
@@ -375,11 +371,11 @@ export default function MachinesPage() {
                     </div>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
+                        <label className="block text-xs font-bold tracking-[0.12em] text-stone-600 uppercase">
                           Nom
                         </label>
                         <input
-                          className="mt-1 h-11 w-full min-w-0 rounded-[var(--radius-sm)] bg-white px-3 text-sm outline-none ring-emerald-300 focus:ring-4 sm:h-12 sm:px-4 sm:text-base"
+                          className="mt-1 h-11 w-full min-w-0 rounded-[var(--cycle-radius-sm)] bg-white px-3 text-sm ring-emerald-300 outline-none focus:ring-4 sm:h-12 sm:px-4 sm:text-base"
                           placeholder="Ex: Coton"
                           value={newProgram.name}
                           onChange={(event) =>
@@ -388,7 +384,7 @@ export default function MachinesPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
+                        <label className="block text-xs font-bold tracking-[0.12em] text-stone-600 uppercase">
                           Durée
                         </label>
                         <DurationFields
@@ -402,23 +398,27 @@ export default function MachinesPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
+                        <label className="block text-xs font-bold tracking-[0.12em] text-stone-600 uppercase">
                           Pas
                         </label>
                         <StepSelect
                           className="mt-1 w-full"
                           value={newProgram.delayStep}
-                          onChange={(delayStep) => setNewProgram((program) => ({ ...program, delayStep }))}
+                          onChange={(delayStep) =>
+                            setNewProgram((program) => ({ ...program, delayStep }))
+                          }
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-[0.12em] text-stone-600">
+                        <label className="block text-xs font-bold tracking-[0.12em] text-stone-600 uppercase">
                           Mode départ
                         </label>
                         <DelayModeSelect
                           className="mt-1 w-full"
                           value={newProgram.delayMode}
-                          onChange={(delayMode) => setNewProgram((program) => ({ ...program, delayMode }))}
+                          onChange={(delayMode) =>
+                            setNewProgram((program) => ({ ...program, delayMode }))
+                          }
                         />
                       </div>
                     </div>

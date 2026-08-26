@@ -33,11 +33,19 @@ export function SlotsTimeline({
     const rawEnd = timeToMinutes(slot.end);
 
     if (rawEnd > start) {
-      return [{ id: slot.id, slotId: slot.id, left: start, width: rawEnd - start, name: slot.name }];
+      return [
+        { id: slot.id, slotId: slot.id, left: start, width: rawEnd - start, name: slot.name },
+      ];
     }
 
     return [
-      { id: `${slot.id}-a`, slotId: slot.id, left: start, width: dayMinutes - start, name: slot.name },
+      {
+        id: `${slot.id}-a`,
+        slotId: slot.id,
+        left: start,
+        width: dayMinutes - start,
+        name: slot.name,
+      },
       { id: `${slot.id}-b`, slotId: slot.id, left: 0, width: rawEnd, name: slot.name },
     ];
   });
@@ -49,7 +57,9 @@ export function SlotsTimeline({
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-50">Journée (24h)</p>
+        <p className="text-xs font-bold tracking-[0.12em] text-emerald-50 uppercase">
+          Journée (24h)
+        </p>
         <p
           className={`rounded-full px-2.5 py-1 text-xs font-bold ${
             isInSlot ? "bg-white text-emerald-800" : "bg-emerald-800 text-emerald-50"
@@ -69,7 +79,9 @@ export function SlotsTimeline({
           />
         ))}
 
-        <div className={`absolute top-0 w-full overflow-hidden rounded-full bg-emerald-800 ${compact ? "h-2.5" : "h-3"}`}>
+        <div
+          className={`absolute top-0 w-full overflow-hidden rounded-full bg-emerald-800 ${compact ? "h-2.5" : "h-3"}`}
+        >
           {segments.map((segment) => {
             const isHighlighted = highlightId !== null && highlightId === segment.slotId;
 
@@ -95,8 +107,11 @@ export function SlotsTimeline({
           className="absolute top-0 flex -translate-x-1/2 flex-col items-center"
           style={{ left: `${nowPct}%` }}
         >
-          <span className="size-3 rounded-full bg-emerald-300 ring-4 ring-emerald-300/30" aria-hidden="true" />
-          <span className="mt-1 whitespace-nowrap rounded-full bg-emerald-900 px-1.5 py-0.5 text-[9px] font-bold text-white font-numeric">
+          <span
+            className="size-3 rounded-full bg-emerald-300 ring-4 ring-emerald-300/30"
+            aria-hidden="true"
+          />
+          <span className="font-numeric mt-1 rounded-full bg-emerald-900 px-1.5 py-0.5 text-[9px] font-bold whitespace-nowrap text-white">
             {currentTime}
           </span>
         </div>
@@ -111,7 +126,7 @@ export function SlotsTimeline({
             return (
               <span
                 key={hour}
-                className={`absolute top-0 font-numeric ${
+                className={`font-numeric absolute top-0 ${
                   isFirst ? "" : isLast ? "-translate-x-full" : "-translate-x-1/2"
                 }`}
                 style={{ left: `${pct(hour * 60)}%` }}

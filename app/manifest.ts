@@ -1,16 +1,20 @@
 import type { MetadataRoute } from "next";
+import { env } from "@/lib/env";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CycleSmart",
-    short_name: "CycleSmart",
-    description: "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
     id: "/",
+    name: env.NEXT_PUBLIC_APP_NAME,
+    short_name: env.NEXT_PUBLIC_APP_NAME,
+    description: "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
     start_url: "/calculer",
     scope: "/",
     display: "standalone",
+    orientation: "portrait-primary",
     background_color: "#f5f7f7",
     theme_color: "#047857",
+    lang: "fr",
+    categories: ["productivity", "utilities"],
     icons: [
       { src: "/icon-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },

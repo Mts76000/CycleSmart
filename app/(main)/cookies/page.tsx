@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
+import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Politique cookies - CycleSmart",
   description: "Information sur les cookies et le stockage local utilisés par CycleSmart.",
 };
-
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@mathis-lamotte.fr";
 
 export default function CookiesPage() {
   return (
@@ -24,20 +23,20 @@ export default function CookiesPage() {
           <h2 className="text-lg font-bold text-stone-950">1. Cookie de session</h2>
           <p>
             Un cookie technique contenant un identifiant de session est déposé lorsque tu te
-            connectes. Il est strictement nécessaire à l&apos;authentification et expire à la fermeture
-            de la session.
+            connectes. Il est strictement nécessaire à l&apos;authentification et expire à la
+            fermeture de la session.
           </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">2. Stockage local</h2>
           <p>
-            En mode invité, CycleSmart utilise le stockage local de ton navigateur pour conserver tes
-            créneaux et réglages sans compte. Ces données restent sur ton appareil.
+            En mode invité, CycleSmart utilise le stockage local de ton navigateur pour conserver
+            tes créneaux et réglages sans compte. Ces données restent sur ton appareil.
           </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">3. Aucun traceur tiers</h2>
           <p>
-            CycleSmart n&apos;utilise pas de cookies publicitaires, de réseaux sociaux ou de statistiques
-            tiers.
+            CycleSmart n&apos;utilise pas de cookies publicitaires, de réseaux sociaux ou de
+            statistiques tiers.
           </p>
 
           <h2 className="mt-5 text-lg font-bold text-stone-950">4. Gestion des préférences</h2>
@@ -49,8 +48,8 @@ export default function CookiesPage() {
           <h2 className="mt-5 text-lg font-bold text-stone-950">5. Contact</h2>
           <p>
             Pour toute question, écris-nous à{" "}
-            <a className="font-bold text-emerald-700" href={`mailto:${contactEmail}`}>
-              {contactEmail}
+            <a className="font-bold text-emerald-700" href={`mailto:${env.CONTACT_EMAIL}`}>
+              {env.CONTACT_EMAIL}
             </a>
             .
           </p>

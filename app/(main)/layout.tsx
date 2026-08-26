@@ -1,8 +1,8 @@
 import { MainShell } from "@/components/main-shell";
-import { getCurrentUser } from "@/lib/current-user";
+import { getOptionalSession } from "@/lib/permissions";
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
+  const session = await getOptionalSession();
 
-  return <MainShell isAuthenticated={Boolean(user)}>{children}</MainShell>;
+  return <MainShell isAuthenticated={Boolean(session)}>{children}</MainShell>;
 }

@@ -39,9 +39,9 @@ function getDbConfig(): PoolConfig {
     process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
 
   const base = {
-    // Fail fast if Postgres is unreachable so the UI can fall back to guest mode.
-    connectionTimeoutMillis: 3000,
-    query_timeout: 5000,
+    // Give Postgres more time in production while still failing fast enough to fall back to guest mode.
+    connectionTimeoutMillis: 10000,
+    query_timeout: 10000,
     idleTimeoutMillis: 30000,
     max: 10,
   };
@@ -106,15 +106,52 @@ export async function ensureDatabaseSchema() {
 
   await query(`
     create table if not exists off_peak_slots (
-      id text primary key,
+      id text not null,
       user_id text not null references users(id) on delete cascade,
       name text not null,
       start_time text not null,
       end_time text not null,
       created_at timestamptz not null default now(),
-      updated_at timestamptz not null default now()
+      updated_at timestamptz not null default now(),
+      primary key (user_id, id)
     )
   `);
+
+  // Migrate old off_peak_slots tables that had a global id primary key.
+  // This preserves data and makes slot ids unique per user instead of globally.
+  await query(`
+    do $$
+    begin
+      if exists (
+        select 1
+        from pg_constraint c
+        join pg_class t on t.oid = c.conrelid
+        where t.relname = 'off_peak_slots'
+          and c.contype = 'p'
+          and c.conkey::int2[] = array[1]::int2[]
+      ) then
+        alter table off_peak_slots rename to off_peak_slots_old;
+
+        create table off_peak_slots (
+          id text not null,
+          user_id text not null references users(id) on delete cascade,
+          name text not null,
+          start_time text not null,
+          end_time text not null,
+          created_at timestamptz not null default now(),
+          updated_at timestamptz not null default now(),
+          primary key (user_id, id)
+        );
+
+        insert into off_peak_slots (id, user_id, name, start_time, end_time, created_at, updated_at)
+        select id, user_id, name, start_time, end_time, created_at, updated_at
+        from off_peak_slots_old
+        on conflict (user_id, id) do nothing;
+
+        drop table off_peak_slots_old;
+      end if;
+    end $$
+  `).catch(() => undefined);
 
   await query(`alter table off_peak_slots add column if not exists user_id text`);
   await query(`

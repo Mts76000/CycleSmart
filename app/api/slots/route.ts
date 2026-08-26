@@ -97,7 +97,18 @@ export async function PUT(request: Request) {
 
   try {
     const body = (await request.json()) as { slots?: unknown[] };
-    const slots = Array.isArray(body.slots) ? body.slots.filter(isSlot) : [];
+    const allSlots = Array.isArray(body.slots) ? body.slots.filter(isSlot) : [];
+
+    // Defensive: a slot id should be unique within the same user. Drop duplicates and warn.
+    const seen = new Set<string>();
+    const slots = allSlots.filter((slot) => {
+      if (seen.has(slot.id)) {
+        console.warn("Duplicate slot id in PUT /api/slots:", slot.id);
+        return false;
+      }
+      seen.add(slot.id);
+      return true;
+    });
 
     await ensureDatabaseSchema();
     client = await getPool().connect();

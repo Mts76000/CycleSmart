@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { UmamiScript } from "@/components/umami-script";
 import { canonicalUrl, organizationJsonLd } from "@/lib/seo";
 import { env } from "@/lib/env";
+import ServiceWorkerRegister from "@/components/service-worker-register";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <ToastProvider>{children}</ToastProvider>
         <UmamiScript />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

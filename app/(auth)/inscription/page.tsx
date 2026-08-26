@@ -112,7 +112,10 @@ export default function RegisterPage() {
             />
             <span>
               J&apos;accepte les{" "}
-              <Link href="/legal/terms" className="text-primary font-medium hover:underline">
+              <Link
+                href="/conditions-generales"
+                className="text-primary font-medium hover:underline"
+              >
                 CGU
               </Link>
             </span>

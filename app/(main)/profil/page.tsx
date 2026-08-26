@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { requireAuth, UnauthorizedError } from "@/lib/permissions";
-import { ProfileView } from "@/app/profil/profile-view";
+import { ProfileView } from "./profile-view";
 
 // Server Component: the authoritative auth check for this page (proxy.ts only does a cheap
 // cookie-presence check — this is the real one, per the requireAuth()/requireRole() rule).

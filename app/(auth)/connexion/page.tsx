@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { GoogleButton } from "@/components/ui/google-button";
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { authClient } from "@/lib/auth-client";
 import { useToast } from "@/components/ui/toast";
 
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -25,7 +27,7 @@ export default function LoginPage() {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, rememberMe }),
+        body: JSON.stringify({ email, password, rememberMe, turnstileToken }),
       });
       const json = await res.json();
 
@@ -97,6 +99,13 @@ export default function LoginPage() {
             Mot de passe oublié ?
           </Link>
         </div>
+
+        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+          <TurnstileWidget
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+            onVerify={setTurnstileToken}
+          />
+        ) : null}
 
         <Button type="submit" isLoading={isLoading} className="w-full">
           Se connecter

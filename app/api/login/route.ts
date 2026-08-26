@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { apiSuccess, apiError, withApiErrorHandling } from "@/lib/api-response";
 import { validateBody } from "@/lib/validation";
 import { loginSchema } from "@/lib/validation-schemas";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { requestMetadata } from "@/lib/audit-log";
 
@@ -17,7 +18,12 @@ export const POST = withApiErrorHandling(async (request: Request) => {
 
   const validation = await validateBody(loginSchema, request);
   if (!validation.success) return validation.response;
-  const { email, password, rememberMe } = validation.data;
+  const { email, password, rememberMe, turnstileToken } = validation.data;
+
+  const turnstileValid = await verifyTurnstileToken(turnstileToken, ip);
+  if (!turnstileValid) {
+    return apiError("VALIDATION_ERROR", "Vérification anti-bot échouée.");
+  }
 
   try {
     const result = await auth.api.signInEmail({

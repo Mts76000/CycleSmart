@@ -8,6 +8,8 @@ const optional = <T extends z.ZodType>(schema: T) =>
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   NEXT_PUBLIC_APP_URL: z.url(),
+  // Used in page titles, OG tags, and the admin signup notification email.
+  NEXT_PUBLIC_APP_NAME: z.string().min(1).default("CycleSmart"),
   // Set to "true" on the Coolify preview/staging environment (see README) to force
   // noindex regardless of NODE_ENV, which is "production" there too.
   NEXT_PUBLIC_IS_PREVIEW: optional(z.enum(["true", "false"])),
@@ -30,6 +32,10 @@ const envSchema = z.object({
 
   UPSTASH_REDIS_REST_URL: optional(z.url()),
   UPSTASH_REDIS_REST_TOKEN: optional(z.string().min(1)),
+
+  // Optional: shows a "Buy me a coffee" button when set. Your page slug at
+  // buymeacoffee.com/<slug>.
+  NEXT_PUBLIC_BUYMEACOFFEE_SLUG: optional(z.string().min(1)),
 });
 
 export type Env = z.infer<typeof envSchema>;

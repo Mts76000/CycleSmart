@@ -5,6 +5,7 @@ import { logger } from "@/lib/logger";
 import NotificationEmail from "@/emails/notification-email";
 
 const resend = new Resend(env.RESEND_API_KEY);
+const appName = env.NEXT_PUBLIC_APP_NAME;
 
 interface SendArgs {
   to: string;
@@ -32,7 +33,7 @@ async function sendTransactionalEmail({ to, subject, heading, body, ctaLabel, ct
     await resend.emails.send({
       from: env.CONTACT_EMAIL,
       to,
-      subject,
+      subject: `[${appName}] ${subject}`,
       html,
     });
   } catch (err) {
@@ -76,8 +77,8 @@ export async function sendChangeEmailVerification(oldEmail: string, newEmail: st
 export async function sendSignupAdminNotification(userEmail: string, userName: string) {
   await sendTransactionalEmail({
     to: env.CONTACT_EMAIL,
-    subject: "Nouvelle inscription",
-    heading: "Nouvelle inscription",
-    body: `${userName} vient de s'inscrire avec l'adresse ${userEmail}.`,
+    subject: `Nouvelle inscription sur ${appName}`,
+    heading: `Nouvelle inscription sur ${appName}`,
+    body: `${userName} vient de s'inscrire sur ${appName} avec l'adresse ${userEmail}.`,
   });
 }

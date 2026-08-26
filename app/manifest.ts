@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { env } from "@/lib/env";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "CycleSmart",
-    short_name: "CycleSmart",
+    name: env.NEXT_PUBLIC_APP_NAME,
+    short_name: env.NEXT_PUBLIC_APP_NAME,
     description: "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.",
     start_url: "/calculer",
     scope: "/",

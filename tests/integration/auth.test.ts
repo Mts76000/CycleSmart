@@ -99,6 +99,7 @@ describe("POST /api/login", () => {
       jsonRequest("http://localhost:3000/api/login", {
         email: credentials.email,
         password: credentials.password,
+        turnstileToken: "test-token",
       }),
     );
     expect(res.status).toBe(401);
@@ -114,6 +115,7 @@ describe("POST /api/login", () => {
       jsonRequest("http://localhost:3000/api/login", {
         email: credentials.email,
         password: credentials.password,
+        turnstileToken: "test-token",
       }),
     );
     expect(res.status).toBe(200);
@@ -130,6 +132,7 @@ describe("POST /api/login", () => {
       jsonRequest("http://localhost:3000/api/login", {
         email: credentials.email,
         password: "wrong-password",
+        turnstileToken: "test-token",
       }),
     );
     expect(res.status).toBe(401);
@@ -139,7 +142,10 @@ describe("POST /api/login", () => {
 describe("POST /api/forgot-password", () => {
   it("returns success without leaking whether the email exists", async () => {
     const res = await forgotPasswordHandler(
-      jsonRequest("http://localhost:3000/api/forgot-password", { email: "unknown@example.com" }),
+      jsonRequest("http://localhost:3000/api/forgot-password", {
+        email: "unknown@example.com",
+        turnstileToken: "test-token",
+      }),
     );
     expect(res.status).toBe(200);
     const body = await res.json();

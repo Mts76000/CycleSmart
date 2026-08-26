@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { apiSuccess, apiError, withApiErrorHandling } from "@/lib/api-response";
 import { validateBody } from "@/lib/validation";
 import { forgotPasswordSchema } from "@/lib/validation-schemas";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { requestMetadata } from "@/lib/audit-log";
 
@@ -16,6 +17,11 @@ export const POST = withApiErrorHandling(async (request: Request) => {
 
   const validation = await validateBody(forgotPasswordSchema, request);
   if (!validation.success) return validation.response;
+
+  const turnstileValid = await verifyTurnstileToken(validation.data.turnstileToken, ip);
+  if (!turnstileValid) {
+    return apiError("VALIDATION_ERROR", "Vérification anti-bot échouée.");
+  }
 
   // Always return success regardless of whether the email exists, to avoid leaking
   // which addresses are registered.

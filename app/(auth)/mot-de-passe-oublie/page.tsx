@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { useToast } from "@/components/ui/toast";
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -19,7 +21,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, turnstileToken }),
       });
       const json = await res.json();
 
@@ -68,6 +70,14 @@ export default function ForgotPasswordPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
+        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+          <TurnstileWidget
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+            onVerify={setTurnstileToken}
+          />
+        ) : null}
+
         <Button type="submit" isLoading={isLoading} className="w-full">
           Envoyer le lien
         </Button>

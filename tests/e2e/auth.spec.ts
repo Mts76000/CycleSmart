@@ -29,6 +29,7 @@ test.describe("Inscription, vérification, connexion, déconnexion", () => {
     await verifyEmailDirectly(email);
 
     await page.goto("/connexion");
+    await waitForTurnstileReady(page);
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Mot de passe", { exact: true }).fill("password123");
     await page.getByRole("button", { name: "Se connecter" }).click();
@@ -59,7 +60,9 @@ test.describe("Rate limiting", () => {
   test("bloque la connexion après trop de tentatives échouées", async ({ page }) => {
     await page.context().setExtraHTTPHeaders({ "x-forwarded-for": uniqueIp() });
     const email = uniqueEmail("ratelimit");
+    await mockTurnstile(page);
     await page.goto("/connexion");
+    await waitForTurnstileReady(page);
 
     let sawRateLimited = false;
     for (let i = 0; i < 11 && !sawRateLimited; i++) {
@@ -96,7 +99,9 @@ test.describe("Révocation de session à distance", () => {
 
     const contextA = await browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": ip } });
     const pageA = await contextA.newPage();
+    await mockTurnstile(pageA);
     await pageA.goto("/connexion");
+    await waitForTurnstileReady(pageA);
     await pageA.getByLabel("Email").fill(email);
     await pageA.getByLabel("Mot de passe", { exact: true }).fill("password123");
     await pageA.getByRole("button", { name: "Se connecter" }).click();
@@ -104,7 +109,9 @@ test.describe("Révocation de session à distance", () => {
 
     const contextB = await browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": ip } });
     const pageB = await contextB.newPage();
+    await mockTurnstile(pageB);
     await pageB.goto("/connexion");
+    await waitForTurnstileReady(pageB);
     await pageB.getByLabel("Email").fill(email);
     await pageB.getByLabel("Mot de passe", { exact: true }).fill("password123");
     await pageB.getByRole("button", { name: "Se connecter" }).click();

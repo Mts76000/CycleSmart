@@ -10,7 +10,7 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "CycleSmart",
+    name: env.NEXT_PUBLIC_APP_NAME,
     url: env.NEXT_PUBLIC_APP_URL,
   };
 }

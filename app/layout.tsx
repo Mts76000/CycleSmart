@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
-import { themeInitScript } from "@/lib/theme-script";
 import { ToastProvider } from "@/components/ui/toast";
 import { UmamiScript } from "@/components/umami-script";
 import { canonicalUrl, organizationJsonLd } from "@/lib/seo";
@@ -24,32 +23,33 @@ const outfit = Outfit({
   display: "swap",
 });
 
+const appName = env.NEXT_PUBLIC_APP_NAME;
 const description =
   "Calcule le meilleur moment pour lancer tes machines pendant les heures creuses.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: {
-    default: "CycleSmart",
-    template: "%s | CycleSmart",
+    default: appName,
+    template: `%s | ${appName}`,
   },
   description,
   alternates: { canonical: canonicalUrl("/") },
   openGraph: {
-    title: "CycleSmart",
+    title: appName,
     description,
     url: canonicalUrl("/"),
-    siteName: "CycleSmart",
+    siteName: appName,
     locale: "fr_FR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CycleSmart",
+    title: appName,
     description,
   },
   appleWebApp: {
-    title: "CycleSmart",
+    title: appName,
     statusBarStyle: "default",
   },
   formatDetection: {
@@ -60,29 +60,20 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f7f7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
-  ],
+  themeColor: "#f5f7f7",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="fr"
-      className={`${plusJakarta.variable} ${outfit.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="fr" className={`${plusJakarta.variable} ${outfit.variable} h-full antialiased`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
         />
       </head>
       {/* suppressHydrationWarning: browser extensions (ColorZilla, Grammarly, etc.) inject
-          attributes like cz-shortcut-listen into <body> before React hydrates. Harmless —
-          the <html> suppression above doesn't cover this element too. */}
+          attributes like cz-shortcut-listen into <body> before React hydrates. Harmless. */}
       <body
         className="bg-background text-foreground flex min-h-full flex-col"
         suppressHydrationWarning

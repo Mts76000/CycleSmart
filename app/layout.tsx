@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import { CookieBanner } from "@/components/cookie-banner";
 import ServiceWorkerRegister from "@/components/service-worker-register";
@@ -73,6 +74,11 @@ export default function RootLayout({
         {children}
         <CookieBanner />
         <ServiceWorkerRegister />
+        <Script
+          strategy="beforeInteractive"
+          src="http://umami-587uoxmh6bswbfvi2ihyi2zz.72.61.109.246.sslip.io/script.js"
+          data-website-id="0d9dace8-6c75-4189-aa13-0d3ffd5b0265"
+        />
       </body>
     </html>
   );

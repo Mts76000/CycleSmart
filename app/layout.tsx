@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import { themeInitScript } from "@/lib/theme-script";
 import { ToastProvider } from "@/components/ui/toast";
 import { UmamiScript } from "@/components/umami-script";
@@ -10,6 +10,16 @@ import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// CycleSmart's original display font for headings/big numbers (TimeDial, stats,
+// page titles) — see .font-display in globals.css. Lighter letterforms than
+// Plus Jakarta Sans, which is what made those elements read as "blacker"/denser
+// when this was missing during the migration.
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
   display: "swap",
 });
@@ -60,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="fr"
-      className={`${plusJakarta.variable} h-full antialiased`}
+      className={`${plusJakarta.variable} ${outfit.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

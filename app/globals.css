@@ -176,7 +176,7 @@ select.field-select {
 
 @layer utilities {
   .font-display {
-    font-family: var(--font-sans);
+    font-family: var(--font-outfit), var(--font-sans);
   }
 
   /* Tinted, soft shadows instead of generic flat black/gray drop-shadows. */

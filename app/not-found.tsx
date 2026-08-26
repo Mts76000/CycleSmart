@@ -1,19 +1,32 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
     <main
       id="main-content"
-      className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4 text-center"
+      className="bg-cycle-background flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center"
     >
-      <p className="text-primary text-sm font-medium">404</p>
-      <h1 className="text-foreground text-2xl font-semibold tracking-tight">Page introuvable</h1>
-      <p className="text-muted-foreground max-w-sm text-sm">
-        La page que vous cherchez n&apos;existe pas ou a été déplacée.
+      <Image
+        alt="CycleSmart"
+        className="size-12"
+        height={48}
+        priority
+        src="/logo-icon.png"
+        width={48}
+      />
+      <p className="text-sm font-bold text-emerald-700">404</p>
+      <h1 className="font-display text-2xl font-black tracking-tight text-stone-950">
+        Page introuvable
+      </h1>
+      <p className="max-w-sm text-sm text-stone-600">
+        La page que tu cherches n&apos;existe pas ou a été déplacée.
       </p>
-      <Link href="/">
-        <Button type="button">Retour à l&apos;accueil</Button>
+      <Link
+        className="shadow-cta mt-2 flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 text-sm font-bold text-white transition hover:bg-emerald-800 active:scale-[0.98]"
+        href="/calculer"
+      >
+        Retour à l&apos;accueil
       </Link>
     </main>
   );

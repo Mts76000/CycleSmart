@@ -157,26 +157,16 @@ export function ProfileView() {
           className="pointer-events-none absolute -top-16 -right-14 size-44 rounded-full border-[24px] border-white/10"
           aria-hidden="true"
         />
-        <div className="relative flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-4">
-            <span className="font-display grid size-14 shrink-0 place-items-center rounded-2xl bg-white/15 text-xl font-black sm:size-16">
-              {initialsFrom(session.user.name || session.user.email)}
-            </span>
-            <div className="min-w-0">
-              <p className="font-display truncate text-xl font-bold tracking-tight sm:text-2xl">
-                {session.user.name || "Mon compte"}
-              </p>
-              <p className="mt-1 truncate text-sm text-emerald-50">{session.user.email}</p>
-            </div>
+        <div className="relative flex min-w-0 items-center gap-4">
+          <span className="font-display grid size-14 shrink-0 place-items-center rounded-2xl bg-white/15 text-xl font-black sm:size-16">
+            {initialsFrom(session.user.name || session.user.email)}
+          </span>
+          <div className="min-w-0">
+            <p className="font-display truncate text-xl font-bold tracking-tight sm:text-2xl">
+              {session.user.name || "Mon compte"}
+            </p>
+            <p className="mt-1 truncate text-sm text-emerald-50">{session.user.email}</p>
           </div>
-          <Button
-            type="button"
-            onClick={handleSignOut}
-            className="shrink-0 border border-white/25 bg-white/15 text-white hover:bg-white/25"
-          >
-            <SignOut size={16} aria-hidden="true" />
-            Se déconnecter
-          </Button>
         </div>
 
         <div className="relative mt-5">
@@ -303,6 +293,13 @@ export function ProfileView() {
       >
         <PwaInstallSection />
       </SectionCard>
+
+      <section className="surface-card p-5">
+        <Button type="button" variant="secondary" onClick={handleSignOut} className="w-full">
+          <SignOut size={16} aria-hidden="true" />
+          Se déconnecter
+        </Button>
+      </section>
 
       <section className="border-destructive/30 bg-destructive/5 rounded-xl border p-6">
         <div className="mb-5 flex items-start gap-3">

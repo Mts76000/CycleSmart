@@ -44,7 +44,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push(searchParams.get("redirectTo") ?? "/profil");
+      router.push(searchParams.get("redirectTo") ?? "/calculer");
       router.refresh();
     } finally {
       setIsLoading(false);
@@ -52,7 +52,7 @@ export default function LoginPage() {
   }
 
   async function handleGoogleSignIn() {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/profil" });
+    await authClient.signIn.social({ provider: "google", callbackURL: "/calculer" });
   }
 
   return (

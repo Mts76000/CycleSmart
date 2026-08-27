@@ -58,7 +58,7 @@ export default function RegisterPage() {
   }
 
   async function handleGoogleSignIn() {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/profil" });
+    await authClient.signIn.social({ provider: "google", callbackURL: "/calculer" });
   }
 
   return (

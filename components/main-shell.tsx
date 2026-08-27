@@ -59,14 +59,14 @@ export function MainShell({
 
             <section
               className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-8 sm:px-6 md:pt-0 md:pb-10 ${
-                isAuthenticated ? "pb-28 md:px-0" : "md:px-8"
+                isAuthenticated ? "md:px-0" : "md:px-8"
               }`}
             >
               <CycleGuard>{children}</CycleGuard>
             </section>
-          </div>
 
-          {isAuthenticated && <MobileDock pathname={pathname} />}
+            {isAuthenticated && <MobileDock pathname={pathname} />}
+          </div>
         </div>
 
         {!isAuthenticated && <Footer />}
@@ -246,8 +246,13 @@ function RailItem({
 
 function MobileDock({ pathname }: { pathname: string }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full pt-2 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden">
-      <div className="surface-card mx-auto flex max-w-[420px] items-end justify-between px-3 pt-3 pb-2">
+    // sticky, not fixed: mobile browsers (address bar shown/hidden) resize the visual
+    // viewport dynamically, and `position: fixed` bottom bars can end up misaligned with
+    // the true visible bottom edge until the browser "settles". `sticky` is laid out in
+    // the normal flow and stuck against the actual scroll viewport, so it stays flush with
+    // the true bottom in both the browser and the installed PWA.
+    <nav className="shadow-card sticky bottom-0 z-30 w-full bg-white pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden">
+      <div className="flex items-end justify-between px-3 pt-3 pb-2">
         {tabs.map((tab) => (
           <DockItem
             active={pathname === tab.href}

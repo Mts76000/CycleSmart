@@ -25,7 +25,7 @@ function isIos() {
   return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 }
 
-export function PwaInstallPrompt() {
+export function PwaInstallPrompt({ hasBottomDock = false }: { hasBottomDock?: boolean }) {
   const [deferredEvent, setDeferredEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [platform, setPlatform] = useState<"android" | "ios" | null>(null);
@@ -94,7 +94,11 @@ export function PwaInstallPrompt() {
   }
 
   return (
-    <div className="shadow-card fixed inset-x-4 bottom-24 z-40 mx-auto max-w-sm rounded-[24px] bg-white p-4 md:inset-x-auto md:right-auto md:bottom-6 md:left-6">
+    <div
+      className={`shadow-card fixed inset-x-4 z-40 mx-auto max-w-sm rounded-[24px] bg-white p-4 md:inset-x-auto md:right-auto md:bottom-6 md:left-6 ${
+        hasBottomDock ? "bottom-24" : "bottom-6"
+      }`}
+    >
       <div className="flex items-start gap-3">
         <Image
           alt="CycleSmart"

@@ -1,9 +1,20 @@
 import type { NextConfig } from "next";
 
+// Self-hosted Umami: derive its origin from the script URL so the CSP allows whatever
+// instance/domain this deployment points at, instead of hardcoding a fixed host.
+function umamiOrigin(): string | null {
+  if (!process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL) return null;
+  try {
+    return new URL(process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL).origin;
+  } catch {
+    return null;
+  }
+}
+
 // CSP whitelist rationale:
 // - 'self' + inline styles/scripts: Next.js/Tailwind require these for hydration + the
 //   theme-init script in app/layout.tsx.
-// - cloud.umami.is: Umami Cloud analytics script (lib/umami.ts).
+// - Umami origin: self-hosted analytics script (lib/umami.ts), domain varies per deployment.
 // - challenges.cloudflare.com: Turnstile widget + its iframe challenge.
 // - accounts.google.com: Google OAuth (better-auth socialProviders.google).
 // - 'unsafe-eval' in script-src: non-production only. React dev mode (`next dev`, which
@@ -14,11 +25,13 @@ const scriptSrc = [
   "'self'",
   "'unsafe-inline'",
   process.env.NODE_ENV !== "production" ? "'unsafe-eval'" : null,
-  "https://cloud.umami.is",
+  umamiOrigin(),
   "https://challenges.cloudflare.com",
 ]
   .filter(Boolean)
   .join(" ");
+
+const connectSrc = ["'self'", umamiOrigin()].filter(Boolean).join(" ");
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -26,7 +39,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://lh3.googleusercontent.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://cloud.umami.is",
+  `connect-src ${connectSrc}`,
   "frame-src https://challenges.cloudflare.com https://accounts.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",

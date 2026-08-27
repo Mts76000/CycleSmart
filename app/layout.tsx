@@ -61,6 +61,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#f5f7f7",
+  // Without this, mobile browsers (address bar visible, not the standalone PWA) don't
+  // report env(safe-area-inset-*) reliably, which is what the fixed bottom nav relies
+  // on to sit flush against the true bottom edge instead of leaving a gap above it.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

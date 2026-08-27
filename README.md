@@ -1,11 +1,28 @@
 # CycleSmart
 
-Calcule le meilleur moment pour lancer tes machines (lave-linge, lave-vaisselle...) pendant
-les heures creuses. Bâti sur le socle [starter-nextjs](https://github.com/Mts76000/starter-nextjs) :
-authentification, format API standardisé, transactions, audit log, RGPD, analytics, email
-transactionnel, anti-bot, sécurité HTTP, SEO/PWA, tests, CI/CD, qualité/DX. Voir
-[AGENTS.md](./AGENTS.md) pour les principes de conception détaillés du socle (lu
-automatiquement par les agents IA).
+Calculateur d'heures creuses : indique la durée de ton cycle (lave-linge, lave-vaisselle...) et
+tes plages d'heures creuses, CycleSmart te dit immédiatement le meilleur moment pour lancer ta
+machine — en local (invité) ou synchronisé sur tous tes appareils une fois connecté.
+
+Application installable en PWA (icône sur l'écran d'accueil, mode standalone).
+
+## Fonctionnalités
+
+- **Calculateur** (`/calculer`) : durée du cycle + plages d'heures creuses → prochain créneau
+  optimal (plusieurs modes de calcul).
+- **Créneaux** (`/creneaux`) : gestion des plages d'heures creuses.
+- **Machines** (`/machines`) : appareils enregistrés (durée de cycle par défaut).
+- **Profil** (`/profil`) : compte, synchronisation, session.
+- Mode invité (réglages en local storage) ou compte (email/password ou Google), avec
+  synchronisation entre appareils une fois connecté.
+- Bandeau d'installation PWA (Android : `beforeinstallprompt` ; iOS : instructions
+  "Partager → Sur l'écran d'accueil"), affiché après quelques visites (voir
+  `components/pwa-install-prompt.tsx`).
+
+Bâti sur le socle [starter-nextjs](https://github.com/Mts76000/starter-nextjs) : authentification,
+format API standardisé, transactions, audit log, RGPD, analytics, email transactionnel, anti-bot,
+sécurité HTTP, SEO/PWA, tests, CI/CD, qualité/DX. Voir [AGENTS.md](./AGENTS.md) pour les principes
+de conception détaillés du socle (lu automatiquement par les agents IA).
 
 ## Démarrage
 
@@ -23,13 +40,15 @@ automatiquement par les agents IA).
 | `DATABASE_URL`                                            | Postgres local (Docker, voir ci-dessous) ou Coolify en prod                                                                           |
 | `BETTER_AUTH_SECRET`                                      | `openssl rand -base64 32`                                                                                                             |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`               | [Google Cloud Console → Identifiants OAuth](https://console.cloud.google.com/apis/credentials)                                        |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`                            | Dashboard Umami self-hosted (le domaine est en dur dans `lib/umami.ts`)                                                               |
+| `NEXT_PUBLIC_UMAMI_SCRIPT_URL`                            | URL complète du script de ton instance Umami self-hosted (ex : `https://umami.example.com/script.js`)                                 |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`                            | Dashboard Umami self-hosted                                                                                                           |
 | `RESEND_API_KEY`                                          | [resend.com/api-keys](https://resend.com/api-keys)                                                                                    |
 | `CONTACT_EMAIL`                                           | Adresse admin (from + to des notifications)                                                                                           |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | [Cloudflare Dashboard → Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile)                                               |
 | `CRON_SECRET`                                             | `openssl rand -hex 32`                                                                                                                |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`     | Optionnel en dev. Requis en prod pour un rate limiting partagé entre instances (sinon fallback mémoire, non fiable en multi-instance) |
 | `NEXT_PUBLIC_IS_PREVIEW`                                  | À mettre à `true` uniquement sur l'environnement preview/staging Coolify                                                              |
+| `NEXT_PUBLIC_BUYMEACOFFEE_SLUG`                           | Optionnel. Ton slug sur buymeacoffee.com, affiche un bouton de soutien sur le profil                                                  |
 
 `lib/env.ts` valide toutes ces variables au démarrage (Zod) et plante immédiatement si une
 variable obligatoire manque.
@@ -89,7 +108,7 @@ npm run db:reset      # reset complet (drop + migrate + seed), à relancer à vo
 npm install
 docker compose up -d postgres postgres-test
 cp .env.example .env.local && cp .env.test.example .env.test
-# éditer .env.local avec vos vraies clés (Google OAuth, Resend, Turnstile...)
+# éditer .env.local avec vos vraies clés (Google OAuth, Resend, Turnstile, Umami...)
 npm run db:migrate
 npm run db:seed
 npm run dev
@@ -115,9 +134,9 @@ npm run check   # format:check → lint → typecheck → test
 
 - `Dockerfile` multi-stage (build + image de production légère, `output: "standalone"`).
 - `GET /api/health` vérifie l'app + la connexion BDD (utilisé par le `HEALTHCHECK` Docker).
-- Les migrations ne sont pas exécutées automatiquement au démarrage du conteneur : lancez
-  `npm run db:migrate` comme commande de pré-déploiement Coolify (ou manuellement, ciblant le
-  stage `builder` de l'image qui contient les devDependencies nécessaires à `tsx`/`drizzle-kit`).
+- Les migrations Drizzle s'exécutent automatiquement au démarrage du conteneur
+  (`drizzle/migrate-prod.mjs`, avant `node server.js` dans le `CMD` du Dockerfile) : chaque
+  déploiement converge le schéma prod sans étape manuelle.
 - **Environnement preview/staging** : déployer une branche dédiée sur un service Coolify
   séparé, avec `NEXT_PUBLIC_IS_PREVIEW=true` — `app/robots.ts` bloque alors totalement
   l'indexation sur cet environnement.

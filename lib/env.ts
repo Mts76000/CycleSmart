@@ -21,6 +21,8 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
 
   NEXT_PUBLIC_UMAMI_WEBSITE_ID: optional(z.string().min(1)),
+  // Full script URL of your self-hosted Umami instance (e.g. https://umami.example.com/script.js).
+  NEXT_PUBLIC_UMAMI_SCRIPT_URL: optional(z.url()),
 
   RESEND_API_KEY: z.string().min(1),
   CONTACT_EMAIL: z.email(),

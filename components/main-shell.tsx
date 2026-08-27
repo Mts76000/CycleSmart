@@ -71,7 +71,7 @@ export function MainShell({
 
         {!isAuthenticated && <Footer />}
       </main>
-      {isAuthenticated && <PwaInstallPrompt />}
+      <PwaInstallPrompt hasBottomDock={isAuthenticated} />
     </CycleProvider>
   );
 }

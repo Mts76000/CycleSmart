@@ -1,4 +1,4 @@
-// Umami host is fixed on purpose (only the website ID varies per project/environment).
-// Umami Cloud serves its tracker from cloud.umami.is (analytics.umami.is is the older/
-// self-hosted-era domain and no longer what Umami Cloud accounts use).
-export const UMAMI_SCRIPT_URL = "https://cloud.umami.is/script.js";
+// Self-hosted Umami: the tracker script lives on your own instance's domain, so its full
+// URL (e.g. https://umami.example.com/script.js) is project-specific config, not a fixed
+// constant — see NEXT_PUBLIC_UMAMI_SCRIPT_URL in .env.example.
+export const UMAMI_SCRIPT_URL = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL;

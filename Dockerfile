@@ -19,6 +19,7 @@ COPY . .
 # Build-time env vars: only what's needed to satisfy lib/env.ts during `next build`.
 # Real secrets are injected at runtime by Coolify, not baked into the image.
 ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_UMAMI_SCRIPT_URL
 ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ARG NEXT_PUBLIC_IS_PREVIEW

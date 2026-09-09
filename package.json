@@ -30,7 +30,7 @@
     "@phosphor-icons/react": "^2.1.10",
     "@react-email/components": "^1.0.12",
     "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.38.3",
+    "@upstash/redis": "^1.38.4",
     "better-auth": "^1.7.1",
     "drizzle-orm": "^0.45.2",
     "file-type": "^22.0.2",

@@ -372,26 +372,51 @@ function mergeStoredMachines(storedMachines: Machine[] | undefined) {
     : defaultMachines;
   const builtInMachines = builtInSource.map((defaultMachine) => {
     const storedMachine = storedById.get(defaultMachine.id);
+    const defaultProgramIds = new Set(defaultMachine.programs.map((program) => program.id));
+    // Programs the user added to this built-in machine (e.g. a custom cycle on "Lave-linge")
+    // aren't in defaultMachine.programs, so they must be carried over separately below -
+    // otherwise every reload silently drops any program that isn't one of the two defaults.
+    const extraPrograms = (storedMachine?.programs ?? [])
+      .filter(
+        (program) =>
+          program &&
+          typeof program.id === "string" &&
+          typeof program.name === "string" &&
+          !defaultProgramIds.has(program.id),
+      )
+      .map((program) => ({
+        ...program,
+        duration: normalizeDuration(program.duration),
+        delayStep: normalizeDelayStep(program.delayStep),
+        delayMode:
+          program.delayMode === "depart" || program.delayMode === "fin"
+            ? program.delayMode
+            : ("depart" as ProgramDelayMode),
+      }));
 
     return {
       ...defaultMachine,
       name: typeof storedMachine?.name === "string" ? storedMachine.name : defaultMachine.name,
-      programs: defaultMachine.programs.map((defaultProgram) => {
-        const storedProgram = storedMachine?.programs?.find((p) => p.id === defaultProgram.id);
-        return {
-          ...defaultProgram,
-          name: typeof storedProgram?.name === "string" ? storedProgram.name : defaultProgram.name,
-          duration:
-            typeof storedProgram?.duration === "number"
-              ? normalizeDuration(storedProgram.duration)
-              : defaultProgram.duration,
-          delayStep: normalizeDelayStep(storedProgram?.delayStep),
-          delayMode:
-            storedProgram?.delayMode === "depart" || storedProgram?.delayMode === "fin"
-              ? storedProgram.delayMode
-              : defaultProgram.delayMode,
-        };
-      }),
+      programs: [
+        ...defaultMachine.programs.map((defaultProgram) => {
+          const storedProgram = storedMachine?.programs?.find((p) => p.id === defaultProgram.id);
+          return {
+            ...defaultProgram,
+            name:
+              typeof storedProgram?.name === "string" ? storedProgram.name : defaultProgram.name,
+            duration:
+              typeof storedProgram?.duration === "number"
+                ? normalizeDuration(storedProgram.duration)
+                : defaultProgram.duration,
+            delayStep: normalizeDelayStep(storedProgram?.delayStep),
+            delayMode:
+              storedProgram?.delayMode === "depart" || storedProgram?.delayMode === "fin"
+                ? storedProgram.delayMode
+                : defaultProgram.delayMode,
+          };
+        }),
+        ...extraPrograms,
+      ],
     };
   });
 

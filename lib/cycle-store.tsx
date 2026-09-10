@@ -601,15 +601,9 @@ export function CycleProvider({
       }),
       signal: controller.signal,
     })
-      .then((response) => {
-        if (response.status === 401) {
-          return { local: true };
-        }
-
-        return response.json();
-      })
-      .then((json: { success?: boolean; local?: boolean }) => {
-        setSyncStatus(json.local ? "local" : json.success ? "saved" : "error");
+      .then((response) => response.json())
+      .then((json: { success?: boolean }) => {
+        setSyncStatus(json.success ? "saved" : "error");
       })
       .catch((error) => {
         if ((error as Error).name !== "AbortError") {
@@ -646,15 +640,9 @@ export function CycleProvider({
       body: JSON.stringify({ slots }),
       signal: controller.signal,
     })
-      .then((response) => {
-        if (response.status === 401) {
-          return { local: true };
-        }
-
-        return response.json();
-      })
-      .then((json: { success?: boolean; local?: boolean }) => {
-        setSyncStatus(json.local ? "local" : json.success ? "saved" : "error");
+      .then((response) => response.json())
+      .then((json: { success?: boolean }) => {
+        setSyncStatus(json.success ? "saved" : "error");
       })
       .catch((error) => {
         if ((error as Error).name !== "AbortError") {

@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -583,38 +584,62 @@ export function CycleProvider({
     );
   }, [machines, duration, calculationMode, hydrated, selectedProgramId]);
 
+  // Sends the latest payload for a resource to the server, one request at a time. Firing a
+  // PUT per keystroke with no debounce meant two rapid edits (e.g. adding a machine, then
+  // immediately adding a program to it) could have their requests race on the server and
+  // complete out of order, silently overwriting the newer state with the older one. Queuing
+  // to "at most one in-flight request, always carrying the latest state" makes that
+  // impossible: requests are never concurrent, so they can never complete out of order.
+  const syncQueueRef = useRef<Record<"settings" | "slots", { sending: boolean; pending: unknown }>>(
+    {
+      settings: { sending: false, pending: null },
+      slots: { sending: false, pending: null },
+    },
+  );
+
+  const syncResource = useCallback(
+    (resource: "settings" | "slots", url: string, payload: unknown) => {
+      const state = syncQueueRef.current[resource];
+      state.pending = payload;
+      if (state.sending) {
+        return;
+      }
+
+      void (async () => {
+        state.sending = true;
+        while (state.pending) {
+          const body = state.pending;
+          state.pending = null;
+          setSyncStatus("saving");
+          try {
+            const response = await fetch(url, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const json: { success?: boolean } = await response.json();
+            setSyncStatus(json.success ? "saved" : "error");
+          } catch {
+            setSyncStatus("error");
+          }
+        }
+        state.sending = false;
+      })();
+    },
+    [],
+  );
+
   useEffect(() => {
     if (!hydrated || !remoteHydrated || !isAuthenticated) {
       return;
     }
 
-    const controller = new AbortController();
-    const statusTimer = window.setTimeout(() => setSyncStatus("saving"), 0);
-    fetch("/api/settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        machines,
-        duration,
-        calculationMode,
-        selectedProgramId,
-      }),
-      signal: controller.signal,
-    })
-      .then((response) => response.json())
-      .then((json: { success?: boolean }) => {
-        setSyncStatus(json.success ? "saved" : "error");
-      })
-      .catch((error) => {
-        if ((error as Error).name !== "AbortError") {
-          setSyncStatus("error");
-        }
-      });
-
-    return () => {
-      window.clearTimeout(statusTimer);
-      controller.abort();
-    };
+    syncResource("settings", "/api/settings", {
+      machines,
+      duration,
+      calculationMode,
+      selectedProgramId,
+    });
   }, [
     machines,
     duration,
@@ -623,6 +648,7 @@ export function CycleProvider({
     isAuthenticated,
     remoteHydrated,
     selectedProgramId,
+    syncResource,
   ]);
 
   useEffect(() => {
@@ -631,30 +657,8 @@ export function CycleProvider({
     }
 
     window.localStorage.setItem(storageKey, JSON.stringify(slots));
-
-    const controller = new AbortController();
-    const statusTimer = window.setTimeout(() => setSyncStatus("saving"), 0);
-    fetch("/api/slots", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slots }),
-      signal: controller.signal,
-    })
-      .then((response) => response.json())
-      .then((json: { success?: boolean }) => {
-        setSyncStatus(json.success ? "saved" : "error");
-      })
-      .catch((error) => {
-        if ((error as Error).name !== "AbortError") {
-          setSyncStatus("error");
-        }
-      });
-
-    return () => {
-      window.clearTimeout(statusTimer);
-      controller.abort();
-    };
-  }, [hydrated, isAuthenticated, remoteHydrated, slots]);
+    syncResource("slots", "/api/slots", { slots });
+  }, [hydrated, isAuthenticated, remoteHydrated, slots, syncResource]);
 
   const selectedProgram = getAllPrograms(machines).find(
     (program) => program.id === selectedProgramId,

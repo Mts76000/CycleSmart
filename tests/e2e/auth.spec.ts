@@ -34,7 +34,9 @@ test.describe("Inscription, vérification, connexion, déconnexion", () => {
     await page.getByLabel("Mot de passe", { exact: true }).fill("password123");
     await page.getByRole("button", { name: "Se connecter" }).click();
 
-    await expect(page).toHaveURL(/\/profil/);
+    await expect(page).toHaveURL(/\/calculer/);
+
+    await page.goto("/profil");
     await expect(page.getByText(email)).toBeVisible();
 
     await page.getByRole("button", { name: "Se déconnecter" }).click();
@@ -105,7 +107,7 @@ test.describe("Révocation de session à distance", () => {
     await pageA.getByLabel("Email").fill(email);
     await pageA.getByLabel("Mot de passe", { exact: true }).fill("password123");
     await pageA.getByRole("button", { name: "Se connecter" }).click();
-    await expect(pageA).toHaveURL(/\/profil/);
+    await expect(pageA).toHaveURL(/\/calculer/);
 
     const contextB = await browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": ip } });
     const pageB = await contextB.newPage();
@@ -115,10 +117,10 @@ test.describe("Révocation de session à distance", () => {
     await pageB.getByLabel("Email").fill(email);
     await pageB.getByLabel("Mot de passe", { exact: true }).fill("password123");
     await pageB.getByRole("button", { name: "Se connecter" }).click();
-    await expect(pageB).toHaveURL(/\/profil/);
+    await expect(pageB).toHaveURL(/\/calculer/);
 
     // From session A, revoke every other session in the list.
-    await pageA.reload();
+    await pageA.goto("/profil");
     const revokeButtons = pageA.getByRole("button", { name: "Révoquer cette session" });
     await expect(revokeButtons.first()).toBeVisible();
     const revokeResponse = pageA.waitForResponse("**/api/auth/revoke-session");

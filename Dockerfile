@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:26-alpine AS base
+FROM node:24-alpine AS base
 
 # --- Dependencies ---
 FROM base AS deps
@@ -16,13 +16,19 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Build-time env vars: only what's needed to satisfy lib/env.ts during `next build`.
-# Real secrets are injected at runtime by Coolify, not baked into the image.
+# NEXT_PUBLIC_* values are inlined into the client bundle at build time: any of them
+# missing here is silently undefined in the browser in production (e.g. the Buy Me a
+# Coffee button or Umami never show up). Declare every one of them.
+# Note: `next build` also imports lib/env.ts, which validates the server-side vars too —
+# Coolify injects the vars marked "Build Variable" as build args for that step; secrets
+# are only consumed at runtime and are never written into the final image layers.
 ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_APP_NAME
 ARG NEXT_PUBLIC_UMAMI_SCRIPT_URL
 ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ARG NEXT_PUBLIC_IS_PREVIEW
+ARG NEXT_PUBLIC_BUYMEACOFFEE_SLUG
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

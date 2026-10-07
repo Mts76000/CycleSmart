@@ -22,17 +22,23 @@ export const DELETE = withApiErrorHandling(async (request: Request) => {
   const session = await requireAuth();
   const { ip, userAgent } = requestMetadata(request);
 
-  await logAuditEvent({
-    userId: session.user.id,
-    action: "user.delete_account",
-    entityType: "user",
-    entityId: session.user.id,
-    metadata: { email: session.user.email },
-    ip,
-    userAgent,
+  // One transaction: the audit entry never claims a deletion that didn't happen, and the
+  // deletion never happens without its audit entry.
+  await db.transaction(async (tx) => {
+    await logAuditEvent(
+      {
+        userId: session.user.id,
+        action: "user.delete_account",
+        entityType: "user",
+        entityId: session.user.id,
+        metadata: { email: session.user.email },
+        ip,
+        userAgent,
+      },
+      tx,
+    );
+    await tx.delete(user).where(eq(user.id, session.user.id));
   });
-
-  await db.delete(user).where(eq(user.id, session.user.id));
 
   return apiSuccess(null, "Compte supprimé.");
 });

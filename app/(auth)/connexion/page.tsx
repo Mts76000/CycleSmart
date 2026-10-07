@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { GoogleButton } from "@/components/ui/google-button";
 import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { authClient } from "@/lib/auth-client";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 import { useToast } from "@/components/ui/toast";
 
 export default function LoginPage() {
@@ -44,7 +45,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push(searchParams.get("redirectTo") ?? "/calculer");
+      router.push(safeRedirectPath(searchParams.get("redirectTo"), "/calculer"));
       router.refresh();
     } finally {
       setIsLoading(false);

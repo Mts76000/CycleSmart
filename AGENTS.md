@@ -43,8 +43,9 @@ doit être enveloppée par `withApiErrorHandling()`.
 - Pagination : `parsePaginationParams()` / `toPaginated()` — `lib/pagination.ts` +
   `<Pagination />` dans `components/ui/`.
 - Opérations à écritures multiples et dépendantes : utiliser `db.transaction(async (tx) => {...})`
-  (Drizzle natif, voir l'inscription dans `lib/auth.ts`/`app/api/register/route.ts` comme
-  référence) — jamais de laisser une opération partiellement appliquée.
+  (Drizzle natif, voir la suppression de compte dans `app/api/account/route.ts` comme
+  référence : `logAuditEvent(entry, tx)` écrit l'audit dans la même transaction) — jamais
+  de laisser une opération partiellement appliquée.
 - **Soft delete vs hard delete : jamais un défaut automatique.** Chaque nouvelle entité doit
   trancher explicitement. Les tables techniques (sessions, tokens, rate limits, logs, audit
   logs, tables de liaison) sont toujours en suppression physique. Le compte utilisateur

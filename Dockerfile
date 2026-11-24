@@ -19,16 +19,25 @@ COPY . .
 # NEXT_PUBLIC_* values are inlined into the client bundle at build time: any of them
 # missing here is silently undefined in the browser in production (e.g. the Buy Me a
 # Coffee button or Umami never show up). Declare every one of them.
-# Note: `next build` also imports lib/env.ts, which validates the server-side vars too —
-# Coolify injects the vars marked "Build Variable" as build args for that step; secrets
-# are only consumed at runtime and are never written into the final image layers.
-ARG NEXT_PUBLIC_APP_URL
-ARG NEXT_PUBLIC_APP_NAME
+# Note: `next build` also imports lib/env.ts, which validates the server-side vars too.
+# Server secrets are NOT passed to the build (Coolify: "Available at Buildtime" off), so
+# they get placeholder values below: useless during the build, injected for real at runtime.
+# lib/env.ts refuses to start in production if a placeholder survived (assertNoBuildPlaceholders).
+ARG NEXT_PUBLIC_APP_URL=http://build-placeholder.invalid
+ARG NEXT_PUBLIC_APP_NAME=CycleSmart
 ARG NEXT_PUBLIC_UMAMI_SCRIPT_URL
 ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
-ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=build-placeholder
 ARG NEXT_PUBLIC_IS_PREVIEW
 ARG NEXT_PUBLIC_BUYMEACOFFEE_SLUG
+ARG DATABASE_URL=postgres://build-placeholder@build-placeholder.invalid/build-placeholder
+ARG BETTER_AUTH_SECRET=build-placeholder-secret-at-least-32-characters
+ARG GOOGLE_CLIENT_ID=build-placeholder
+ARG GOOGLE_CLIENT_SECRET=build-placeholder
+ARG RESEND_API_KEY=build-placeholder
+ARG CONTACT_EMAIL=build-placeholder@build-placeholder.invalid
+ARG TURNSTILE_SECRET_KEY=build-placeholder
+ARG CRON_SECRET=build-placeholder-cron-secret
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
